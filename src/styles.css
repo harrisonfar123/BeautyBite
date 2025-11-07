@@ -6,25 +6,34 @@
 }
 
 :root {
-    --medical-blue: #0066CC;
-    --light-blue: #4DA6FF;
-    --dark-blue: #003D7A;
+    --primary-blue: #0066CC;
+    --secondary-blue: #4DA6FF;
+    --accent-teal: #14B8A6;
+    --accent-purple: #8B5CF6;
+    --accent-pink: #EC4899;
+    --accent-green: #10B981;
+    --dark-blue: #1E3A8A;
+    --light-blue: #DBEAFE;
     --white: #FFFFFF;
-    --light-gray: #F8F9FA;
-    --dark-gray: #2C3E50;
-    --border-gray: #E9ECEF;
-    --accent-green: #28A745;
-    --accent-red: #DC3545;
-    --accent-purple: #6F42C1;
-    --accent-orange: #FD7E14;
-    --gradient-1: linear-gradient(135deg, var(--medical-blue) 0%, var(--light-blue) 100%);
-    --gradient-2: linear-gradient(135deg, var(--accent-green) 0%, var(--light-blue) 100%);
-    --gradient-3: linear-gradient(135deg, var(--accent-purple) 0%, var(--medical-blue) 100%);
-    --shadow-1: 0 10px 30px rgba(0, 102, 204, 0.1);
-    --shadow-2: 0 20px 40px rgba(0, 102, 204, 0.15);
+    --light-gray: #F8FAFC;
+    --medium-gray: #64748B;
+    --dark-gray: #1E293B;
+    --border-gray: #E2E8F0;
+    --gradient-1: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    --gradient-2: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-purple) 100%);
+    --gradient-3: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-pink) 100%);
+    --gradient-4: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-teal) 100%);
+    --gradient-5: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-green) 100%);
+    --gradient-6: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    --shadow-1: 0 10px 30px rgba(0, 102, 204, 0.15);
+    --shadow-2: 0 20px 40px rgba(0, 102, 204, 0.2);
     --shadow-3: 0 4px 15px rgba(0, 0, 0, 0.1);
-    --border-radius: 15px;
-    --transition: all 0.3s ease;
+    --shadow-4: 0 15px 35px rgba(0, 0, 0, 0.1);
+    --border-radius: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --section-spacing: 100px;
+    --card-spacing: 2rem;
+    --text-spacing: 1.5rem;
 }
 
 html {
@@ -36,6 +45,52 @@ body {
     line-height: 1.7;
     color: var(--dark-gray);
     background-color: var(--white);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+
+/* Enhanced Typography Hierarchy */
+h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--text-spacing);
+}
+
+h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+}
+
+p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: var(--text-spacing);
+    color: var(--medium-gray);
+}
+
+small {
+    font-size: 0.875rem;
+    color: var(--medium-gray);
 }
 
 .container {
@@ -78,9 +133,13 @@ header {
 header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--medical-blue);
+    color: var(--primary-blue);
     letter-spacing: -0.5px;
     margin: 0;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 header nav ul {
@@ -90,15 +149,18 @@ header nav ul {
 }
 
 header nav ul li a {
-    color: var(--dark-gray);
+    color: var(--medium-gray);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
     position: relative;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
 }
 
 header nav ul li a:hover {
-    color: var(--medical-blue);
+    color: var(--primary-blue);
+    transform: translateY(-1px);
 }
 
 header nav ul li a::after {
@@ -108,7 +170,7 @@ header nav ul li a::after {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--medical-blue);
+    background: var(--primary-blue);
     transition: width 0.3s ease;
 }
 
@@ -118,9 +180,9 @@ header nav ul li a:hover::after {
 
 /* Hero Styles */
 .hero {
-    background: var(--gradient-1);
+    background: var(--gradient-4);
     color: var(--white);
-    padding: 150px 0 100px;
+    padding: 180px 0 120px;
     margin-top: 70px;
     position: relative;
     overflow: hidden;
@@ -133,8 +195,25 @@ header nav ul li a:hover::after {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    opacity: 0.3;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="hero-grid" width="15" height="15" patternUnits="userSpaceOnUse"><path d="M 15 0 L 0 0 0 15" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/></pattern></defs><rect width="100" height="100" fill="url(%23hero-grid)"/></svg>');
+    opacity: 0.4;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.1); opacity: 0.1; }
 }
 
 .hero-content {
@@ -151,24 +230,27 @@ header nav ul li a:hover::after {
 }
 
 .hero h2 {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
     letter-spacing: -1px;
     line-height: 1.2;
+    position: relative;
+    z-index: 1;
 }
 
 .hero p {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin-bottom: 2.5rem;
-    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.95);
     max-width: 500px;
     line-height: 1.6;
+    font-weight: 400;
 }
 
 .hero .btn {
     background: var(--white);
-    color: var(--medical-blue);
+    color: var(--white);
     padding: 15px 35px;
     border: none;
     border-radius: 50px;
@@ -181,6 +263,7 @@ header nav ul li a:hover::after {
     display: inline-block;
     position: relative;
     overflow: hidden;
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .hero .btn::before {
@@ -224,32 +307,56 @@ header nav ul li a:hover::after {
 
 /* Modern About Styles */
 .about {
-    padding: 80px 0;
+    padding: var(--section-spacing) 0;
     background: var(--light-gray);
+    position: relative;
+}
+
+.about::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-teal), transparent);
+    opacity: 0.3;
 }
 
 .section-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
+    position: relative;
+}
+
+.section-header .subtitle {
+    font-size: 1.3rem;
+    color: var(--medium-gray);
+    margin-bottom: 2rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .section-header h2 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     font-weight: 700;
     color: var(--dark-gray);
     margin-bottom: 1rem;
     position: relative;
+    letter-spacing: -0.5px;
 }
 
 .section-header h2::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: var(--medical-blue);
+    width: 80px;
+    height: 4px;
+    background: var(--gradient-2);
     border-radius: 2px;
 }
 
@@ -258,13 +365,31 @@ header nav ul li a:hover::after {
     margin: 0 auto;
     text-align: center;
     font-size: 1.1rem;
-    line-height: 1.8;
+    line-height: 1.7;
+    color: var(--medium-gray);
+}
+
+.about-content p {
+    margin-bottom: 1.5rem;
+    font-weight: 400;
 }
 
 /* Technology Section Styles */
 .technology {
-    padding: 80px 0;
+    padding: var(--section-spacing) 0;
     background: var(--white);
+    position: relative;
+}
+
+.technology::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-blue), transparent);
+    opacity: 0.2;
 }
 
 .technology .section-header h2 {
@@ -273,15 +398,15 @@ header nav ul li a:hover::after {
 
 .tech-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--card-spacing);
+    margin-top: 5rem;
 }
 
 .tech-card {
     background: var(--white);
     border-radius: var(--border-radius);
-    padding: 2.5rem;
+    padding: 3.5rem 2.5rem;
     box-shadow: var(--shadow-1);
     transition: var(--transition);
     border: 1px solid var(--border-gray);
@@ -291,6 +416,13 @@ header nav ul li a:hover::after {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-height: 400px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.tech-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: var(--shadow-2);
 }
 
 .tech-card::before {
@@ -303,41 +435,65 @@ header nav ul li a:hover::after {
     background: var(--gradient-1);
 }
 
+.tech-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 40px 40px 0;
+    border-color: transparent var(--accent-teal) transparent transparent;
+    opacity: 0.1;
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover::after {
+    width: 100%;
+    height: 100%;
+    border-width: 0 0 100px 100px;
+    border-color: transparent transparent var(--accent-teal) transparent;
+}
+
 .tech-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-2);
 }
 
 .tech-icon {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     background: var(--gradient-1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     transition: var(--transition);
-    box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.25);
+    position: relative;
+    z-index: 1;
 }
 
 .tech-card:hover .tech-icon {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 12px 35px rgba(0, 102, 204, 0.35);
 }
 
 .tech-icon svg {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     color: var(--white);
 }
 
 .tech-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 1rem;
     position: relative;
+    letter-spacing: -0.3px;
 }
 
 .tech-card h3::after {
@@ -353,11 +509,11 @@ header nav ul li a:hover::after {
 }
 
 .tech-card p {
-    color: var(--dark-gray);
+    color: var(--medium-gray);
     margin-bottom: 1.5rem;
-    opacity: 0.8;
     line-height: 1.6;
     max-width: 320px;
+    font-weight: 400;
 }
 
 .feature-badges {
@@ -370,7 +526,7 @@ header nav ul li a:hover::after {
 
 /* Clinical Applications Styles */
 .clinical-applications {
-    padding: 80px 0;
+    padding: var(--section-spacing) 0;
     background: var(--light-gray);
 }
 
@@ -380,15 +536,15 @@ header nav ul li a:hover::after {
 
 .applications-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--card-spacing);
+    margin-top: 5rem;
 }
 
 .application-card {
     background: var(--white);
     border-radius: var(--border-radius);
-    padding: 2.5rem;
+    padding: 3rem 2rem;
     box-shadow: var(--shadow-1);
     transition: var(--transition);
     border: 1px solid var(--border-gray);
@@ -398,6 +554,13 @@ header nav ul li a:hover::after {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-height: 380px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.application-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: var(--shadow-2);
 }
 
 .application-card::before {
@@ -440,11 +603,12 @@ header nav ul li a:hover::after {
 }
 
 .application-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 1rem;
     position: relative;
+    letter-spacing: -0.3px;
 }
 
 .application-card h3::after {
@@ -460,11 +624,11 @@ header nav ul li a:hover::after {
 }
 
 .application-card p {
-    color: var(--dark-gray);
+    color: var(--medium-gray);
     margin-bottom: 1.5rem;
-    opacity: 0.8;
     line-height: 1.6;
     max-width: 320px;
+    font-weight: 400;
 }
 
 .app-features {
@@ -478,7 +642,7 @@ header nav ul li a:hover::after {
 
 /* Specifications Styles */
 .specifications {
-    padding: 80px 0;
+    padding: var(--section-spacing) 0;
     background: var(--white);
 }
 
@@ -488,18 +652,19 @@ header nav ul li a:hover::after {
 
 .specs-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--card-spacing);
+    margin-top: 5rem;
 }
 
 .specs-column {
     background: var(--white);
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-1);
     border: 1px solid var(--border-gray);
-    transition: all 0.3s ease;
+    transition: var(--transition);
+    min-height: 350px;
 }
 
 .specs-column:hover {
@@ -510,7 +675,7 @@ header nav ul li a:hover::after {
 .specs-column h3 {
     font-size: 1.3rem;
     font-weight: 600;
-    color: var(--medical-blue);
+    color: var(--primary-blue);
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -535,7 +700,7 @@ header nav ul li a:hover::after {
 
 /* Modern Contact Styles */
 .contact {
-    padding: 80px 0;
+    padding: var(--section-spacing) 0;
     background: var(--light-gray);
 }
 
@@ -547,28 +712,28 @@ header nav ul li a:hover::after {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
-    margin-top: 3rem;
+    margin-top: 5rem;
     align-items: start;
 }
 
 .contact-info {
     background: var(--white);
-    padding: 2.5rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-1);
 }
 
 .contact-info h3 {
-    color: var(--medical-blue);
+    color: var(--primary-blue);
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
 
 .contact-form {
     background: var(--white);
-    padding: 2.5rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-1);
 }
 
 .form-group {
@@ -596,7 +761,7 @@ header nav ul li a:hover::after {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--medical-blue);
+    border-color: var(--primary-blue);
 }
 
 .form-group textarea {
@@ -605,7 +770,7 @@ header nav ul li a:hover::after {
 }
 
 .contact-form .btn {
-    background: var(--medical-blue);
+    background: var(--gradient-1);
     color: var(--white);
     padding: 15px 30px;
     border: none;
@@ -615,6 +780,14 @@ header nav ul li a:hover::after {
     transition: all 0.3s ease;
     font-size: 1rem;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.contact-form .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
 }
 
 .contact-form .btn:hover {
@@ -624,25 +797,49 @@ header nav ul li a:hover::after {
 
 /* Technical Visualization Section */
 .technical-visualization {
-    padding: 100px 0;
-    background: var(--light-gray);
+    padding: var(--section-spacing) 0;
+    background: linear-gradient(135deg, var(--light-gray) 0%, rgba(20, 184, 166, 0.05) 100%);
     position: relative;
+    overflow: hidden;
+}
+
+.technical-visualization::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tech-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(139, 92, 246, 0.03)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23tech-grid)"/></svg>');
+    opacity: 0.5;
 }
 
 .technical-visualization .section-header h2 {
     color: var(--dark-gray);
     position: relative;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
 
 .technical-visualization .section-header h2::after {
     background: var(--gradient-3);
+    width: 80px;
+    height: 4px;
+}
+
+.technical-visualization .section-header p {
+    color: var(--medium-gray);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .visualization-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2.5rem;
-    margin-top: 4rem;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--card-spacing);
+    margin-top: 5rem;
 }
 
 .viz-card {
@@ -653,18 +850,26 @@ header nav ul li a:hover::after {
     transition: var(--transition);
     position: relative;
     border: 1px solid var(--border-gray);
+    display: flex;
+    flex-direction: column;
+    min-height: 450px;
+    animation: fadeInUp 0.8s ease-out;
 }
 
 .viz-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-15px) scale(1.03);
     box-shadow: var(--shadow-2);
 }
 
-.viz-placeholder {
+.viz-card:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-2);
+}
+
+.viz-content {
     padding: 3rem;
     text-align: center;
-    background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(77, 166, 255, 0.05) 100%);
-    min-height: 300px;
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -672,7 +877,7 @@ header nav ul li a:hover::after {
     position: relative;
 }
 
-.viz-placeholder::before {
+.viz-content::before {
     content: '';
     position: absolute;
     top: 0;
@@ -682,12 +887,27 @@ header nav ul li a:hover::after {
     background: var(--gradient-3);
 }
 
-.viz-placeholder h3 {
-    font-size: 1.5rem;
+.viz-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.viz-card:hover .viz-image {
+    transform: scale(1.05);
+}
+
+.viz-content h3 {
+    font-size: 1.4rem;
     font-weight: 600;
-    color: var(--medical-blue);
+    color: var(--primary-blue);
     margin-bottom: 1rem;
     position: relative;
+    letter-spacing: -0.3px;
 }
 
 .viz-placeholder h3::after {
@@ -702,12 +922,12 @@ header nav ul li a:hover::after {
     border-radius: 1px;
 }
 
-.viz-placeholder p {
-    font-size: 1.1rem;
-    color: var(--dark-gray);
-    opacity: 0.8;
+.viz-content p {
+    font-size: 1rem;
+    color: var(--medium-gray);
     margin-bottom: 1.5rem;
     max-width: 280px;
+    font-weight: 400;
 }
 
 .patent-indicator {
@@ -1035,160 +1255,3061 @@ footer p {
     to { transform: rotate(360deg); }
 }
 
-/* Testimonials Section Styles */
-.testimonials {
-    padding: 80px 0;
-    background: var(--light-gray);
+/* Modern Animation Classes */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.testimonials .section-header h2 {
-    color: var(--dark-gray);
+.animate-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.testimonials-grid {
+/* Enhanced Hover Effects */
+.hover-lift {
+    transition: var(--transition);
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-2);
+}
+
+/* Modern Gradient Backgrounds */
+.gradient-bg {
+    background: var(--gradient-1);
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="gradient-pattern" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23gradient-pattern)"/></svg>');
+    opacity: 0.3;
+}
+
+/* Modern Card Effects */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Floating Animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+}
+
+.floating {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Pulse Animation */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 102, 204, 0.6);
+        transform: scale(1.05);
+    }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Modern Loading Animation */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Interactive Elements */
+.interactive-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.interactive-card:hover::before {
+    left: 100%;
+}
+
+/* Modern Button Styles */
+.btn-modern {
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    z-index: 1;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+    z-index: -1;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+/* Scroll Progress Indicator */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1001;
+}
+
+.scroll-progress-bar {
+    height: 100%;
+    background: var(--gradient-3);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Parallax Effect */
+.parallax {
+    position: relative;
+    overflow: hidden;
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.parallax-back {
+    transform: translateZ(-1px) scale(2);
+}
+
+.parallax-base {
+    transform: translateZ(0);
+}
+
+/* Modern Text Effects */
+.text-gradient {
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-shadow {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Border Animations */
+.animated-border {
+    position: relative;
+    background: var(--white);
+    border-radius: var(--border-radius);
+}
+
+.animated-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--border-radius);
+    padding: 2px;
+    background: var(--gradient-3);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: border-rotate 3s linear infinite;
+}
+
+@keyframes border-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+/* Innovative Medical Device Visual Elements */
+.innovation-showcase {
+    background: linear-gradient(135deg, var(--light-gray) 0%, rgba(139, 92, 246, 0.05) 100%);
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.innovation-showcase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="innovation-grid" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="1" fill="rgba(20, 184, 166, 0.1)"/><circle cx="12.5" cy="12.5" r="3" fill="none" stroke="rgba(20, 184, 166, 0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23innovation-grid)"/></svg>');
+    opacity: 0.6;
+}
+
+.innovation-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
 
-.testimonial-card {
+.innovation-card {
     background: var(--white);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--shadow-1);
-    transition: var(--transition);
-    border: 1px solid var(--border-gray);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.innovation-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-2);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.innovation-card:hover::before {
+    transform: scaleX(1);
+}
+
+.innovation-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.innovation-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
 }
 
-.testimonial-card::before {
-    content: '"';
+.innovation-icon::after {
+    content: '';
     position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 4rem;
-    color: var(--medical-blue);
-    opacity: 0.1;
-    font-family: Georgia, serif;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+    opacity: 0;
 }
 
-.testimonial-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-2);
+.innovation-card:hover .innovation-icon::after {
+    animation: icon-shine 0.6s ease-in-out;
 }
 
-.testimonial-content {
-    margin-bottom: 1.5rem;
-    position: relative;
+@keyframes icon-shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+}
+
+.innovation-icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--white);
     z-index: 1;
 }
 
-.testimonial-content p {
+.innovation-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
     color: var(--dark-gray);
-    font-size: 1rem;
-    line-height: 1.6;
-    font-style: italic;
-    opacity: 0.9;
+    margin-bottom: 1rem;
+    position: relative;
 }
 
-.testimonial-author {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.innovation-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--accent-teal);
+    border-radius: 1px;
+}
+
+.innovation-card p {
+    color: var(--medium-gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.tech-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin: 4rem 0;
+}
+
+.metric-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-3);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.metric-label {
+    color: var(--medium-gray);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.interactive-demo {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-teal) 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    margin: 4rem 0;
+}
+
+.interactive-demo::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: demo-pulse 4s ease-in-out infinite;
+}
+
+@keyframes demo-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.2); opacity: 0.1; }
+}
+
+.demo-content {
     position: relative;
     z-index: 1;
+    text-align: center;
 }
 
-.author-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--gradient-1);
+.demo-content h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.demo-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+}
+
+.demo-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.demo-feature {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.demo-feature:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white);
-    font-weight: 600;
-    font-size: 1.2rem;
-    flex-shrink: 0;
+    margin: 0 auto 1rem;
 }
 
-.author-info h4 {
-    color: var(--dark-gray);
+.feature-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--white);
+}
+
+.feature-title {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
-.author-info p {
-    color: var(--medical-blue);
+.feature-description {
     font-size: 0.9rem;
-    font-weight: 500;
-    margin: 0;
+    opacity: 0.9;
+    line-height: 1.5;
 }
 
-.testimonial-rating {
-    display: flex;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
+/* Advanced Animations */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.8s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.8s ease-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.6s ease-out;
+}
+
+/* Modern Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, var(--border-gray) 25%, var(--light-gray) 50%, var(--border-gray) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Modern Tooltip */
+.tooltip {
     position: relative;
-    z-index: 1;
+    display: inline-block;
 }
 
-.testimonial-rating .star {
-    color: var(--accent-orange);
-    font-size: 1rem;
+.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-gray);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
 }
 
-/* Responsive Design for Testimonials */
-@media (max-width: 768px) {
-    .testimonials-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+.tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--dark-gray);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.tooltip:hover::before,
+.tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modern Scroll Animations */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Modern Glass Card Effects */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Modern 3D Card Effects */
+.card-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.card-3d:hover {
+    transform: rotateY(5deg) rotateX(5deg);
+}
+
+/* Modern Particle Background */
+.particle-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float-particle 20s infinite linear;
+}
+
+@keyframes float-particle {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
     }
-    
-    .testimonial-card {
-        padding: 1.5rem;
+    10% {
+        opacity: 0.3;
     }
-    
-    .testimonial-card::before {
-        font-size: 3rem;
-        top: 15px;
-        left: 15px;
+    90% {
+        opacity: 0.3;
     }
-    
-    .author-avatar {
-        width: 50px;
-        height: 50px;
-        font-size: 1rem;
-    }
-    
-    .author-info h4 {
-        font-size: 1rem;
-    }
-    
-    .author-info p {
-        font-size: 0.85rem;
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
     }
 }
 
-@media (max-width: 480px) {
-    .testimonials {
-        padding: 60px 0;
+/* Modern Interactive Elements */
+.interactive-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.interactive-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.interactive-button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Modern Progress Ring */
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 1s ease;
+}
+
+/* Modern Wave Animation */
+.wave-animation {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path fill="%2314B8A6" fill-opacity="0.1" d="M0,60 C200,120 400,0 600,60 C800,120 1000,0 1200,60 L1200,120 L0,120 Z"></path></svg>');
+    background-size: 1200px 100px;
+    animation: wave 10s linear infinite;
+}
+
+@keyframes wave {
+    0% { background-position-x: 0; }
+    100% { background-position-x: 1200px; }
+}
+
+/* Modern Glitch Effect */
+.glitch {
+    position: relative;
+    color: var(--dark-gray);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75),
+                 -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+                 0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+    animation: glitch 1s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    animation: glitch-1 0.5s infinite;
+    color: rgba(255, 0, 0, 0.75);
+    z-index: -1;
+}
+
+.glitch::after {
+    animation: glitch-2 0.5s infinite;
+    color: rgba(0, 255, 0, 0.75);
+    z-index: -2;
+}
+
+@keyframes glitch {
+    0%, 100% { text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.05em 0 rgba(0, 255, 0, 0.75), 0.025em 0.05em 0 rgba(0, 0, 255, 0.75); }
+    14% { text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.05em 0 rgba(0, 255, 0, 0.75), 0.025em 0.05em 0 rgba(0, 0, 255, 0.75); }
+    15% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75); }
+    49% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75); }
+    50% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75); }
+    99% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75); }
+}
+
+@keyframes glitch-1 {
+    0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    20% { clip-path: inset(20% 0 30% 0); transform: translate(-5px); }
+    40% { clip-path: inset(50% 0 20% 0); transform: translate(5px); }
+    60% { clip-path: inset(10% 0 60% 0); transform: translate(-3px); }
+    80% { clip-path: inset(80% 0 5% 0); transform: translate(3px); }
+}
+
+@keyframes glitch-2 {
+    0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    20% { clip-path: inset(60% 0 10% 0); transform: translate(5px); }
+    40% { clip-path: inset(20% 0 60% 0); transform: translate(-5px); }
+    60% { clip-path: inset(30% 0 40% 0); transform: translate(3px); }
+    80% { clip-path: inset(5% 0 80% 0); transform: translate(-3px); }
+}
+
+/* Modern Holographic Effect */
+.holographic {
+    background: linear-gradient(45deg, 
+        #ff0080, #ff8c00, #40e0d0, #ff0080, #ff8c00, #40e0d0);
+    background-size: 400% 400%;
+    animation: holographic-shift 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@keyframes holographic-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Modern Neon Glow */
+.neon-glow {
+    text-shadow: 0 0 10px rgba(20, 184, 166, 0.8),
+                 0 0 20px rgba(20, 184, 166, 0.6),
+                 0 0 30px rgba(20, 184, 166, 0.4),
+                 0 0 40px rgba(20, 184, 166, 0.2);
+    animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neon-pulse {
+    from { text-shadow: 0 0 10px rgba(20, 184, 166, 0.8), 0 0 20px rgba(20, 184, 166, 0.6), 0 0 30px rgba(20, 184, 166, 0.4), 0 0 40px rgba(20, 184, 166, 0.2); }
+    to { text-shadow: 0 0 20px rgba(20, 184, 166, 1), 0 0 30px rgba(20, 184, 166, 0.8), 0 0 40px rgba(20, 184, 166, 0.6), 0 0 50px rgba(20, 184, 166, 0.4); }
+}
+
+/* Modern Matrix Rain Effect */
+.matrix-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--accent-teal);
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Cyber Grid */
+.cyber-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 10s linear infinite;
+    z-index: -1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Modern Data Visualization */
+.data-viz {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.data-viz::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-3);
+    animation: data-flow 3s linear infinite;
+}
+
+@keyframes data-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.data-chart {
+    height: 200px;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.data-bar {
+    position: absolute;
+    bottom: 0;
+    width: 30px;
+    background: var(--gradient-3);
+    border-radius: 5px 5px 0 0;
+    animation: bar-grow 2s ease-out infinite;
+}
+
+@keyframes bar-grow {
+    0% { height: 0; }
+    50% { height: var(--bar-height); }
+    100% { height: 0; }
+}
+
+/* Modern Tech Pattern */
+.tech-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    animation: pattern-pulse 4s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes pattern-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Modern Circuit Board Effect */
+.circuit-board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 0 5 L 10 5 M 5 0 L 5 10" stroke="rgba(20, 184, 166, 0.1)" stroke-width="0.5" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>');
+    opacity: 0.3;
+    animation: circuit-move 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes circuit-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(100px, 100px); }
+}
+
+/* Modern Digital Rain */
+.digital-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.05;
+}
+
+.digital-drop {
+    position: absolute;
+    color: var(--accent-teal);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    animation: digital-fall linear infinite;
+}
+
+@keyframes digital-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Binary Code */
+.binary-code {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: rgba(20, 184, 166, 0.1);
+    overflow: hidden;
+    z-index: -1;
+}
+
+.binary-line {
+    position: absolute;
+    width: 100%;
+    animation: binary-scroll 10s linear infinite;
+}
+
+@keyframes binary-scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Modern Tech Lines */
+.tech-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: line-move 3s linear infinite;
+}
+
+@keyframes line-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Pulse Ring */
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid rgba(20, 184, 166, 0.3);
+    border-radius: 50%;
+    animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
     }
-    
-    .testimonial-card {
-        padding: 1.2rem;
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
     }
-    
-    .testimonial-content p {
-        font-size: 0.95rem;
+}
+
+/* Modern Energy Burst */
+.energy-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.8) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: energy-burst 1.5s ease-out infinite;
+}
+
+@keyframes energy-burst {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
     }
-    
-    .author-avatar {
-        width: 45px;
-        height: 45px;
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
     }
+}
+
+/* Modern Data Stream */
+.data-stream {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-packet {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream 3s linear infinite;
+}
+
+@keyframes data-stream {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network */
+.tech-network {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.network-node {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: node-pulse 2s ease-in-out infinite;
+}
+
+.network-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: connection-pulse 3s ease-in-out infinite;
+}
+
+@keyframes node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.5); opacity: 1; }
+}
+
+@keyframes connection-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* Modern Digital Grid */
+.digital-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: grid-move 15s linear infinite;
+    z-index: -1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+}
+
+/* Modern Tech Radar */
+.tech-radar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border: 2px solid rgba(20, 184, 166, 0.3);
+    border-radius: 50%;
+    animation: radar-scan 4s linear infinite;
+}
+
+@keyframes radar-scan {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Modern Energy Wave */
+.energy-wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(180deg, transparent, rgba(20, 184, 166, 0.1));
+    animation: wave-move 3s ease-in-out infinite;
+}
+
+@keyframes wave-move {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Modern Tech Particles */
+.tech-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: particle-float 10s linear infinite;
+}
+
+@keyframes particle-float {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.3;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-100px) translateX(100px);
+        opacity: 0;
+    }
+}
+
+/* Modern Digital Signal */
+.digital-signal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.signal-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.5), transparent);
+    animation: signal-move 2s linear infinite;
+}
+
+@keyframes signal-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Circuit */
+.tech-circuit {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.circuit-path {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: circuit-flow 5s linear infinite;
+}
+
+@keyframes circuit-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Data Flow */
+.data-flow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-flow-line {
+    position: absolute;
+    width: 2px;
+    height: 50px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-flow-move 3s linear infinite;
+}
+
+@keyframes data-flow-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Lines */
+.network-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.network-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: network-line-move 4s linear infinite;
+}
+
+@keyframes network-line-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Digital Matrix */
+.digital-matrix {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.05;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--accent-teal);
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Overlay */
+.tech-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+    animation: grid-overlay-move 8s linear infinite;
+    z-index: -1;
+}
+
+@keyframes grid-overlay-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(30px, 30px); }
+}
+
+/* Modern Energy Field */
+.energy-field {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-field-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: energy-field-move 6s linear infinite;
+}
+
+@keyframes energy-field-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Pulse */
+.tech-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(20, 184, 166, 0.3);
+    border-radius: 50%;
+    animation: tech-pulse 3s ease-out infinite;
+}
+
+@keyframes tech-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Data Stream Lines */
+.data-stream-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-stream-line {
+    position: absolute;
+    width: 1px;
+    height: 100px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream-line-move 4s linear infinite;
+}
+
+@keyframes data-stream-line-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Nodes */
+.tech-network-nodes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.network-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: network-node-pulse 2s ease-in-out infinite;
+}
+
+@keyframes network-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(2); opacity: 1; }
+}
+
+/* Modern Digital Rain Effect */
+.digital-rain-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.03;
+}
+
+.rain-drop {
+    position: absolute;
+    color: var(--accent-teal);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    animation: rain-drop-fall linear infinite;
+}
+
+@keyframes rain-drop-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Circuit Pattern */
+.tech-circuit-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 0 10 L 20 10 M 10 0 L 10 20" stroke="rgba(20, 184, 166, 0.1)" stroke-width="0.5" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit-pattern)"/></svg>');
+    opacity: 0.3;
+    animation: circuit-pattern-move 12s linear infinite;
+    z-index: -1;
+}
+
+@keyframes circuit-pattern-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(100px, 100px); }
+}
+
+/* Modern Energy Flow */
+.energy-flow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-flow-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.4), transparent);
+    animation: energy-flow-move 5s linear infinite;
+}
+
+@keyframes energy-flow-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Grid Background */
+.tech-grid-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: tech-grid-background-move 10s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-grid-background-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+}
+
+/* Modern Digital Pulse */
+.digital-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(20, 184, 166, 0.5);
+    border-radius: 50%;
+    animation: digital-pulse-effect 2s ease-out infinite;
+}
+
+@keyframes digital-pulse-effect {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Visualization */
+.tech-network-viz {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.network-viz-node {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: network-viz-node-pulse 3s ease-in-out infinite;
+}
+
+.network-viz-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: network-viz-connection-pulse 4s ease-in-out infinite;
+}
+
+@keyframes network-viz-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.5); opacity: 1; }
+}
+
+@keyframes network-viz-connection-pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+}
+
+/* Modern Data Transmission */
+.data-transmission {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-transmission-packet {
+    position: absolute;
+    width: 3px;
+    height: 30px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-transmission-move 3s linear infinite;
+}
+
+@keyframes data-transmission-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Radar Sweep */
+.tech-radar-sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    border-radius: 50%;
+    animation: tech-radar-sweep-rotate 6s linear infinite;
+}
+
+@keyframes tech-radar-sweep-rotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Modern Energy Wave Pattern */
+.energy-wave-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-wave-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: energy-wave-pattern-move 4s linear infinite;
+}
+
+@keyframes energy-wave-pattern-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Particle System */
+.tech-particle-system {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: tech-particle-system-move 8s linear infinite;
+}
+
+@keyframes tech-particle-system-move {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.4;
+    }
+    90% {
+        opacity: 0.4;
+    }
+    100% {
+        transform: translateY(-100px) translateX(200px);
+        opacity: 0;
+    }
+}
+
+/* Modern Digital Signal Processing */
+.digital-signal-processing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.digital-signal-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.4), transparent);
+    animation: digital-signal-processing-move 3s linear infinite;
+}
+
+@keyframes digital-signal-processing-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Circuit Board */
+.tech-circuit-board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit-board-pattern" width="15" height="15" patternUnits="userSpaceOnUse"><path d="M 0 7.5 L 15 7.5 M 7.5 0 L 7.5 15" stroke="rgba(20, 184, 166, 0.1)" stroke-width="0.3" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit-board-pattern)"/></svg>');
+    opacity: 0.2;
+    animation: tech-circuit-board-move 15s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-circuit-board-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(100px, 100px); }
+}
+
+/* Modern Data Visualization Grid */
+.data-viz-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-viz-grid-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: data-viz-grid-move 5s linear infinite;
+}
+
+@keyframes data-viz-grid-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Network Animation */
+.tech-network-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-node-pulse 2.5s ease-in-out infinite;
+}
+
+.tech-network-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: tech-network-connection-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes tech-network-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(2); opacity: 1; }
+}
+
+@keyframes tech-network-connection-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* Modern Digital Rain Background */
+.digital-rain-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.02;
+}
+
+.digital-rain-drop {
+    position: absolute;
+    color: var(--accent-teal);
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    animation: digital-rain-drop-fall linear infinite;
+}
+
+@keyframes digital-rain-drop-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Animation */
+.tech-grid-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-grid-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: tech-grid-animation-move 6s linear infinite;
+}
+
+@keyframes tech-grid-animation-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Energy Field Effect */
+.energy-field-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-field-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: energy-field-effect-move 4s linear infinite;
+}
+
+@keyframes energy-field-effect-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Pulse Effect */
+.tech-pulse-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(20, 184, 166, 0.4);
+    border-radius: 50%;
+    animation: tech-pulse-effect-expand 3s ease-out infinite;
+}
+
+@keyframes tech-pulse-effect-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Data Stream Effect */
+.data-stream-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-stream-packet {
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream-effect-move 3.5s linear infinite;
+}
+
+@keyframes data-stream-effect-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Visualization */
+.tech-network-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-viz-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-viz-node-pulse 2.8s ease-in-out infinite;
+}
+
+.tech-network-viz-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.25), transparent);
+    animation: tech-network-viz-connection-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes tech-network-viz-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.35; }
+    50% { transform: scale(1.8); opacity: 1; }
+}
+
+@keyframes tech-network-viz-connection-pulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 0.7; }
+}
+
+/* Modern Digital Signal Transmission */
+.digital-signal-transmission {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.digital-signal-transmission-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.35), transparent);
+    animation: digital-signal-transmission-move 2.8s linear infinite;
+}
+
+@keyframes digital-signal-transmission-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Circuit Animation */
+.tech-circuit-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-circuit-path {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: tech-circuit-animation-move 5.5s linear infinite;
+}
+
+@keyframes tech-circuit-animation-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Data Flow Visualization */
+.data-flow-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-flow-visualization-line {
+    position: absolute;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-flow-visualization-move 4.2s linear infinite;
+}
+
+@keyframes data-flow-visualization-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Pattern */
+.tech-network-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-pattern-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+    animation: tech-network-pattern-move 4.8s linear infinite;
+}
+
+@keyframes tech-network-pattern-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Digital Matrix Effect */
+.digital-matrix-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.04;
+}
+
+.digital-matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--accent-teal);
+    animation: digital-matrix-effect-fall linear infinite;
+}
+
+@keyframes digital-matrix-effect-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Overlay */
+.tech-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.08) 1px, transparent 1px);
+    background-size: 35px 35px;
+    animation: tech-grid-overlay-move 9s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-grid-overlay-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(35px, 35px); }
+}
+
+/* Modern Energy Field Visualization */
+.energy-field-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-field-visualization-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.25), transparent);
+    animation: energy-field-visualization-move 5.2s linear infinite;
+}
+
+@keyframes energy-field-visualization-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Pulse Animation */
+.tech-pulse-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 1px solid rgba(20, 184, 166, 0.35);
+    border-radius: 50%;
+    animation: tech-pulse-animation-expand 2.6s ease-out infinite;
+}
+
+@keyframes tech-pulse-animation-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Data Stream Animation */
+.data-stream-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-stream-animation-packet {
+    position: absolute;
+    width: 2px;
+    height: 35px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream-animation-move 3.2s linear infinite;
+}
+
+@keyframes data-stream-animation-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Animation */
+.tech-network-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-animation-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-animation-node-pulse 2.4s ease-in-out infinite;
+}
+
+.tech-network-animation-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.28), transparent);
+    animation: tech-network-animation-connection-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes tech-network-animation-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.32; }
+    50% { transform: scale(1.6); opacity: 1; }
+}
+
+@keyframes tech-network-animation-connection-pulse {
+    0%, 100% { opacity: 0.28; }
+    50% { opacity: 0.75; }
+}
+
+/* Modern Digital Rain Animation */
+.digital-rain-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.025;
+}
+
+.digital-rain-animation-drop {
+    position: absolute;
+    color: var(--accent-teal);
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    animation: digital-rain-animation-drop-fall linear infinite;
+}
+
+@keyframes digital-rain-animation-drop-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Background */
+.tech-grid-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.06) 1px, transparent 1px);
+    background-size: 45px 45px;
+    animation: tech-grid-background-move 11s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-grid-background-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(45px, 45px); }
+}
+
+/* Modern Digital Pulse Effect */
+.digital-pulse-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 90px;
+    border: 1px solid rgba(20, 184, 166, 0.45);
+    border-radius: 50%;
+    animation: digital-pulse-effect-expand 2.2s ease-out infinite;
+}
+
+@keyframes digital-pulse-effect-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Visualization */
+.tech-network-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-visualization-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-visualization-node-pulse 2.7s ease-in-out infinite;
+}
+
+.tech-network-visualization-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.22), transparent);
+    animation: tech-network-visualization-connection-pulse 3.1s ease-in-out infinite;
+}
+
+@keyframes tech-network-visualization-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.38; }
+    50% { transform: scale(1.7); opacity: 1; }
+}
+
+@keyframes tech-network-visualization-connection-pulse {
+    0%, 100% { opacity: 0.22; }
+    50% { opacity: 0.68; }
+}
+
+/* Modern Data Transmission Effect */
+.data-transmission-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-transmission-effect-packet {
+    position: absolute;
+    width: 2px;
+    height: 32px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-transmission-effect-move 2.9s linear infinite;
+}
+
+@keyframes data-transmission-effect-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Radar Sweep */
+.tech-radar-sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
+    border: 1px solid rgba(20, 184, 166, 0.32);
+    border-radius: 50%;
+    animation: tech-radar-sweep-rotate 5.5s linear infinite;
+}
+
+@keyframes tech-radar-sweep-rotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Modern Energy Wave Pattern */
+.energy-wave-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-wave-pattern-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.28), transparent);
+    animation: energy-wave-pattern-move 3.8s linear infinite;
+}
+
+@keyframes energy-wave-pattern-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Particle System */
+.tech-particle-system {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-particle-system-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    opacity: 0.35;
+    animation: tech-particle-system-move 7.2s linear infinite;
+}
+
+@keyframes tech-particle-system-move {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.35;
+    }
+    90% {
+        opacity: 0.35;
+    }
+    100% {
+        transform: translateY(-100px) translateX(180px);
+        opacity: 0;
+    }
+}
+
+/* Modern Digital Signal Processing */
+.digital-signal-processing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.digital-signal-processing-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.38), transparent);
+    animation: digital-signal-processing-move 2.7s linear infinite;
+}
+
+@keyframes digital-signal-processing-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Circuit Board */
+.tech-circuit-board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tech-circuit-board-pattern" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M 0 9 L 18 9 M 9 0 L 9 18" stroke="rgba(20, 184, 166, 0.12)" stroke-width="0.4" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23tech-circuit-board-pattern)"/></svg>');
+    opacity: 0.25;
+    animation: tech-circuit-board-move 13.5s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-circuit-board-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(90px, 90px); }
+}
+
+/* Modern Data Visualization Grid */
+.data-viz-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-viz-grid-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.18), transparent);
+    animation: data-viz-grid-move 4.6s linear infinite;
+}
+
+@keyframes data-viz-grid-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Network Animation */
+.tech-network-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-animation-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-animation-node-pulse 2.3s ease-in-out infinite;
+}
+
+.tech-network-animation-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.26), transparent);
+    animation: tech-network-animation-connection-pulse 3.4s ease-in-out infinite;
+}
+
+@keyframes tech-network-animation-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.36; }
+    50% { transform: scale(1.5); opacity: 1; }
+}
+
+@keyframes tech-network-animation-connection-pulse {
+    0%, 100% { opacity: 0.26; }
+    50% { opacity: 0.72; }
+}
+
+/* Modern Digital Rain Background */
+.digital-rain-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.018;
+}
+
+.digital-rain-background-drop {
+    position: absolute;
+    color: var(--accent-teal);
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    animation: digital-rain-background-drop-fall linear infinite;
+}
+
+@keyframes digital-rain-background-drop-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Animation */
+.tech-grid-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-grid-animation-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.24), transparent);
+    animation: tech-grid-animation-move 5.8s linear infinite;
+}
+
+@keyframes tech-grid-animation-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Energy Field Effect */
+.energy-field-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-field-effect-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.32), transparent);
+    animation: energy-field-effect-move 3.6s linear infinite;
+}
+
+@keyframes energy-field-effect-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Pulse Effect */
+.tech-pulse-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    border: 1px solid rgba(20, 184, 166, 0.42);
+    border-radius: 50%;
+    animation: tech-pulse-effect-expand 2.8s ease-out infinite;
+}
+
+@keyframes tech-pulse-effect-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Data Stream Effect */
+.data-stream-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-stream-effect-packet {
+    position: absolute;
+    width: 2px;
+    height: 38px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream-effect-move 3.3s linear infinite;
+}
+
+@keyframes data-stream-effect-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Visualization */
+.tech-network-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-visualization-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-visualization-node-pulse 2.6s ease-in-out infinite;
+}
+
+.tech-network-visualization-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.2), transparent);
+    animation: tech-network-visualization-connection-pulse 3s ease-in-out infinite;
+}
+
+@keyframes tech-network-visualization-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.34; }
+    50% { transform: scale(1.6); opacity: 1; }
+}
+
+@keyframes tech-network-visualization-connection-pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.66; }
+}
+
+/* Modern Digital Signal Transmission */
+.digital-signal-transmission {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.digital-signal-transmission-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.36), transparent);
+    animation: digital-signal-transmission-move 2.5s linear infinite;
+}
+
+@keyframes digital-signal-transmission-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Circuit Animation */
+.tech-circuit-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-circuit-animation-path {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.16), transparent);
+    animation: tech-circuit-animation-move 5.2s linear infinite;
+}
+
+@keyframes tech-circuit-animation-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Data Flow Visualization */
+.data-flow-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-flow-visualization-line {
+    position: absolute;
+    width: 1px;
+    height: 55px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-flow-visualization-move 4s linear infinite;
+}
+
+@keyframes data-flow-visualization-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Pattern */
+.tech-network-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-pattern-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.28), transparent);
+    animation: tech-network-pattern-move 4.4s linear infinite;
+}
+
+@keyframes tech-network-pattern-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Digital Matrix Effect */
+.digital-matrix-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    opacity: 0.035;
+}
+
+.digital-matrix-effect-column {
+    position: absolute;
+    top: -100%;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: var(--accent-teal);
+    animation: digital-matrix-effect-fall linear infinite;
+}
+
+@keyframes digital-matrix-effect-fall {
+    to { transform: translateY(100vh); }
+}
+
+/* Modern Tech Grid Overlay */
+.tech-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+    animation: tech-grid-overlay-move 8.4s linear infinite;
+    z-index: -1;
+}
+
+@keyframes tech-grid-overlay-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(32px, 32px); }
+}
+
+/* Modern Energy Field Visualization */
+.energy-field-visualization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.energy-field-visualization-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.22), transparent);
+    animation: energy-field-visualization-move 4.8s linear infinite;
+}
+
+@keyframes energy-field-visualization-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modern Tech Pulse Animation */
+.tech-pulse-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 130px;
+    height: 130px;
+    border: 1px solid rgba(20, 184, 166, 0.38);
+    border-radius: 50%;
+    animation: tech-pulse-animation-expand 2.4s ease-out infinite;
+}
+
+@keyframes tech-pulse-animation-expand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Modern Data Stream Animation */
+.data-stream-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.data-stream-animation-packet {
+    position: absolute;
+    width: 2px;
+    height: 33px;
+    background: linear-gradient(180deg, transparent, var(--accent-teal), transparent);
+    animation: data-stream-animation-move 3s linear infinite;
+}
+
+@keyframes data-stream-animation-move {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Modern Tech Network Animation */
+.tech-network-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.tech-network-animation-node {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    animation: tech-network-animation-node-pulse 2.2s ease-in-out infinite;
+}
+
+.tech-network-animation-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.24), transparent);
 }
