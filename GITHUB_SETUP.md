@@ -1,6 +1,7 @@
 # GitHub Repository Setup Instructions
 
-Since I cannot create the GitHub repository directly, please follow these steps to create your BeautyBite repository on GitHub:
+## Current Status
+The repository has not been created yet. Please follow these steps to create your BeautyBite repository on GitHub:
 
 ## Step 1: Create GitHub Repository
 
