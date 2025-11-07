@@ -6,13 +6,15 @@
 }
 
 :root {
-    --bachelor-button: #348BBF;
-    --light-blue: #5BA3D1;
-    --dark-blue: #2A6B8C;
+    --medical-blue: #0066CC;
+    --light-blue: #4DA6FF;
+    --dark-blue: #003D7A;
     --white: #FFFFFF;
     --light-gray: #F8F9FA;
     --dark-gray: #2C3E50;
     --border-gray: #E9ECEF;
+    --accent-green: #28A745;
+    --accent-red: #DC3545;
 }
 
 html {
@@ -20,7 +22,7 @@ html {
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.7;
     color: var(--dark-gray);
     background-color: var(--white);
@@ -35,7 +37,7 @@ body {
 /* Modern Header Styles */
 header {
     background: var(--white);
-    box-shadow: 0 2px 20px rgba(52, 139, 191, 0.1);
+    box-shadow: 0 2px 20px rgba(0, 102, 204, 0.1);
     position: fixed;
     top: 0;
     width: 100%;
@@ -53,7 +55,7 @@ header {
 header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--bachelor-button);
+    color: var(--medical-blue);
     letter-spacing: -0.5px;
 }
 
@@ -72,7 +74,7 @@ header nav ul li a {
 }
 
 header nav ul li a:hover {
-    color: var(--bachelor-button);
+    color: var(--medical-blue);
 }
 
 header nav ul li a::after {
@@ -82,7 +84,7 @@ header nav ul li a::after {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--bachelor-button);
+    background: var(--medical-blue);
     transition: width 0.3s ease;
 }
 
@@ -92,7 +94,7 @@ header nav ul li a:hover::after {
 
 /* Hero Styles */
 .hero {
-    background: linear-gradient(135deg, var(--bachelor-button) 0%, var(--light-blue) 100%);
+    background: linear-gradient(135deg, var(--medical-blue) 0%, var(--light-blue) 100%);
     color: var(--white);
     text-align: center;
     padding: 150px 0 100px;
@@ -117,7 +119,7 @@ header nav ul li a:hover::after {
 
 .hero .btn {
     background: var(--white);
-    color: var(--bachelor-button);
+    color: var(--medical-blue);
     padding: 15px 35px;
     border: none;
     border-radius: 50px;
@@ -162,7 +164,7 @@ header nav ul li a:hover::after {
     transform: translateX(-50%);
     width: 60px;
     height: 3px;
-    background: var(--bachelor-button);
+    background: var(--medical-blue);
     border-radius: 2px;
 }
 
@@ -174,66 +176,173 @@ header nav ul li a:hover::after {
     line-height: 1.8;
 }
 
-/* Modern Products Styles */
-.products {
+/* Technology Section Styles */
+.technology {
     padding: 80px 0;
     background: var(--white);
 }
 
-.products .section-header h2 {
+.technology .section-header h2 {
     color: var(--dark-gray);
 }
 
-.products-grid {
+.tech-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
     margin-top: 3rem;
 }
 
-.product-card {
+.tech-card {
     background: var(--white);
     border-radius: 15px;
     padding: 2rem;
-    box-shadow: 0 10px 30px rgba(52, 139, 191, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
     transition: all 0.3s ease;
     border: 1px solid var(--border-gray);
     position: relative;
     overflow: hidden;
 }
 
-.product-card::before {
+.tech-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, var(--bachelor-button), var(--light-blue));
+    background: linear-gradient(90deg, var(--medical-blue), var(--light-blue));
 }
 
-.product-card:hover {
+.tech-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(52, 139, 191, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 102, 204, 0.15);
 }
 
-.product-card h3 {
+.tech-card h3 {
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--dark-gray);
     margin-bottom: 1rem;
 }
 
-.product-card p {
+.tech-card p {
     color: var(--dark-gray);
     margin-bottom: 1.5rem;
     opacity: 0.8;
 }
 
-.product-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--bachelor-button);
+/* Clinical Applications Styles */
+.clinical-applications {
+    padding: 80px 0;
+    background: var(--light-gray);
+}
+
+.clinical-applications .section-header h2 {
+    color: var(--dark-gray);
+}
+
+.applications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.application-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-gray);
+    position: relative;
+    overflow: hidden;
+}
+
+.application-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--light-blue));
+}
+
+.application-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 102, 204, 0.15);
+}
+
+.application-card h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+
+.application-card p {
+    color: var(--dark-gray);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
+/* Specifications Styles */
+.specifications {
+    padding: 80px 0;
+    background: var(--white);
+}
+
+.specifications .section-header h2 {
+    color: var(--dark-gray);
+}
+
+.specs-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.specs-column {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+    border: 1px solid var(--border-gray);
+    transition: all 0.3s ease;
+}
+
+.specs-column:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 102, 204, 0.15);
+}
+
+.specs-column h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--medical-blue);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.specs-column ul {
+    list-style: none;
+}
+
+.specs-column li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-gray);
+    color: var(--dark-gray);
+}
+
+.specs-column li:last-child {
+    border-bottom: none;
+}
+
+.specs-column strong {
+    color: var(--dark-gray);
 }
 
 /* Modern Contact Styles */
@@ -258,11 +367,11 @@ header nav ul li a:hover::after {
     background: var(--white);
     padding: 2.5rem;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(52, 139, 191, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
 }
 
 .contact-info h3 {
-    color: var(--bachelor-button);
+    color: var(--medical-blue);
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
@@ -271,7 +380,7 @@ header nav ul li a:hover::after {
     background: var(--white);
     padding: 2.5rem;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(52, 139, 191, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
 }
 
 .form-group {
@@ -299,7 +408,7 @@ header nav ul li a:hover::after {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--bachelor-button);
+    border-color: var(--medical-blue);
 }
 
 .form-group textarea {
@@ -308,7 +417,7 @@ header nav ul li a:hover::after {
 }
 
 .contact-form .btn {
-    background: var(--bachelor-button);
+    background: var(--medical-blue);
     color: var(--white);
     padding: 15px 30px;
     border: none;
@@ -338,18 +447,10 @@ footer p {
 }
 
 /* Additional Modern Elements */
-.featured-products {
-    background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
-}
-
-.pricing-section {
-    background: var(--white);
-}
-
 .btn-secondary {
     background: transparent;
-    color: var(--bachelor-button);
-    border: 2px solid var(--bachelor-button);
+    color: var(--medical-blue);
+    border: 2px solid var(--medical-blue);
     padding: 12px 28px;
     border-radius: 25px;
     text-decoration: none;
@@ -359,7 +460,7 @@ footer p {
 }
 
 .btn-secondary:hover {
-    background: var(--bachelor-button);
+    background: var(--medical-blue);
     color: var(--white);
 }
 
@@ -372,6 +473,10 @@ footer p {
     .contact-content {
         grid-template-columns: 1fr;
         gap: 2rem;
+    }
+    
+    .specs-container {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -404,7 +509,8 @@ footer p {
         font-size: 1rem;
     }
 
-    .products-grid {
+    .tech-grid,
+    .applications-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
@@ -442,7 +548,9 @@ footer p {
         font-size: 1.8rem;
     }
 
-    .product-card,
+    .tech-card,
+    .application-card,
+    .specs-column,
     .contact-info,
     .contact-form {
         padding: 1.5rem;
@@ -511,7 +619,7 @@ footer p {
     width: 20px;
     height: 20px;
     margin: -10px 0 0 -10px;
-    border: 2px solid var(--bachelor-button);
+    border: 2px solid var(--medical-blue);
     border-radius: 50%;
     border-top-color: transparent;
     animation: spin 1s linear infinite;
