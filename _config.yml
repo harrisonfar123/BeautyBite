@@ -1,0 +1,63 @@
+# GitHub Pages Configuration for BeautyBite Website
+
+title: BeautyBite - Advanced Medical Device Technology
+description: BeautyBite develops innovative medical devices featuring advanced electrical isolation technology for safe and effective cosmetic procedures and clinical treatments.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. https://example.com
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - .git
+  - .github
+  - deploy.sh
+  - monitoring-config.json
+  - backups/
+  - node_modules/
+  - package-lock.json
+  - Gemfile
+  - Gemfile.lock
+
+# SEO Settings
+twitter:
+  username: harrisonfar123
+  card: summary_large_image
+
+social:
+  name: BeautyBite
+  links:
+    - https://github.com/harrisonfar123/BeautyBite
+
+# SEO Meta Tags
+google_analytics: G-XXXXXXXXXX
+google_site_verification: googleXXXXXXXXXXXXXXXXXXXX
+
+# GitHub Pages specific settings
+github:
+  repository: harrisonfar123/BeautyBite
+
+# Performance optimization
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false
+
+# Liquid settings
+liquid:
+  error_mode: warn
+  strict_filters: false
+  strict_variables: false
+  strict_variables: false

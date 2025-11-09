@@ -1,0 +1,82 @@
+name: Deploy BeautyBite Website
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate HTML
+      run: |
+        npm install -g htmlhint
+        htmlhint src/index.html
+        
+    - name: Check CSS syntax
+      run: |
+        npm install -g stylelint
+        stylelint src/styles.css --syntax css
+        
+    - name: Test image references
+      run: |
+        # Check if all referenced images exist
+        if ! grep -o 'src="[^"]*"' src/index.html | sed 's/src="//g' | sed 's/"//g' | while read img; do
+          if [ ! -f "$img" ] && [[ "$img" != "https://"* ]]; then
+            echo "ERROR: Missing image file: $img"
+            exit 1
+          fi
+        done; then
+          echo "Image validation failed"
+          exit 1
+        fi
+        echo "All image references validated"
+
+  deploy:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: './'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security scan
+      run: |
+        # Check for hardcoded secrets or sensitive information
+        if grep -r -i "password\|secret\|api_key\|token" src/ --exclude-dir=node_modules; then
+          echo "WARNING: Potential sensitive information found"
+        fi
+        
+        # Check for external dependencies
+        echo "Checking for external dependencies..."
+        grep -o "https://[^\"']*" src/index.html | sort | uniq
+        
+        # Validate HTTPS usage
+        echo "Validating HTTPS usage..."
+        grep -o "http://[^\"']*" src/index.html || echo "No HTTP links found - good!"

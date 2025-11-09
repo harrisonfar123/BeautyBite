@@ -1,0 +1,89 @@
+{
+  "analytics": {
+    "google_analytics": {
+      "enabled": true,
+      "tracking_id": "G-XXXXXXXXXX",
+      "anonymize_ip": true,
+      "enhanced_measurement": {
+        "page_changes": true,
+        "scrolls": true,
+        "clicks": true,
+        "form_interactions": true
+      }
+    },
+    "github_pages_analytics": {
+      "enabled": true,
+      "repository": "harrisonfar123/BeautyBite",
+      "branch": "main"
+    }
+  },
+  "monitoring": {
+    "performance": {
+      "core_web_vitals": {
+        "lcp_threshold": "2500ms",
+        "fid_threshold": "100ms",
+        "cls_threshold": "0.1"
+      },
+      "resource_timing": {
+        "image_loading": true,
+        "font_loading": true,
+        "script_loading": true
+      }
+    },
+    "error_tracking": {
+      "javascript_errors": true,
+      "404_monitoring": true,
+      "broken_links": true
+    },
+    "uptime_monitoring": {
+      "enabled": true,
+      "check_interval": "5m",
+      "endpoints": [
+        "https://harrisonfar123.github.io/BeautyBite/",
+        "https://harrisonfar123.github.io/BeautyBite/index.html"
+      ]
+    }
+  },
+  "security": {
+    "content_security_policy": {
+      "default-src": "'self'",
+      "img-src": "'self' data: https:",
+      "style-src": "'self' 'unsafe-inline'",
+      "script-src": "'self'",
+      "connect-src": "'self'",
+      "font-src": "'self' data:",
+      "object-src": "none",
+      "base-uri": "'self'",
+      "form-action": "'self'"
+    },
+    "ssl_enforcement": {
+      "https_redirect": true,
+      "hsts_enabled": true,
+      "hsts_max_age": "63072000"
+    }
+  },
+  "deployment": {
+    "auto_deploy": true,
+    "environment": "production",
+    "backup_retention": "30d",
+    "rollback_enabled": true,
+    "health_check_endpoint": "/health"
+  },
+  "performance_optimization": {
+    "image_optimization": {
+      "webp_format": true,
+      "lazy_loading": true,
+      "responsive_images": true
+    },
+    "caching": {
+      "browser_cache": "1y",
+      "cdn_cache": "1h",
+      "service_worker": false
+    },
+    "code_splitting": {
+      "css_optimization": true,
+      "html_minification": true,
+      "javascript_minification": false
+    }
+  }
+}
