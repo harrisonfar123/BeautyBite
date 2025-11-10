@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BeautyBite - Advanced Medical Device Technology</title>
-    <meta name="description" content="BeautyBite develops innovative medical devices featuring advanced electrical isolation technology for safe and effective cosmetic procedures and clinical treatments.">
-    <meta name="keywords" content="medical device, electrical isolation, cosmetic procedures, clinical treatments, beauty technology">
-    
+    <meta name="description"
+        content="BeautyBite develops innovative medical devices featuring advanced electrical isolation technology for safe and effective cosmetic procedures and clinical treatments.">
+    <meta name="keywords"
+        content="medical device, electrical isolation, cosmetic procedures, clinical treatments, beauty technology">
+
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://harrisonfar123.github.io; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com blob:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    
+
     <!-- Performance Optimization -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <!-- Three.js Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <!-- Monitoring and Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-XXXXXXXXXX', {
             'anonymize_ip': true,
             'page_title': 'BeautyBite - Advanced Medical Device Technology'
         });
     </script>
-    
+
     <!-- GitHub Pages Analytics -->
     <script src="https://harrisonfar123.github.io/BeautyBite/assets/analytics.js"></script>
 </head>
+
 <body>
     <header>
         <div class="header-container">
             <div class="logo-section">
-                <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/logo1.webp" alt="BeautyBite Logo" class="logo-main" loading="eager">
-                <h1>BeautyBite</h1>
+                <h1 class="site-title">BeautyBite</h1>
             </div>
             <nav>
                 <ul>
@@ -59,11 +65,227 @@
                 <div class="hero-content">
                     <div class="hero-text">
                         <h2 class="fade-in-up">Advanced Electrical Isolation Technology</h2>
-                        <p class="fade-in-up">Revolutionary medical device technology ensuring patient safety and treatment efficacy through innovative electrical isolation systems.</p>
+                        <p class="fade-in-up">Revolutionary medical device technology ensuring patient safety and
+                            treatment efficacy through innovative electrical isolation systems.</p>
                         <a href="#technology" class="btn fade-in-up">Explore Technology</a>
                     </div>
                     <div class="hero-visual">
-                        <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/logo2.webp" alt="BeautyBite Technology" class="hero-logo" loading="eager">
+                        <div class="model-container">
+                            <canvas id="threejs-canvas"></canvas>
+                            <div class="loading-indicator">Loading 3D Model...</div>
+                        </div>
+
+                        <!-- Three.js 3D Model Viewer -->
+                        <script>
+                            // Three.js scene setup
+                            let scene, camera, renderer, model, controls;
+                            let isLoading = false;
+                            let hasError = false;
+
+                            function initThreeJS() {
+                                // Get canvas element
+                                const canvas = document.getElementById('threejs-canvas');
+                                if (!canvas) return;
+
+                                // Scene setup
+                                scene = new THREE.Scene();
+                                scene.background = new THREE.Color(0xf5f7fa);
+
+                                // Camera setup
+                                camera = new THREE.PerspectiveCamera(
+                                    75,
+                                    canvas.clientWidth / canvas.clientHeight,
+                                    0.1,
+                                    1000
+                                );
+                                // Position camera from a moderate height looking down at the model
+                                camera.position.set(0, 1.5, 4);
+                                camera.lookAt(0, 0, 0);
+
+                                // Renderer setup
+                                renderer = new THREE.WebGLRenderer({
+                                    canvas: canvas,
+                                    antialias: true,
+                                    alpha: true
+                                });
+                                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                                renderer.setPixelRatio(window.devicePixelRatio);
+                                renderer.shadowMap.enabled = true;
+                                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+                                // Lighting setup
+                                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                                scene.add(ambientLight);
+
+                                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                                directionalLight.position.set(10, 10, 5);
+                                directionalLight.castShadow = true;
+                                directionalLight.shadow.mapSize.width = 2048;
+                                directionalLight.shadow.mapSize.height = 2048;
+                                scene.add(directionalLight);
+
+                                const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+                                directionalLight2.position.set(-10, -10, -5);
+                                scene.add(directionalLight2);
+
+                                // Controls setup
+                                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                                controls.enableDamping = true;
+                                controls.dampingFactor = 0.05;
+                                controls.screenSpacePanning = false;
+                                controls.minDistance = 1.5;
+                                controls.maxDistance = 8;
+                                controls.maxPolarAngle = Math.PI / 2;
+
+                                // Handle window resize
+                                window.addEventListener('resize', onWindowResize, false);
+
+                                // Start loading the model
+                                loadGLBModel();
+                            }
+
+                            function loadGLBModel() {
+                                if (isLoading) return;
+
+                                isLoading = true;
+                                updateLoadingUI();
+
+                                // GLTFLoader setup
+                                const loader = new THREE.GLTFLoader();
+
+                                // Load the GLB model
+                                loader.load(
+                                    'mg.glb',
+                                    function (gltf) {
+                                        model = gltf.scene;
+
+                                        // Center and scale the model
+                                        const box = new THREE.Box3().setFromObject(model);
+                                        const center = box.getCenter(new THREE.Vector3());
+                                        const size = box.getSize(new THREE.Vector3());
+
+                                        const maxDim = Math.max(size.x, size.y, size.z);
+                                        const scale = 3 / maxDim;
+                                        model.scale.multiplyScalar(scale);
+
+                                        model.position.sub(center.multiplyScalar(scale));
+
+                                        // Enable shadows
+                                        model.traverse((node) => {
+                                            if (node.isMesh) {
+                                                node.castShadow = true;
+                                                node.receiveShadow = true;
+                                            }
+                                        });
+
+                                        // Rotate model to face opposite direction
+                                        model.rotation.y = Math.PI;
+
+                                        scene.add(model);
+
+                                        // Start auto-rotation
+                                        startAutoRotation();
+
+                                        isLoading = false;
+                                        updateLoadingUI();
+                                    },
+                                    function (xhr) {
+                                        // Loading progress
+                                        const percentComplete = (xhr.loaded / xhr.total) * 100;
+                                        console.log('Loading model: ' + percentComplete.toFixed(2) + '%');
+                                    },
+                                    function (error) {
+                                        console.error('Error loading GLB model:', error);
+                                        isLoading = false;
+                                        hasError = true;
+                                        updateLoadingUI();
+                                    }
+                                );
+                            }
+
+                            function startAutoRotation() {
+                                if (!model) return;
+
+                                let isUserInteracting = false;
+
+                                // Listen for user interaction
+                                controls.addEventListener('start', () => {
+                                    isUserInteracting = true;
+                                });
+
+                                controls.addEventListener('end', () => {
+                                    isUserInteracting = false;
+                                });
+
+                                // Auto-rotate the model
+                                function animate() {
+                                    requestAnimationFrame(animate);
+
+                                    if (model) {
+                                        // Only rotate when user is not interacting
+                                        if (!isUserInteracting) {
+                                            model.rotation.y += 0.003; // Slower rotation
+                                        }
+
+                                        controls.update();
+                                        renderer.render(scene, camera);
+                                    }
+                                }
+
+                                // Start animation immediately
+                                animate();
+                            }
+
+                            function onWindowResize() {
+                                const canvas = document.getElementById('threejs-canvas');
+                                if (!canvas) return;
+
+                                camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                                camera.updateProjectionMatrix();
+                                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                            }
+
+                            function updateLoadingUI() {
+                                const loadingIndicator = document.querySelector('.loading-indicator');
+                                if (!loadingIndicator) return;
+
+                                if (isLoading) {
+                                    loadingIndicator.style.display = 'flex';
+                                    loadingIndicator.innerHTML = `
+                                        <div class="spinner"></div>
+                                        <span>Loading 3D Model...</span>
+                                    `;
+                                } else if (hasError) {
+                                    loadingIndicator.style.display = 'flex';
+                                    loadingIndicator.innerHTML = `
+                                        <div class="error-icon">⚠️</div>
+                                        <span>Error loading model. Please refresh the page.</span>
+                                    `;
+                                } else {
+                                    loadingIndicator.style.display = 'none';
+                                }
+                            }
+
+                            // Initialize Three.js when DOM is loaded
+                            document.addEventListener('DOMContentLoaded', function () {
+                                initThreeJS();
+                            });
+
+                            // Handle visibility change to pause/resume animation
+                            document.addEventListener('visibilitychange', function () {
+                                if (document.hidden) {
+                                    // Pause animation when tab is not visible
+                                    if (controls) {
+                                        controls.enabled = false;
+                                    }
+                                } else {
+                                    // Resume animation when tab becomes visible
+                                    if (controls) {
+                                        controls.enabled = true;
+                                    }
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
@@ -71,15 +293,22 @@
 
         <section id="about" class="about">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header centered">
                     <h2>About BeautyBite</h2>
                 </div>
                 <div class="about-content">
-                    <p>BeautyBite is at the forefront of medical device innovation, specializing in advanced electrical isolation technology for cosmetic and clinical applications. Our patented technology represents a breakthrough in patient safety and treatment efficacy.</p>
-                    
-                    <p>Founded on the principles of innovation, safety, and clinical excellence, BeautyBite develops cutting-edge medical devices that meet the highest standards of quality and performance. Our proprietary electrical isolation architecture ensures maximum safety while delivering optimal therapeutic outcomes.</p>
-                    
-                    <p>Our mission is to advance medical technology through continuous research and development, creating solutions that improve patient outcomes and set new standards in the medical device industry.</p>
+                    <p>BeautyBite is at the forefront of medical device innovation, specializing in advanced electrical
+                        isolation technology for cosmetic and clinical applications. Our patented technology represents
+                        a breakthrough in patient safety and treatment efficacy.</p>
+
+                    <p>Founded on the principles of innovation, safety, and clinical excellence, BeautyBite develops
+                        cutting-edge medical devices that meet the highest standards of quality and performance. Our
+                        proprietary electrical isolation architecture ensures maximum safety while delivering optimal
+                        therapeutic outcomes.</p>
+
+                    <p>Our mission is to advance medical technology through continuous research and development,
+                        creating solutions that improve patient outcomes and set new standards in the medical device
+                        industry.</p>
                 </div>
             </div>
         </section>
@@ -93,63 +322,78 @@
                 <div class="tech-grid">
                     <div class="tech-card">
                         <div class="tech-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <!-- Precision Engineering Icon - Gear with precision elements -->
+                                <path
+                                    d="M12 2V6M12 18V22M4.22 4.22L7.05 7.05M16.95 16.95L19.78 19.78M2 12H6M18 12H22M4.22 19.78L7.05 16.95M16.95 7.05L19.78 4.22"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none" />
+                                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
                             </svg>
                         </div>
                         <h3>Electrical Isolation Architecture</h3>
-                        <p>Advanced multi-layer isolation system designed to prevent electrical current leakage and ensure patient safety during all cosmetic and clinical procedures.</p>
+                        <p>Advanced multi-layer isolation system designed to prevent electrical current leakage and
+                            ensure patient safety during all cosmetic and clinical procedures.</p>
                         <div class="feature-badges">
                             <span class="feature-badge">Multi-layer</span>
                             <span class="feature-badge">Medical Grade</span>
                         </div>
                     </div>
-                    
+
                     <div class="tech-card">
                         <div class="tech-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <!-- Advanced Materials Icon - Hexagonal molecular structure -->
+                                <path d="M12 2L4 7V17L12 22L20 17V7L12 2Z" stroke="currentColor" stroke-width="2"
+                                    fill="none" />
+                                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                                <circle cx="8" cy="9" r="1.5" fill="currentColor" />
+                                <circle cx="16" cy="9" r="1.5" fill="currentColor" />
+                                <circle cx="8" cy="15" r="1.5" fill="currentColor" />
+                                <circle cx="16" cy="15" r="1.5" fill="currentColor" />
+                                <line x1="12" y1="12" x2="8" y2="9" stroke="currentColor" stroke-width="1" />
+                                <line x1="12" y1="12" x2="16" y2="9" stroke="currentColor" stroke-width="1" />
+                                <line x1="12" y1="12" x2="8" y2="15" stroke="currentColor" stroke-width="1" />
+                                <line x1="12" y1="12" x2="16" y2="15" stroke="currentColor" stroke-width="1" />
                             </svg>
                         </div>
                         <h3>Material Innovation</h3>
-                        <p>Proprietary biocompatible materials with precise thickness control (0.001-0.010 inches) providing optimal electrical isolation without compromising device flexibility.</p>
+                        <p>Proprietary biocompatible materials with precise thickness control (0.001-0.010 inches)
+                            providing optimal electrical isolation without compromising device flexibility.</p>
                         <div class="feature-badges">
                             <span class="feature-badge">Biocompatible</span>
                             <span class="feature-badge">Precision</span>
                         </div>
                     </div>
-                    
+
                     <div class="tech-card">
                         <div class="tech-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <!-- Innovation/Technology Icon - Lightbulb with circuit elements -->
+                                <path
+                                    d="M12 2C8.13 2 5 5.13 5 9C5 11 6 12.5 7 13.5V17C7 18.1 7.9 19 9 19H15C16.1 19 17 18.1 17 17V13.5C18 12.5 19 11 19 9C19 5.13 15.87 2 12 2Z"
+                                    stroke="currentColor" stroke-width="2" fill="none" />
+                                <path d="M9 14C9 14 10 15 12 15C14 15 15 14 15 14" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <circle cx="12" cy="8" r="1" fill="currentColor" />
+                                <path d="M12 8V6M12 8V10" stroke="currentColor" stroke-width="1"
+                                    stroke-linecap="round" />
+                                <path d="M10 8H8M16 8H14" stroke="currentColor" stroke-width="1"
+                                    stroke-linecap="round" />
                             </svg>
                         </div>
                         <h3>Current Range Management</h3>
-                        <p>Sophisticated current regulation system supporting precise control from microamperes to milliamperes, ensuring safe and effective treatment delivery.</p>
+                        <p>Sophisticated current regulation system supporting precise control from microamperes to
+                            milliamperes, ensuring safe and effective treatment delivery.</p>
                         <div class="feature-badges">
                             <span class="feature-badge">Precision Control</span>
                             <span class="feature-badge">Wide Range</span>
                         </div>
                     </div>
-                    
-                    <div class="tech-card">
-                        <div class="tech-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Safety Monitoring</h3>
-                        <p>Real-time safety monitoring with automatic shutdown capabilities, providing an additional layer of protection for patients and practitioners.</p>
-                        <div class="feature-badges">
-                            <span class="feature-badge">Real-time</span>
-                            <span class="feature-badge">Auto-shutdown</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </section>
@@ -163,71 +407,57 @@
                 <div class="applications-grid">
                     <div class="application-card">
                         <div class="app-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </div>
                         <h3>Cosmetic Procedures</h3>
-                        <p>Safe and effective treatments for skin rejuvenation, wrinkle reduction, and aesthetic enhancement with minimal risk of electrical complications.</p>
+                        <p>Safe and effective treatments for skin rejuvenation, wrinkle reduction, and aesthetic
+                            enhancement with minimal risk of electrical complications.</p>
                         <div class="app-features">
-                            <div class="progress-indicator">
-                                <div class="progress-bar" style="width: 95%"></div>
-                            </div>
-                            <span class="feature-badge">95% Safety</span>
+                            <span class="feature-badge">Enhanced Safety</span>
                         </div>
                     </div>
-                    
+
                     <div class="application-card">
                         <div class="app-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                         </div>
                         <h3>Therapeutic Treatments</h3>
-                        <p>Clinical applications for pain management, tissue regeneration, and medical therapy with enhanced safety protocols.</p>
+                        <p>Clinical applications for pain management, tissue regeneration, and medical therapy with
+                            enhanced safety protocols.</p>
                         <div class="app-features">
-                            <div class="progress-indicator">
-                                <div class="progress-bar" style="width: 90%"></div>
-                            </div>
-                            <span class="feature-badge">90% Efficacy</span>
+                            <span class="feature-badge">High Efficacy</span>
                         </div>
                     </div>
-                    
+
                     <div class="application-card">
                         <div class="app-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.93 4.93A10 10 0 0 1 19.07 19.07" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 2L12 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M2 12L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                         </div>
                         <h3>Minimally Invasive Procedures</h3>
-                        <p>Support for advanced minimally invasive techniques requiring precise electrical control and maximum patient safety.</p>
+                        <p>Support for advanced minimally invasive techniques requiring precise electrical control and
+                            maximum patient safety.</p>
                         <div class="app-features">
-                            <div class="progress-indicator">
-                                <div class="progress-bar" style="width: 88%"></div>
-                            </div>
-                            <span class="feature-badge">88% Precision</span>
+                            <span class="feature-badge">High Precision</span>
                         </div>
                     </div>
-                    
-                    <div class="application-card">
-                        <div class="app-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23L12 21L16.38 23C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Specialized Medical Applications</h3>
-                        <p>Customizable solutions for specialized medical treatments requiring electrical isolation and precise current delivery.</p>
-                        <div class="app-features">
-                            <div class="progress-indicator">
-                                <div class="progress-bar" style="width: 92%"></div>
-                            </div>
-                            <span class="feature-badge">92% Customizable</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </section>
@@ -249,7 +479,7 @@
                             <li><strong>Frequency Response:</strong> DC - 10kHz</li>
                         </ul>
                     </div>
-                    
+
                     <div class="specs-column">
                         <h3>Material Specifications</h3>
                         <ul>
@@ -259,12 +489,13 @@
                             <li><strong>Flexibility:</strong> High, maintains performance</li>
                         </ul>
                     </div>
-                    
+
                     <div class="specs-column">
                         <h3>Safety Features</h3>
                         <ul>
                             <li><strong>Isolation Rating:</strong> Medical grade</li>
-                            <li><strong>Leakage Current:</strong> < 10µA</li>
+                            <li><strong>Leakage Current:</strong>
+                                < 10µA</li>
                             <li><strong>Fault Protection:</strong> Automatic shutdown</li>
                             <li><strong>Compliance:</strong> IEC 60601, FDA standards</li>
                         </ul>
@@ -277,12 +508,14 @@
             <div class="container">
                 <div class="section-header">
                     <h2>Technical Visualization</h2>
-                    <p>Interactive diagrams and visual representations of our patented electrical isolation technology</p>
+                    <p>Interactive diagrams and visual representations of our patented electrical isolation technology
+                    </p>
                 </div>
                 <div class="visualization-grid">
                     <div class="viz-card">
                         <div class="viz-content">
-                            <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/diagram1.png" alt="Electrical Isolation Architecture" class="viz-image" loading="lazy">
+                            <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/diagram1.png"
+                                alt="Electrical Isolation Architecture" class="viz-image" loading="lazy">
                             <h3>Diagram 1: Electrical Isolation Architecture</h3>
                             <p>Multi-layer isolation system diagram showing advanced electrical protection</p>
                             <div class="patent-indicator">Patent: C1688.70001US00</div>
@@ -290,17 +523,10 @@
                     </div>
                     <div class="viz-card">
                         <div class="viz-content">
-                            <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/diagram2.png" alt="Current Flow Visualization" class="viz-image" loading="lazy">
+                            <img src="https://raw.githubusercontent.com/harrisonfar123/BeautyBite/main/diagram2.png"
+                                alt="Current Flow Visualization" class="viz-image" loading="lazy">
                             <h3>Diagram 2: Current Flow Visualization</h3>
                             <p>Current regulation and monitoring system with precision control</p>
-                            <div class="patent-indicator">Patent: C1688.70001US00</div>
-                        </div>
-                    </div>
-                    <div class="viz-card">
-                        <div class="viz-content">
-                            <img src="https://images.squarespace-cdn.com/content/v1/5f8a3c4b2b6a3b3b8c8d4e4f/5f8a3c4b2b6a3b3b8c8d4e4f/diagram3.png" alt="Safety Monitoring System" class="viz-image">
-                            <h3>Diagram 3: Safety Monitoring System</h3>
-                            <p>Real-time protection mechanisms and automatic safety protocols</p>
                             <div class="patent-indicator">Patent: C1688.70001US00</div>
                         </div>
                     </div>
@@ -314,110 +540,55 @@
                     <h2>Innovation Showcase</h2>
                     <p>Cutting-edge medical device technology with advanced visualization</p>
                 </div>
-                
+
                 <div class="innovation-cards">
                     <div class="innovation-card">
                         <div class="innovation-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </div>
                         <h3>Advanced Electrical Isolation</h3>
-                        <p>Revolutionary multi-layer isolation technology providing unprecedented levels of patient safety and treatment efficacy.</p>
+                        <p>Revolutionary multi-layer isolation technology providing unprecedented levels of patient
+                            safety and treatment efficacy.</p>
                         <div class="feature-badges">
                             <span class="feature-badge">Patented</span>
                             <span class="feature-badge">Medical Grade</span>
                             <span class="feature-badge">Innovative</span>
                         </div>
                     </div>
-                    
+
                     <div class="innovation-card">
                         <div class="innovation-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                         </div>
                         <h3>Precision Current Control</h3>
-                        <p>Advanced regulation system supporting microampere to milliampere precision for optimal treatment delivery.</p>
+                        <p>Advanced regulation system supporting microampere to milliampere precision for optimal
+                            treatment delivery.</p>
                         <div class="feature-badges">
                             <span class="feature-badge">Precision</span>
                             <span class="feature-badge">Adaptive</span>
                             <span class="feature-badge">Smart</span>
                         </div>
                     </div>
-                    
-                    <div class="innovation-card">
-                        <div class="innovation-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Real-time Safety Monitoring</h3>
-                        <p>Continuous monitoring with automatic shutdown capabilities ensuring maximum patient protection.</p>
-                        <div class="feature-badges">
-                            <span class="feature-badge">Real-time</span>
-                            <span class="feature-badge">Automatic</span>
-                            <span class="feature-badge">Secure</span>
-                        </div>
-                    </div>
+
                 </div>
-                
+
                 <div class="tech-metrics">
                     <div class="metric-card">
-                        <div class="metric-value">99.9%</div>
-                        <div class="metric-label">Safety Rating</div>
+                        <div class="metric-value">Advanced</div>
+                        <div class="metric-label">Technology</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value">10,000+</div>
-                        <div class="metric-label">Procedures</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">50+</div>
-                        <div class="metric-label">Clinical Studies</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">24/7</div>
-                        <div class="metric-label">Support</div>
-                    </div>
-                </div>
-                
-                <div class="interactive-demo">
-                    <div class="demo-content">
-                        <h3>Interactive Technology Demo</h3>
-                        <p>Experience our advanced electrical isolation technology through this interactive demonstration</p>
-                        <div class="demo-features">
-                            <div class="demo-feature">
-                                <div class="feature-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <div class="feature-title">Electrical Flow</div>
-                                <div class="feature-description">Visualize current flow through our isolation system</div>
-                            </div>
-                            <div class="demo-feature">
-                                <div class="feature-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <div class="feature-title">Power Control</div>
-                                <div class="feature-description">Adjust and monitor power delivery in real-time</div>
-                            </div>
-                            <div class="demo-feature">
-                                <div class="feature-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <div class="feature-title">Safety Systems</div>
-                                <div class="feature-description">Experience our advanced safety monitoring protocols</div>
-                            </div>
-                        </div>
+                        <div class="metric-value">Patented</div>
+                        <div class="metric-label">Design</div>
                     </div>
                 </div>
             </div>
@@ -434,54 +605,64 @@
                     <div class="contact-info">
                         <h3>Contact Information</h3>
                         <p><strong>Address:</strong><br>
-                        123 Medical Innovation Drive<br>
-                        Boston, MA 02115</p>
-                        
+                            123 Medical Innovation Drive<br>
+                            Boston, MA 02115</p>
+
                         <p><strong>Phone:</strong><br>
-                        +1 (555) 987-6543</p>
-                        
+                            +1 (555) 987-6543</p>
+
                         <p><strong>Email:</strong><br>
-                        info@beautybite-medical.com</p>
-                        
+                            info@beautybite-medical.com</p>
+
                         <p><strong>Business Hours:</strong><br>
-                        Monday - Friday: 8:00 AM - 6:00 PM<br>
-                        Saturday: 9:00 AM - 2:00 PM<br>
-                        Sunday: Closed</p>
+                            Monday - Friday: 8:00 AM - 6:00 PM<br>
+                            Saturday: 9:00 AM - 2:00 PM<br>
+                            Sunday: Closed</p>
                     </div>
-                    
+
                     <div class="contact-form">
                         <form>
                             <div class="form-group">
                                 <label for="name">Full Name *</label>
                                 <input type="text" id="name" name="name" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="email">Email Address *</label>
                                 <input type="email" id="email" name="email" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="subject">Subject</label>
                                 <input type="text" id="subject" name="subject">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="message">Message *</label>
-                                <textarea id="message" name="message" required placeholder="Tell us how we can assist you..."></textarea>
+                                <textarea id="message" name="message" required
+                                    placeholder="Tell us how we can assist you..."></textarea>
                             </div>
-                            
+
                             <button type="submit" class="btn">Send Message</button>
                         </form>
                     </div>
                 </div>
             </div>
         </section>
+
+
     </main>
 
     <footer>
         <div class="container">
-            <p>&copy; 2024 BeautyBite Medical Technologies. All rights reserved. | Advancing medical device innovation through electrical isolation technology</p>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2 class="site-title">BeautyBite</h2>
+                </div>
+                <div class="footer-text">
+                    <p>&copy; 2025 BeautyBite. Innovative medical devices ensuring patient safety and treatment efficiency.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -497,18 +678,18 @@
         });
 
         // Add loading animation to form submission
-        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
+        document.querySelector('.contact-form form').addEventListener('submit', function (e) {
             e.preventDefault();
             const button = this.querySelector('.btn');
             button.classList.add('loading');
             button.textContent = 'Sending...';
-            
+
             // Simulate form submission
             setTimeout(() => {
                 button.classList.remove('loading');
                 button.textContent = 'Message Sent!';
                 this.reset();
-                
+
                 setTimeout(() => {
                     button.textContent = 'Send Message';
                 }, 2000);
@@ -535,4 +716,5 @@
         });
     </script>
 </body>
+
 </html>

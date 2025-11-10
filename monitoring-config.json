@@ -47,11 +47,11 @@
   "security": {
     "content_security_policy": {
       "default-src": "'self'",
-      "img-src": "'self' data: https:",
-      "style-src": "'self' 'unsafe-inline'",
-      "script-src": "'self'",
-      "connect-src": "'self'",
-      "font-src": "'self' data:",
+      "img-src": "'self' data: https: blob:",
+      "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src": "'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://harrisonfar123.github.io",
+      "connect-src": "'self' https://www.google-analytics.com https://www.googletagmanager.com blob:",
+      "font-src": "'self' https://fonts.gstatic.com",
       "object-src": "none",
       "base-uri": "'self'",
       "form-action": "'self'"
