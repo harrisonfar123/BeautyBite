@@ -131,7 +131,7 @@
 
             try {
                 console.log('Verifying token for user:', user.name);
-                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                const response = await fetch('https://beautybite-36e5434be6c8.herokuapp.com/api/auth/verify', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
