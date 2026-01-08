@@ -1,168 +1,165 @@
-// Complete Express server for BeautyBite authentication
-// Load environment variables first
-require('dotenv').config();
+// server.js - Complete Express backend for BeautyBite authentication
+// Features: Register, Login, Verify JWT, Logout (client-side)
+// DB: PostgreSQL via pg pool, bcrypt for hashing, JWT for tokens
+// Validation: Email regex, password length
+// Error handling: 400, 401, 409, 500 with messages
+// CORS: All origins for development
 
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const pool = require('./db'); // Database connection pool
+const jwt = require('jsonwebtoken');
+const pool = require('./db');  // PostgreSQL pool
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-// CORS for development (frontend on localhost any port)
-app.use(cors({
-    origin: /^http:\/\/localhost(:\d+)?$/,
-    credentials: true
-}));
-
-// Body parsers
+app.use(cors({ origin: '*' }));  // Allow all origins in development; restrict in production
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Email validation regex
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// JWT authentication middleware for protected routes
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    if (!token) {
-        return res.status(401).json({ error: 'Access token required' });
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            console.log('Token verification failed:', err.message);
-            return res.status(401).json({ error: 'Invalid or expired token' });
-        }
-        req.user = user;
-        next();
-    });
-};
+// Simple email validation regex
+const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
 
 // POST /api/auth/register
-// Registers new user with validation, bcrypt hashing, unique email check
+// Body: { name, email, password }
+// Creates user if email unique, hashes password (10 rounds), returns user without pw
 app.post('/api/auth/register', async (req, res) => {
     try {
-        let { name, email, password } = req.body;
-
-        // Sanitize inputs
-        name = (name || '').trim();
-        email = (email || '').trim().toLowerCase();
-        password = password || '';
+        const { name, email, password } = req.body;
 
         // Validation
         if (!name || !email || !password) {
-            return res.status(400).json({ error: 'Name, email, and password are required' });
+            return res.status(400).json({ message: 'Missing required fields: name, email, password' });
         }
         if (!emailRegex.test(email)) {
-            return res.status(400).json({ error: 'Invalid email format' });
+            return res.status(400).json({ message: 'Invalid email format' });
         }
         if (password.length < 6) {
-            return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+            return res.status(400).json({ message: 'Password must be at least 6 characters long' });
         }
 
-        // Hash password
+        // Hash password with 10 salt rounds
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insert user with prepared statement
-        const query = `
-      INSERT INTO users (email, password, name) 
-      VALUES ($1, $2, $3) 
-      RETURNING id, email, name
-    `;
-        const result = await pool.query(query, [email, hashedPassword, name]);
-
-        const user = result.rows[0];
-        // Generate JWT
-        const token = jwt.sign(
-            { id: user.id, email: user.email, name: user.name },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
+        // Insert user with prepared statement (prevents SQL injection)
+        const result = await pool.query(
+            'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
+            [name, email, hashedPassword]
         );
 
-        console.log(`User registered: ${email}`);
-        res.status(201).json({ message: 'User created successfully', token });
-    } catch (err) {
-        console.error('Register error:', err);
-        if (err.code === '23505') { // PostgreSQL unique violation
-            return res.status(409).json({ error: 'Email already exists' });
+        console.log('✅ New user registered:', result.rows[0].email);
+        res.status(201).json({
+            message: 'User created successfully',
+            user: result.rows[0]
+        });
+    } catch (error) {
+        console.error('❌ Register error:', error);
+        // PostgreSQL unique violation error code
+        if (error.code === '23505') {
+            return res.status(409).json({ message: 'Email already exists' });
         }
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 // POST /api/auth/login
-// Logs in user, verifies password, returns token and user info
+// Body: { email, password }
+// Verifies credentials, signs JWT (7 days), returns token and user
 app.post('/api/auth/login', async (req, res) => {
     try {
-        let { email, password } = req.body;
-
-        // Sanitize
-        email = (email || '').trim().toLowerCase();
-        password = password || '';
+        const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+            return res.status(400).json({ message: 'Email and password required' });
         }
 
-        // Find user
+        // Find user by email
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         const user = result.rows[0];
 
+        // Verify password hash
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            console.log('Invalid login attempt for:', email);
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Generate JWT
+        // Sign JWT with user id and email, expires in 7 days
         const token = jwt.sign(
-            { id: user.id, email: user.email, name: user.name },
+            { id: user.id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        console.log(`User logged in: ${email}`);
+        console.log('✅ User logged in:', user.email);
         res.status(200).json({
             token,
-            user: { name: user.name, email: user.email }
+            user: { id: user.id, name: user.name, email: user.email }
         });
-    } catch (err) {
-        console.error('Login error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 // GET /api/auth/verify
-// Verifies JWT token, returns user info if valid
-app.get('/api/auth/verify', authenticateToken, (req, res) => {
-    console.log(`Token verified for user: ${req.user.email}`);
-    res.status(200).json({
-        valid: true,
-        user: { name: req.user.name, email: req.user.email }
-    });
+// Header: Authorization: Bearer <token>
+// Verifies JWT, returns user if valid
+app.get('/api/auth/verify', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];  // Bearer TOKEN
+
+        if (!token) {
+            return res.status(401).json({ message: 'Authorization token required' });
+        }
+
+        // Verify JWT
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Fetch fresh user data
+        const result = await pool.query(
+            'SELECT id, name, email FROM users WHERE id = $1',
+            [decoded.id]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        console.log('✅ Token verified for user:', user.email);
+        res.status(200).json({ valid: true, user });
+    } catch (error) {
+        console.error('❌ Verify error:', error.message);
+        res.status(401).json({ message: 'Invalid or expired token' });
+    }
 });
 
 // POST /api/auth/logout
-// Client-side logout (clears token), server just acknowledges
+// Client-side only: clears token in frontend
 app.post('/api/auth/logout', (req, res) => {
-    console.log('Logout requested');
-    res.status(200).json({ message: 'Logged out successfully' });
+    console.log('👋 Logout requested');
+    res.status(200).json({ message: 'Logged out successfully (token cleared client-side)' });
 });
 
-// Error handling middleware (catch-all)
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Global error handler (optional)
 app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ Unhandled error:', err);
+    res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-    console.log('Auth endpoints ready: /api/auth/register, /api/auth/login, /api/auth/verify, /api/auth/logout');
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Health: http://localhost:${PORT}/health`);
 });
+
+module.exports = app;  // For testing if needed

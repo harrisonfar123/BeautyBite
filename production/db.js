@@ -1,19 +1,22 @@
+// db.js - PostgreSQL connection pool for BeautyBite backend
 const { Pool } = require('pg');
-const url = require('url');
-require('dotenv').config();
 
-const params = url.parse(process.env.DATABASE_URL);
-const auth = params.auth.split(':');
-
+// Create connection pool using DATABASE_URL from .env
 const pool = new Pool({
-    user: auth[0],
-    password: auth[1],
-    host: params.hostname,
-    port: params.port,
-    database: params.pathname.split('/')[1],
+    connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false  // Required for Heroku Postgres
     }
+});
+
+// Log connection events for debugging
+pool.on('connect', () => {
+    console.log('✅ Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+    console.error('❌ Unexpected error on idle client', err);
+    process.exit(-1);
 });
 
 module.exports = pool;
