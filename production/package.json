@@ -5,14 +5,8 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "dev": "nodemon server.js"
+        "heroku-postbuild": "npm rebuild bcrypt --build-from-source"
     },
-    "keywords": [
-        "express",
-        "postgres",
-        "auth",
-        "nodejs"
-    ],
     "author": "",
     "license": "ISC",
     "dependencies": {
