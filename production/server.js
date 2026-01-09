@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Simple email validation regex
-const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // POST /api/auth/register
 // Body: { name, email, password }
