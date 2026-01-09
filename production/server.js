@@ -44,7 +44,51 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         const session = event.data.object;
         console.log('Payment successful for session:', session.id);
 
-        // TODO: Save order to database here
+        try {
+            // Get session details from metadata
+            const userId = session.metadata?.user_id;
+            const productType = session.metadata?.product_type;
+            const quantity = session.metadata?.quantity || 1;
+            const subscriptionMonths = session.metadata?.subscription_months;
+
+            if (productType === 'one-time') {
+                // Insert one-time order
+                await pool.query(`
+                    INSERT INTO orders (user_id, stripe_session_id, stripe_payment_intent_id, product_type, quantity, amount, status)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                `, [
+                    userId,
+                    session.id,
+                    session.payment_intent,
+                    'one-time',
+                    quantity,
+                    session.amount_total / 100,
+                    'completed'
+                ]);
+                console.log('✅ Order saved to database');
+
+            } else if (productType === 'subscription') {
+                // Insert subscription
+                const endDate = new Date();
+                endDate.setMonth(endDate.getMonth() + parseInt(subscriptionMonths));
+
+                await pool.query(`
+                    INSERT INTO subscriptions (user_id, stripe_subscription_id, stripe_customer_id, product_id, status, duration_months, end_date)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                `, [
+                    userId,
+                    session.subscription,
+                    session.customer,
+                    session.metadata?.product_id || 'prod_Tl0VtHyf9DBStQ',
+                    'active',
+                    subscriptionMonths,
+                    endDate
+                ]);
+                console.log('✅ Subscription saved to database');
+            }
+        } catch (dbError) {
+            console.error('❌ Database error:', dbError);
+        }
     }
 
     res.json({ received: true });
