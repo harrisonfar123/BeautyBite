@@ -108,6 +108,25 @@
                 Welcome back, <span id="user-name"></span>!
             </h1>
             <button id="logout-btn">Logout</button>
+            <!-- Add this after the "Welcome [name]!" section -->
+            <div class="navigation-buttons"
+                style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                <a href="shop.html"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: transform 0.2s;">
+                    🛒 Go to Shop
+                </a>
+                <a href="orders.html"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: transform 0.2s;">
+                    📦 View Orders
+                </a>
+            </div>
+
+            <style>
+                .navigation-buttons a:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+                }
+            </style>
         </div>
     </div>
     <script>

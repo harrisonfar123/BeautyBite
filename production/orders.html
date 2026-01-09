@@ -256,11 +256,25 @@
         </div>
     </main>
     <script>
-        const API_BASE = location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://beautybite-36e5434be6c8.herokuapp.com';
+        // Always use Heroku backend (frontend is local, backend is on Heroku)
+        const API_BASE = 'https://beautybite-36e5434be6c8.herokuapp.com';
         const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (!token || !user.id) window.location.href = 'login.html';
-        document.querySelector('.user-name').textContent = user.name;
+
+        // Better error handling for user data
+        let user = {};
+        try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+        } catch (e) {
+            console.error('Error parsing user data:', e);
+        }
+
+        // Only redirect if NO token exists
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            window.location.href = 'login.html';
+        }
+
+        document.querySelector('.user-name').textContent = user.name || 'User';
         document.getElementById('logout').onclick = () => { localStorage.clear(); location.href = 'login.html'; };
 
         function populateTable(tableId, data, keys) {
