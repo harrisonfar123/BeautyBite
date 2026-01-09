@@ -278,6 +278,73 @@ app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, r
     }
 });
 
+app.post('/api/stripe/create-payment-intent', authenticateToken, async (req, res) => {
+    try {
+        const { quantity } = req.body;
+        const userId = req.user.id;
+        
+        // Validate quantity
+        if (!quantity || quantity < 1 || quantity > 10000) {
+            return res.status(400).json({ error: 'Invalid quantity (1-10000)' });
+        }
+        
+        // Calculate amount (price is $200 = 20000 cents)
+        const amount = quantity * 20000;
+        
+        // Create PaymentIntent
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount,
+            currency: 'usd',
+            automatic_payment_methods: {
+                enabled: true
+            },
+            metadata: {
+                user_id: userId,
+                product_type: 'one-time',
+                quantity: quantity
+            }
+        });
+        
+        res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+        console.error('PaymentIntent creation error:', error);
+        res.status(500).json({ error: 'Failed to create payment intent' });
+    }
+});
+
+app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
+    try {
+        const { paymentIntentId } = req.body;
+        const userId = req.user.id;
+        
+        // Retrieve PaymentIntent from Stripe
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        
+        if (paymentIntent.status !== 'succeeded') {
+            return res.status(400).json({ error: 'Payment not completed' });
+        }
+        
+        // Save order to database
+        const result = await pool.query(`
+            INSERT INTO orders (user_id, stripe_payment_intent_id, product_type, quantity, amount, status)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *
+        `, [
+            userId,
+            paymentIntent.id,
+            paymentIntent.metadata.product_type,
+            parseInt(paymentIntent.metadata.quantity),
+            paymentIntent.amount / 100, // Convert cents to dollars
+            'completed'
+        ]);
+        
+        res.json({ order: result.rows[0] });
+    } catch (error) {
+        console.error('Payment confirmation error:', error);
+        res.status(500).json({ error: 'Failed to confirm payment' });
+    }
+});
+
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
