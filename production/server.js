@@ -20,6 +20,35 @@ app.use(cors({
     credentials: true
 }));
 
+// IMPORTANT: Webhook endpoint MUST come BEFORE bodyParser.json()
+// It needs express.raw() to verify signatures
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(
+            req.body,  // Raw body
+            sig,
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
+    } catch (err) {
+        console.log('Webhook signature verification failed:', err.message);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log('✅ Webhook received:', event.type);
+
+    // Handle the event
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        console.log('Payment successful for session:', session.id);
+
+        // TODO: Save order to database here
+    }
+
+    res.json({ received: true });
+});
 // Body parsers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
