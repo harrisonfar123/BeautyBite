@@ -237,13 +237,13 @@ app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, r
             return res.status(400).json({ error: 'productType must be "one-time" or "subscription"' });
         }
 
-        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
-            return res.status(400).json({ error: 'quantity must be an integer between 1 and 10' });
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10000) {
+            return res.status(400).json({ error: 'quantity must be an integer between 1 and 10,000' });
         }
 
         if (productType === 'subscription') {
-            if (!Number.isInteger(subscriptionMonths) || subscriptionMonths < 1 || subscriptionMonths > 12) {
-                return res.status(400).json({ error: 'subscriptionMonths must be an integer between 1 and 12' });
+            if (!Number.isInteger(subscriptionMonths) || subscriptionMonths < 1 || subscriptionMonths > 36) {
+                return res.status(400).json({ error: 'subscriptionMonths must be an integer between 1 and 36' });
             }
         }
 
@@ -282,15 +282,15 @@ app.post('/api/stripe/create-payment-intent', authenticateToken, async (req, res
     try {
         const { quantity } = req.body;
         const userId = req.user.id;
-        
+
         // Validate quantity
         if (!quantity || quantity < 1 || quantity > 10000) {
             return res.status(400).json({ error: 'Invalid quantity (1-10000)' });
         }
-        
+
         // Calculate amount (price is $200 = 20000 cents)
         const amount = quantity * 20000;
-        
+
         // Create PaymentIntent
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
@@ -304,7 +304,7 @@ app.post('/api/stripe/create-payment-intent', authenticateToken, async (req, res
                 quantity: quantity
             }
         });
-        
+
         res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
         console.error('PaymentIntent creation error:', error);
@@ -316,14 +316,14 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
     try {
         const { paymentIntentId } = req.body;
         const userId = req.user.id;
-        
+
         // Retrieve PaymentIntent from Stripe
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-        
+
         if (paymentIntent.status !== 'succeeded') {
             return res.status(400).json({ error: 'Payment not completed' });
         }
-        
+
         // Save order to database
         const result = await pool.query(`
             INSERT INTO orders (user_id, stripe_payment_intent_id, product_type, quantity, amount, status)
@@ -337,7 +337,7 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
             paymentIntent.amount / 100, // Convert cents to dollars
             'completed'
         ]);
-        
+
         res.json({ order: result.rows[0] });
     } catch (error) {
         console.error('Payment confirmation error:', error);
