@@ -86,6 +86,21 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
                 ]);
                 console.log('✅ Subscription saved to database');
             }
+            // Schedule subscription cancellation after duration from metadata
+            if (session.mode === 'subscription' && session.subscription && session.metadata?.subscription_months) {
+                try {
+                    const durationMonths = parseInt(session.metadata.subscription_months);
+                    const cancelAt = Math.floor(Date.now() / 1000) + (durationMonths * 30 * 24 * 60 * 60);
+                    
+                    await stripe.subscriptions.update(session.subscription, {
+                        cancel_at: cancelAt
+                    });
+                    
+                    console.log(`✅ Subscription ${session.subscription} scheduled to cancel after ${durationMonths} months`);
+                } catch (subError) {
+                    console.error('❌ Failed to schedule subscription cancellation:', subError);
+                }
+            }
         } catch (dbError) {
             console.error('❌ Database error:', dbError);
         }
@@ -257,8 +272,11 @@ app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, r
             line_items: [{ price: priceId, quantity }],
             ...(productType === 'subscription' && {
                 subscription_data: {
-                    cancel_at: Math.floor(Date.now() / 1000) + (subscriptionMonths * 30 * 24 * 60 * 60),
-                    metadata: { duration_months: subscriptionMonths, user_id: req.user.id }
+                    metadata: {
+                        duration_months: subscriptionMonths,
+                        user_id: req.user.id,
+                        quantity_per_month: quantity
+                    }
                 }
             }),
             success_url: 'http://localhost:3000/shop.html?session_id={CHECKOUT_SESSION_ID}',
