@@ -188,8 +188,8 @@ app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, r
                     metadata: { duration_months: subscriptionMonths, user_id: req.user.id }
                 }
             }),
-            success_url: `https://beautybite-36e5434be6c8.herokuapp.com/shop.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://beautybite-36e5434be6c8.herokuapp.com/shop.html?cancelled=true`,
+            success_url: 'http://localhost:3000/shop.html?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: `https://localhost:3000/shop.html?cancelled=true`,
             metadata: {
                 user_id: req.user.id.toString(),
                 product_type: productType,
