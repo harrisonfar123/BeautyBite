@@ -87,7 +87,7 @@ app.post('/api/auth/register', async (req, res) => {
         );
 
         console.log(`User registered: ${email}`);
-        res.status(201).json({ message: 'User created successfully', token });
+        res.status(201).json({ message: 'User created successfully', token, user: { id: user.id, name: user.name, email: user.email } });
     } catch (err) {
         console.error('Register error:', err);
         if (err.code === '23505') { // PostgreSQL unique violation
