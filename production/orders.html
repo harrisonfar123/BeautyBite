@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeautyBite Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body.gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        #back-shop {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        #back-shop:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        #logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .section {
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .section h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 40px;
+        }
+
+        thead th {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        tbody td {
+            padding: 18px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.9);
+            color: white;
+        }
+
+        .status-active {
+            background: rgba(33, 150, 243, 0.9);
+            color: white;
+        }
+
+        .status-cancelled {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+        }
+
+        .details-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .details-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1em;
+        }
+
+        .empty-state a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .header-left {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            thead th,
+            tbody td {
+                min-width: 100px;
+                padding: 12px 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body class="gradient-bg">
+    <div class="header">
+        <div class="header-left">
+            <h1>Order History</h1>
+            <a id="back-shop" href="shop.html">← Back to Shop</a>
+        </div>
+        <span class="user-name">Guest</span>
+        <button id="logout">Logout</button>
+    </div>
+    <main>
+        <div id="orders-section" class="section">
+            <h2>Orders</h2>
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="subs-section" class="section">
+            <h2>Subscriptions</h2>
+            <table id="subs-table">
+                <thead>
+                    <tr>
+                        <th>Duration</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                        <th>Next Billing</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
+    <script>
+        const API_BASE = location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://beautybite-36e5434be6c8.herokuapp.com';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!token || !user.id) window.location.href = 'login.html';
+        document.querySelector('.user-name').textContent = user.name;
+        document.getElementById('logout').onclick = () => { localStorage.clear(); location.href = 'login.html'; };
+
+        function populateTable(tableId, data, keys) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            const isOrders = tableId === 'orders-table';
+            const colSpan = keys.length + 1;
+            if (!data || !data.length) {
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="empty-state">No ${isOrders ? 'orders' : 'subscriptions'} yet. <a href="shop.html">Shop now</a></td></tr>`;
+                return;
+            }
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                keys.forEach(key => {
+                    let val = row[key];
+                    if (key.includes('date') || key.includes('_at')) {
+                        val = val ? new Date(val).toLocaleDateString() : '-';
+                    } else if (key === 'amount') {
+                        val = val ? '$' + parseFloat(val).toFixed(2) : '-';
+                    } else if (key === 'quantity') {
+                        val = val || '-';
+                    } else if (key === 'duration_months') {
+                        val = val ? val + ' months' : '-';
+                    } else if (key === 'product_type') {
+                        if (val) {
+                            val = val.charAt(0).toUpperCase() + val.slice(1).replace('-', ' ');
+                        } else {
+                            val = '-';
+                        }
+                    }
+                    const td = document.createElement('td');
+                    if (key === 'status') {
+                        const badge = document.createElement('span');
+                        const statusClass = `status status-${val ? val.toLowerCase() : 'pending'}`;
+                        badge.className = statusClass;
+                        badge.textContent = val ? val.toUpperCase() : 'UNKNOWN';
+                        td.appendChild(badge);
+                    } else {
+                        td.textContent = val;
+                    }
+                    tr.appendChild(td);
+                });
+                // Details button
+                const detailsTd = document.createElement('td');
+                const btn = document.createElement('button');
+                btn.className = 'details-btn';
+                btn.textContent = 'Details';
+                btn.onclick = () => {
+                    console.log(row);
+                    alert(JSON.stringify(row, null, 2));
+                };
+                detailsTd.appendChild(btn);
+                tr.appendChild(detailsTd);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadData() {
+            try {
+                const [ordersRes, subsRes] = await Promise.all([
+                    fetch(`${API_BASE}/api/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_BASE}/api/subscriptions`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                const orders = await ordersRes.json();
+                const subs = await subsRes.json();
+                populateTable('orders-table', orders, ['created_at', 'product_type', 'quantity', 'amount', 'status']);
+                populateTable('subs-table', subs, ['duration_months', 'start_date', 'end_date', 'status', 'next_billing_date']);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+
+</html>

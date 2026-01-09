@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeautyBite Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body.gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        #logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-card img {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-card h2 {
+            font-size: 1.5em;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .price {
+            font-size: 2em;
+            font-weight: 700;
+            color: #FFD700;
+            margin: 10px 0;
+        }
+
+        .product-card label {
+            display: block;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .product-card select {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-left: 10px;
+            min-width: 80px;
+        }
+
+        .product-card button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .product-card button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        #success,
+        #error {
+            display: none;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #success {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        #error {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .products {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body class="gradient-bg">
+    <div class="header">
+        <h1>BeautyBite Shop</h1>
+        <span class="user-name">Guest</span>
+        <button id="logout">Logout</button>
+    </div>
+    <main>
+        <section class="products">
+            <div class="product-card">
+                <img src="https://via.placeholder.com/300x200/667eea/ffffff?text=Mouthguard"
+                    alt="BeautyBite Mouthguard">
+                <h2>BeautyBite Mouthguard - One-Time</h2>
+                <p class="price">$100</p>
+                <label>Quantity:
+                    <select id="qty-one">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </label>
+                <button id="buy-now">Buy Now - $100</button>
+            </div>
+            <div class="product-card">
+                <img src="https://via.placeholder.com/300x200/764ba2/ffffff?text=Subscription"
+                    alt="BeautyBite Subscription">
+                <h2>BeautyBite Monthly Subscription</h2>
+                <p class="price">$100/month</p>
+                <label>Duration (months):
+                    <select id="months">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </label>
+                <button id="subscribe">Subscribe Now</button>
+            </div>
+        </section>
+    </main>
+    <div class="footer">
+        <a href="orders.html">View Orders</a>
+        <div id="success"></div>
+        <div id="error"></div>
+    </div>
+    <script>
+        const API_BASE = location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://beautybite-36e5434be6c8.herokuapp.com';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!token || !user.id) window.location.href = 'login.html';
+        document.querySelector('.user-name').textContent = user.name;
+        document.getElementById('logout').onclick = () => { localStorage.clear(); location.href = 'login.html'; };
+
+        const stripe = Stripe('pk_test_51SU97uGiZtqZsqe8gZyp6Y1HyBdqlUHqNbukme3En5TRj8YVEXXoUwEv9dGIDt62hFybhy2qdJ7zvYfKYqC8nPug00EinP5Wp9');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('session_id')) {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('success').innerHTML = '<h3>✅ Payment Successful!</h3><p>Check your <a href="orders.html">order history</a>.</p>';
+        }
+        if (urlParams.get('cancelled')) {
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = '<h3>❌ Payment Cancelled</h3>';
+        }
+
+        document.getElementById('buy-now').onclick = async () => {
+            const quantity = parseInt(document.getElementById('qty-one').value);
+            try {
+                const res = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ productType: 'one-time', quantity })
+                });
+                const { sessionId } = await res.json();
+                stripe.redirectToCheckout({ sessionId });
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+
+        document.getElementById('subscribe').onclick = async () => {
+            const subscriptionMonths = parseInt(document.getElementById('months').value);
+            try {
+                const res = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ productType: 'subscription', subscriptionMonths })
+                });
+                const { sessionId } = await res.json();
+                stripe.redirectToCheckout({ sessionId });
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+    </script>
+</body>
+
+</html>
