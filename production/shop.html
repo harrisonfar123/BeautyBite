@@ -283,19 +283,7 @@
                 <button id="buy-now">Buy Now</button>
             </div>
             <div class="product-card">
-                <img src="https://placehold.co/300x200/764ba2/ffffff?text=Recurring+Order"
-                    alt="BeautyBite Recurring Order">
-                <h2>BeautyBite Recurring Order</h2>
-                <p class="price">$200/mouthguard</p>
-                <label>Mouthguards per month (1-1,000):
-                    <input type="number" id="qty-recurring" min="1" max="1000" value="1">
-                </label>
-                <label>Duration (1-36 months):
-                    <input type="number" id="months" min="1" max="36" value="1">
-                </label>
-                <button id="recurring-now">Order Now</button>
-            </div>
-            <div class="product-card">
+                <img src="https://placehold.co/300x200/764ba2/ffffff?text=Subscription" alt="BeautyBite Subscription">
                 <h2>BeautyBite Subscription</h2>
                 <p class="price">$200/mouthguard</p>
 
@@ -315,11 +303,11 @@
                     <input type="number" id="sub-duration" min="1" max="36" value="12">
                 </label>
 
-                <div id="subscription-summary"></div>
+                <div id="subscription-summary"
+                    style="margin: 15px 0; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 10px; font-size: 0.9em;">
+                </div>
 
-                <div id="sub-payment-element" style="display: none;"></div>
-                <div id="sub-payment-status" style="min-height: 20px;"></div>
-                <button id="subscribe-now" type="button">Subscribe Now</button>
+                <button id="subscribe-now">Subscribe Now</button>
             </div>
         </section>
 
@@ -382,23 +370,6 @@
             await createPayment('one-time', quantity, 1);
         };
 
-        // Recurring Order button
-        document.getElementById('recurring-now').onclick = async () => {
-            const quantity = parseInt(document.getElementById('qty-recurring').value);
-            const months = parseInt(document.getElementById('months').value);
-
-            // Validate inputs
-            if (!quantity || quantity < 1 || quantity > 1000) {
-                alert('Please enter a valid quantity per month (1-1,000)');
-                return;
-            }
-            if (!months || months < 1 || months > 36) {
-                alert('Please enter a valid duration (1-36 months)');
-                return;
-            }
-
-            await createPayment('recurring', quantity, months);
-        };
 
         async function createPayment(orderType, quantity, months) {
             currentOrderType = orderType;
@@ -474,20 +445,29 @@
             messageDiv.className = '';
 
             try {
-                // Confirm payment
+                // Confirm payment with Stripe
                 const { error, paymentIntent } = await stripe.confirmPayment({
                     elements,
                     redirect: 'if_required'
                 });
 
                 if (error) {
+                    // Payment failed
                     messageDiv.textContent = error.message;
                     messageDiv.className = 'error';
                     submitButton.disabled = false;
                     submitButton.textContent = 'Pay Now';
                 } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                    // Save order to database
-                    await fetch(`${API_BASE}/api/stripe/confirm-payment`, {
+                    // Payment succeeded - save to database
+
+                    // Determine which endpoint to call
+                    const confirmEndpoint = currentOrderType === 'subscription'
+                        ? '/api/stripe/confirm-subscription'
+                        : '/api/stripe/confirm-payment';
+
+                    console.log(`Confirming ${currentOrderType} with endpoint: ${confirmEndpoint}`);
+
+                    const confirmRes = await fetch(`${API_BASE}${confirmEndpoint}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -496,16 +476,21 @@
                         body: JSON.stringify({ paymentIntentId: paymentIntent.id })
                     });
 
-                    // Show success
+                    const confirmData = await confirmRes.json();
+                    console.log('Confirmation response:', confirmData);
+
+                    // Show success message
+                    const orderTypeText = currentOrderType === 'subscription' ? 'subscription' : 'order';
                     document.getElementById('payment-section').innerHTML = `
                         <h2 style="color: #28a745;">✅ Payment Successful!</h2>
-                        <p style="color: #333;">Your order has been placed successfully.</p>
+                        <p style="color: #333;">Your ${orderTypeText} has been created successfully.</p>
+                        ${currentOrderType === 'subscription' ? '<p style="color: #666; font-size: 0.9em;">Future payments will be charged automatically on schedule.</p>' : ''}
                         <a href="orders.html" style="display: inline-block; margin-top: 20px; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 600;">View Orders</a>
                     `;
                 }
             } catch (err) {
                 console.error('Payment error:', err);
-                messageDiv.textContent = 'An unexpected error occurred.';
+                messageDiv.textContent = 'An unexpected error occurred: ' + err.message;
                 messageDiv.className = 'error';
                 submitButton.disabled = false;
                 submitButton.textContent = 'Pay Now';
@@ -518,19 +503,121 @@
             document.getElementById('products-section').style.display = 'grid';
         };
 
-        // handleSubscribe for subscription
-        document.getElementById('subscribe-now').onclick = handleSubscribe;
+        // Subscription summary calculator
+        function updateSubscriptionSummary() {
+            const quantity = parseInt(document.getElementById('sub-quantity')?.value) || 0;
+            const duration = parseInt(document.getElementById('sub-duration')?.value) || 0;
+            const interval = document.getElementById('sub-interval')?.value || 'monthly';
+            
+            if (quantity && duration) {
+                const amountPerPeriod = quantity * 200;
+                const totalAmount = amountPerPeriod * duration;
+                
+                const intervalText = {
+                    '12hour': 'every 12 hours',
+                    'weekly': 'every week',
+                    'monthly': 'every month'
+                }[interval];
+                
+                const summaryDiv = document.getElementById('subscription-summary');
+                if (summaryDiv) {
+                    summaryDiv.innerHTML = `
+                        <strong>First charge:</strong> $${amountPerPeriod.toLocaleString()}<br>
+                        <strong>Then:</strong> $${amountPerPeriod.toLocaleString()} ${intervalText}<br>
+                        <strong>Duration:</strong> ${duration} payments<br>
+                        <strong>Total:</strong> $${totalAmount.toLocaleString()}
+                    `;
+                }
+            }
+        }
 
-        async function handleSubscribe() {
-            const statusEl = document.getElementById('sub-payment-status');
+        // Add event listeners when page loads
+        window.addEventListener('load', () => {
+            const qtyInput = document.getElementById('sub-quantity');
+            const durationInput = document.getElementById('sub-duration');
+            const intervalSelect = document.getElementById('sub-interval');
+            
+            if (qtyInput) qtyInput.addEventListener('input', updateSubscriptionSummary);
+            if (durationInput) durationInput.addEventListener('input', updateSubscriptionSummary);
+            if (intervalSelect) intervalSelect.addEventListener('change', updateSubscriptionSummary);
+            
+            // Initial summary
+            updateSubscriptionSummary();
+        });
+
+        // Subscribe Now button implementation
+        document.getElementById('subscribe-now').onclick = async () => {
             const quantity = parseInt(document.getElementById('sub-quantity').value);
             const duration = parseInt(document.getElementById('sub-duration').value);
-            if (quantity < 1 || quantity > 1000 || duration < 1 || duration > 36) {
-                statusEl.innerHTML = '<div style="color: red;">Invalid quantity (1-1000) or duration (1-36)</div>';
+            const interval = document.getElementById('sub-interval').value;
+            
+            // Validate inputs
+            if (!quantity || quantity < 1 || quantity > 1000) {
+                alert('Please enter a valid quantity (1-1,000)');
                 return;
             }
-            // Core subscription logic (fetch to create-subscription-payment) follows here
-        }
+            if (!duration || duration < 1 || duration > 36) {
+                alert('Please enter a valid duration (1-36 periods)');
+                return;
+            }
+            
+            try {
+                // Create subscription payment
+                const res = await fetch(`${API_BASE}/api/stripe/create-subscription-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ quantity, duration, interval })
+                });
+                
+                const data = await res.json();
+                
+                if (!data.clientSecret) {
+                    alert('Error: ' + (data.error || 'Failed to create subscription'));
+                    return;
+                }
+                
+                clientSecret = data.clientSecret;
+                currentOrderType = 'subscription';
+                
+                // Calculate display values
+                const amountPerPeriod = quantity * 200;
+                const totalAmount = amountPerPeriod * duration;
+                const intervalText = {
+                    '12hour': 'every 12 hours',
+                    'weekly': 'every week',
+                    'monthly': 'every month'
+                }[interval];
+                
+                // Show payment details
+                document.getElementById('payment-details').innerHTML = `
+                    <strong>Product:</strong> Subscription<br>
+                    <strong>Quantity per period:</strong> ${quantity} mouthguards<br>
+                    <strong>Billing:</strong> $${amountPerPeriod.toLocaleString()} ${intervalText}<br>
+                    <strong>Duration:</strong> ${duration} payments<br>
+                    <strong>First charge now:</strong> $${amountPerPeriod.toLocaleString()}<br>
+                    <strong>Total over time:</strong> $${totalAmount.toLocaleString()}
+                `;
+                
+                // Show payment section, hide products
+                document.getElementById('payment-section').style.display = 'block';
+                document.getElementById('products-section').style.display = 'none';
+                
+                // Initialize Stripe Payment Element
+                const appearance = { theme: 'stripe' };
+                elements = stripe.elements({ clientSecret, appearance });
+                const paymentElement = elements.create('payment');
+                paymentElement.mount('#payment-element');
+                
+                console.log('✅ Subscription payment form loaded');
+                
+            } catch (e) {
+                console.error('Subscription error:', e);
+                alert('Error: ' + e.message);
+            }
+        };
     </script>
 </body>
 
