@@ -568,6 +568,17 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
 
         for (const sub of dueSubscriptions.rows) {
             try {
+                // Check if subscription is already complete BEFORE charging
+                if (sub.periods_completed >= sub.total_periods) {
+                    console.log(`✅ Subscription ${sub.id} already complete (${sub.periods_completed}/${sub.total_periods}) - marking as completed`);
+                    await pool.query(
+                        'UPDATE subscriptions SET status = $1, updated_at = NOW() WHERE id = $2',
+                        ['completed', sub.id]
+                    );
+                    continue; // Skip charging, move to next subscription
+                }
+
+                // Create PaymentIntent with saved payment method
                 const paymentIntent = await stripe.paymentIntents.create({
                     amount: Math.round(sub.amount_per_period * 100),
                     currency: 'usd',
@@ -577,7 +588,7 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
                     confirm: true,
                     metadata: {
                         subscription_id: sub.id.toString(),
-                        period_number: (sub.periods_completed + 1).toString()
+                        period_number: sub.periods_completed + 1
                     }
                 });
 
