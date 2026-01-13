@@ -130,18 +130,18 @@
             color: white;
         }
 
-        .status-pending {
-            background: rgba(255, 193, 7, 0.9);
-            color: white;
-        }
-
-        .status-active {
+        .status-scheduled {
             background: rgba(33, 150, 243, 0.9);
             color: white;
         }
 
-        .status-cancelled {
-            background: rgba(244, 67, 54, 0.9);
+        .status-fulfilled {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.9);
             color: white;
         }
 
@@ -173,6 +173,13 @@
             color: #FFD700;
             text-decoration: none;
             font-weight: 600;
+        }
+
+        .deliveries-nested {
+            margin-top: 10px;
+            padding-left: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         @media (max-width: 768px) {
@@ -209,6 +216,26 @@
                 font-size: 0.9em;
             }
         }
+
+        .subscription-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status-success { background-color: #28a745; }
+        .status-danger { background-color: #dc3545; }
+        .status-warning { background-color: #ffc107; color: black; }
+        .status-complete { background-color: #17a2b8; }
     </style>
 </head>
 
@@ -223,13 +250,13 @@
     </div>
     <main>
         <div id="orders-section" class="section">
-            <h2>Orders</h2>
+            <h2>All Orders</h2>
             <table id="orders-table">
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Product</th>
-                        <th>Qty</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
                         <th>Amount</th>
                         <th>Status</th>
                         <th>Details</th>
@@ -238,17 +265,16 @@
                 <tbody></tbody>
             </table>
         </div>
-        <div id="subs-section" class="section">
-            <h2>Subscriptions</h2>
-            <table id="subs-table">
+
+        <div id="deliveries-section" class="section" style="display: none;">
+            <h2>Scheduled Deliveries</h2>
+            <table id="deliveries-table">
                 <thead>
                     <tr>
-                        <th>Duration</th>
-                        <th>Start</th>
-                        <th>End</th>
+                        <th>Delivery Date</th>
+                        <th>Quantity</th>
                         <th>Status</th>
-                        <th>Next Billing</th>
-                        <th>Details</th>
+                        <th>Fulfilled Date</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -256,7 +282,7 @@
         </div>
     </main>
     <script>
-        // Always use Heroku backend (frontend is local, backend is on Heroku)
+        // Always use Heroku backend
         const API_BASE = 'https://beautybite-36e5434be6c8.herokuapp.com';
         const token = localStorage.getItem('token');
 
@@ -277,78 +303,153 @@
         document.querySelector('.user-name').textContent = user.name || 'User';
         document.getElementById('logout').onclick = () => { localStorage.clear(); location.href = 'login.html'; };
 
-        function populateTable(tableId, data, keys) {
-            const table = document.getElementById(tableId);
-            const tbody = table.querySelector('tbody');
-            tbody.innerHTML = '';
-            const isOrders = tableId === 'orders-table';
-            const colSpan = keys.length + 1;
-            if (!data || !data.length) {
-                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="empty-state">No ${isOrders ? 'orders' : 'subscriptions'} yet. <a href="shop.html">Shop now</a></td></tr>`;
-                return;
-            }
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                keys.forEach(key => {
-                    let val = row[key];
-                    if (key.includes('date') || key.includes('_at')) {
-                        val = val ? new Date(val).toLocaleDateString() : '-';
-                    } else if (key === 'amount') {
-                        val = val ? '$' + parseFloat(val).toFixed(2) : '-';
-                    } else if (key === 'quantity') {
-                        val = val || '-';
-                    } else if (key === 'duration_months') {
-                        val = val ? val + ' months' : '-';
-                    } else if (key === 'product_type') {
-                        if (val) {
-                            val = val.charAt(0).toUpperCase() + val.slice(1).replace('-', ' ');
-                        } else {
-                            val = '-';
-                        }
-                    }
-                    const td = document.createElement('td');
-                    if (key === 'status') {
-                        const badge = document.createElement('span');
-                        const statusClass = `status status-${val ? val.toLowerCase() : 'pending'}`;
-                        badge.className = statusClass;
-                        badge.textContent = val ? val.toUpperCase() : 'UNKNOWN';
-                        td.appendChild(badge);
-                    } else {
-                        td.textContent = val;
-                    }
-                    tr.appendChild(td);
-                });
-                // Details button
-                const detailsTd = document.createElement('td');
-                const btn = document.createElement('button');
-                btn.className = 'details-btn';
-                btn.textContent = 'Details';
-                btn.onclick = () => {
-                    console.log(row);
-                    alert(JSON.stringify(row, null, 2));
-                };
-                detailsTd.appendChild(btn);
-                tr.appendChild(detailsTd);
-                tbody.appendChild(tr);
-            });
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleDateString();
         }
 
-        async function loadData() {
+        function formatAmount(amount) {
+            return amount ? '$' + parseFloat(amount).toLocaleString() : '-';
+        }
+
+        async function loadOrders() {
             try {
-                const [ordersRes, subsRes] = await Promise.all([
-                    fetch(`${API_BASE}/api/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch(`${API_BASE}/api/subscriptions`, { headers: { 'Authorization': `Bearer ${token}` } })
-                ]);
-                const orders = await ordersRes.json();
-                const subs = await subsRes.json();
-                populateTable('orders-table', orders, ['created_at', 'product_type', 'quantity', 'amount', 'status']);
-                populateTable('subs-table', subs, ['duration_months', 'start_date', 'end_date', 'status', 'next_billing_date']);
+                const res = await fetch(`${API_BASE}/api/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const orders = await res.json();
+
+                const tbody = document.querySelector('#orders-table tbody');
+                tbody.innerHTML = '';
+
+                if (!orders || orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No orders yet. <a href="shop.html">Shop now</a></td></tr>';
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const tr = document.createElement('tr');
+
+                    // Date
+                    const dateTd = document.createElement('td');
+                    dateTd.textContent = formatDate(order.created_at);
+                    tr.appendChild(dateTd);
+
+                    // Type
+                    const typeTd = document.createElement('td');
+                    if (order.product_type === 'one-time') {
+                        typeTd.textContent = 'One-Time';
+                    } else if (order.product_type === 'recurring') {
+                        typeTd.textContent = 'Recurring Order';
+                    } else {
+                        typeTd.textContent = order.product_type;
+                    }
+                    tr.appendChild(typeTd);
+
+                    // Quantity
+                    const qtyTd = document.createElement('td');
+                    qtyTd.textContent = order.quantity || '-';
+                    tr.appendChild(qtyTd);
+
+                    // Amount
+                    const amountTd = document.createElement('td');
+                    amountTd.textContent = formatAmount(order.amount);
+                    tr.appendChild(amountTd);
+
+                    // Status
+                    const statusTd = document.createElement('td');
+                    const badge = document.createElement('span');
+                    badge.className = `status status-${order.status.toLowerCase()}`;
+                    badge.textContent = order.status.toUpperCase();
+                    statusTd.appendChild(badge);
+                    tr.appendChild(statusTd);
+
+                    // Details button
+                    const detailsTd = document.createElement('td');
+                    const btn = document.createElement('button');
+                    btn.className = 'details-btn';
+                    btn.textContent = 'Details';
+                    btn.onclick = () => showOrderDetails(order);
+                    detailsTd.appendChild(btn);
+                    tr.appendChild(detailsTd);
+
+                    tbody.appendChild(tr);
+                });
+
             } catch (e) {
-                console.error(e);
+                console.error('Error loading orders:', e);
             }
         }
 
-        window.addEventListener('load', loadData);
+        async function loadDeliveries() {
+            try {
+                const res = await fetch(`${API_BASE}/api/deliveries`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const deliveries = await res.json();
+
+                if (!deliveries || deliveries.length === 0) {
+                    return; // Hide deliveries section if none exist
+                }
+
+                // Show deliveries section
+                document.getElementById('deliveries-section').style.display = 'block';
+
+                const tbody = document.querySelector('#deliveries-table tbody');
+                tbody.innerHTML = '';
+
+                deliveries.forEach(delivery => {
+                    const tr = document.createElement('tr');
+
+                    // Delivery Date
+                    const dateTd = document.createElement('td');
+                    dateTd.textContent = formatDate(delivery.delivery_date);
+                    tr.appendChild(dateTd);
+
+                    // Quantity
+                    const qtyTd = document.createElement('td');
+                    qtyTd.textContent = delivery.quantity;
+                    tr.appendChild(qtyTd);
+
+                    // Status
+                    const statusTd = document.createElement('td');
+                    const badge = document.createElement('span');
+                    badge.className = `status status-${delivery.status.toLowerCase()}`;
+                    badge.textContent = delivery.status.toUpperCase();
+                    statusTd.appendChild(badge);
+                    tr.appendChild(statusTd);
+
+                    // Fulfilled Date
+                    const fulfilledTd = document.createElement('td');
+                    fulfilledTd.textContent = formatDate(delivery.fulfilled_at);
+                    tr.appendChild(fulfilledTd);
+
+                    tbody.appendChild(tr);
+                });
+
+            } catch (e) {
+                console.error('Error loading deliveries:', e);
+            }
+        }
+
+        function showOrderDetails(order) {
+            let details = `Order ID: ${order.id}\n`;
+            details += `Date: ${formatDate(order.created_at)}\n`;
+            details += `Type: ${order.product_type}\n`;
+            details += `Quantity: ${order.quantity}\n`;
+            details += `Amount: ${formatAmount(order.amount)}\n`;
+            details += `Status: ${order.status}\n`;
+            if (order.stripe_payment_intent_id) {
+                details += `\nPayment ID: ${order.stripe_payment_intent_id}`;
+            }
+            alert(details);
+        }
+
+        // Load data on page load
+        window.addEventListener('load', () => {
+            loadOrders();
+            loadDeliveries();
+        });
     </script>
 </body>
 

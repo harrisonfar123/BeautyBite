@@ -91,11 +91,11 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
                 try {
                     const durationMonths = parseInt(session.metadata.subscription_months);
                     const cancelAt = Math.floor(Date.now() / 1000) + (durationMonths * 30 * 24 * 60 * 60);
-                    
+
                     await stripe.subscriptions.update(session.subscription, {
                         cancel_at: cancelAt
                     });
-                    
+
                     console.log(`✅ Subscription ${session.subscription} scheduled to cancel after ${durationMonths} months`);
                 } catch (subError) {
                     console.error('❌ Failed to schedule subscription cancellation:', subError);
@@ -419,6 +419,239 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
     res.json({ received: true });
 });
 
+app.post('/api/stripe/create-subscription-payment', authenticateToken, async (req, res) => {
+    try {
+        const quantity = parseInt(req.body.quantity);
+        const duration = parseInt(req.body.duration);
+        const interval = req.body.interval;
+        if (quantity < 1 || quantity > 1000 || duration < 1 || duration > 36) {
+            return res.status(400).json({ error: 'Quantity 1-1000, Duration 1-36' });
+        }
+        const userId = req.user.id;
+        const userEmail = req.user.email;
+        if (!['12hour', 'weekly', 'monthly'].includes(interval)) {
+            return res.status(400).json({ error: 'Invalid interval' });
+        }
+
+        const amount = quantity * 200 * 100; // cents
+
+        let customer;
+        const existingCustomer = await pool.query(
+            'SELECT stripe_customer_id FROM customers WHERE user_id = $1',
+            [userId]
+        );
+
+        if (existingCustomer.rows.length > 0) {
+            customer = await stripe.customers.retrieve(existingCustomer.rows[0].stripe_customer_id);
+        } else {
+            customer = await stripe.customers.create({
+                email: userEmail,
+                metadata: { user_id: userId.toString() }
+            });
+            await pool.query(
+                'INSERT INTO customers (user_id, stripe_customer_id) VALUES ($1, $2)',
+                [userId, customer.id]
+            );
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: 'usd',
+            customer: customer.id,
+            setup_future_usage: 'off_session',
+            automatic_payment_methods: { enabled: true },
+            metadata: {
+                user_id: userId.toString(),
+                subscription_type: 'recurring',
+                quantity: quantity.toString(),
+                duration: duration.toString(),
+                interval
+            }
+        });
+
+        res.json({
+            clientSecret: paymentIntent.client_secret,
+            customerId: customer.id
+        });
+
+    } catch (error) {
+        console.error('Subscription payment creation error:', error);
+        res.status(500).json({ error: 'Failed to create subscription payment' });
+    }
+});
+
+app.post('/api/stripe/confirm-subscription', authenticateToken, async (req, res) => {
+    try {
+        const { paymentIntentId } = req.body;
+        const userId = req.user.id;
+
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+        if (paymentIntent.status !== 'succeeded') {
+            return res.status(400).json({ error: 'Payment not completed' });
+        }
+
+        const { quantity, duration, interval } = paymentIntent.metadata;
+        const amountPerPeriod = paymentIntent.amount / 100;
+
+        const now = new Date();
+        let nextBillingDate = new Date(now);
+        let endDate = new Date(now);
+
+        switch (interval) {
+            case '12hour':
+                nextBillingDate.setHours(now.getHours() + 12);
+                endDate.setHours(now.getHours() + (12 * parseInt(duration)));
+                break;
+            case 'weekly':
+                nextBillingDate.setDate(now.getDate() + 7);
+                endDate.setDate(now.getDate() + (7 * parseInt(duration)));
+                break;
+            case 'monthly':
+                nextBillingDate.setMonth(now.getMonth() + 1);
+                endDate.setMonth(now.getMonth() + parseInt(duration));
+                break;
+        }
+
+        const subscription = await pool.query(`
+            INSERT INTO subscriptions (
+                user_id, stripe_customer_id, stripe_payment_method_id,
+                quantity_per_period, amount_per_period, interval,
+                total_periods, periods_completed, status,
+                next_billing_date, end_date
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            RETURNING *
+        `, [
+            userId,
+            paymentIntent.customer,
+            paymentIntent.payment_method,
+            parseInt(quantity),
+            amountPerPeriod,
+            interval,
+            parseInt(duration),
+            1,
+            'active',
+            nextBillingDate,
+            endDate
+        ]);
+
+        await pool.query(`
+            INSERT INTO subscription_payments (
+                subscription_id, stripe_payment_intent_id, amount, status, period_number
+            ) VALUES ($1, $2, $3, $4, $5)
+        `, [
+            subscription.rows[0].id,
+            paymentIntent.id,
+            amountPerPeriod,
+            'succeeded',
+            1
+        ]);
+
+        console.log('✅ Subscription created:', subscription.rows[0].id);
+        res.json({ subscription: subscription.rows[0] });
+
+    } catch (error) {
+        console.error('Subscription confirmation error:', error);
+        res.status(500).json({ error: 'Failed to confirm subscription' });
+    }
+});
+
+app.post('/api/cron/process-subscriptions', async (req, res) => {
+    try {
+        console.log('🔄 Processing due subscriptions...');
+
+        const dueSubscriptions = await pool.query(`
+            SELECT * FROM subscriptions
+            WHERE status = 'active'
+            AND next_billing_date <= NOW()
+        `);
+
+        for (const sub of dueSubscriptions.rows) {
+            try {
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: Math.round(sub.amount_per_period * 100),
+                    currency: 'usd',
+                    customer: sub.stripe_customer_id,
+                    payment_method: sub.stripe_payment_method_id,
+                    off_session: true,
+                    confirm: true,
+                    metadata: {
+                        subscription_id: sub.id.toString(),
+                        period_number: (sub.periods_completed + 1).toString()
+                    }
+                });
+
+                if (paymentIntent.status === 'succeeded') {
+                    const newPeriodsCompleted = sub.periods_completed + 1;
+                    const isComplete = newPeriodsCompleted >= sub.total_periods;
+
+                    let nextBilling = new Date(sub.next_billing_date);
+                    switch (sub.interval) {
+                        case '12hour':
+                            nextBilling.setHours(nextBilling.getHours() + 12);
+                            break;
+                        case 'weekly':
+                            nextBilling.setDate(nextBilling.getDate() + 7);
+                            break;
+                        case 'monthly':
+                            nextBilling.setMonth(nextBilling.getMonth() + 1);
+                            break;
+                    }
+
+                    await pool.query(`
+                        UPDATE subscriptions
+                        SET periods_completed = $1,
+                            next_billing_date = $2,
+                            status = CASE WHEN $3 THEN 'completed' ELSE 'active' END,
+                            updated_at = NOW()
+                        WHERE id = $4
+                    `, [
+                        newPeriodsCompleted,
+                        nextBilling,
+                        isComplete,
+                        sub.id
+                    ]);
+
+                    await pool.query(`
+                        INSERT INTO subscription_payments (
+                            subscription_id, stripe_payment_intent_id,
+                            amount, status, period_number
+                        ) VALUES ($1, $2, $3, $4, $5)
+                    `, [
+                        sub.id,
+                        paymentIntent.id,
+                        sub.amount_per_period,
+                        'succeeded',
+                        newPeriodsCompleted
+                    ]);
+
+                    console.log(`✅ Charged subscription ${sub.id}: Period ${newPeriodsCompleted}/${sub.total_periods}`);
+
+                } else {
+                    console.error(`❌ Payment failed for subscription ${sub.id}`);
+                }
+
+            } catch (error) {
+                console.error(`❌ Error processing subscription ${sub.id}:`, error.message);
+
+                if (error.code === 'card_declined') {
+                    await pool.query(
+                        'UPDATE subscriptions SET status = $1, updated_at = NOW() WHERE id = $2',
+                        ['payment_failed', sub.id]
+                    );
+                }
+            }
+        }
+
+        console.log('✅ Finished processing subscriptions');
+        res.json({ processed: dueSubscriptions.rows.length });
+
+    } catch (error) {
+        console.error('Cron job error:', error);
+        res.status(500).json({ error: 'Failed to process subscriptions' });
+    }
+});
+
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
@@ -431,10 +664,19 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
 
 app.get('/api/subscriptions', authenticateToken, async (req, res) => {
     try {
-        const result = await pool.query("SELECT * FROM subscriptions WHERE user_id = $1 AND status != 'cancelled' ORDER BY start_date DESC", [req.user.id]);
+        const userId = req.user.id;
+        const result = await pool.query(`
+            SELECT s.*,
+                   COALESCE(SUM(CASE WHEN sp.status = 'succeeded' THEN sp.amount ELSE 0 END), 0) as total_paid
+            FROM subscriptions s
+            LEFT JOIN subscription_payments sp ON s.id = sp.subscription_id
+            WHERE s.user_id = $1
+            GROUP BY s.id
+            ORDER BY s.created_at DESC
+        `, [userId]);
         res.json(result.rows);
-    } catch (err) {
-        console.error('Subscriptions fetch error:', err);
+    } catch (error) {
+        console.error('Fetch subscriptions error:', error);
         res.status(500).json({ error: 'Failed to fetch subscriptions' });
     }
 });

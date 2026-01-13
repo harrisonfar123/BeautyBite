@@ -167,6 +167,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -273,8 +274,7 @@
     <main>
         <section class="products" id="products-section">
             <div class="product-card">
-                <img src="https://placehold.co/300x200/667eea/ffffff?text=Mouthguard"
-                    alt="BeautyBite Mouthguard">
+                <img src="https://placehold.co/300x200/667eea/ffffff?text=Mouthguard" alt="BeautyBite Mouthguard">
                 <h2>BeautyBite Mouthguard - One-Time</h2>
                 <p class="price">$200</p>
                 <label>Quantity (1-10,000):
@@ -294,6 +294,32 @@
                     <input type="number" id="months" min="1" max="36" value="1">
                 </label>
                 <button id="recurring-now">Order Now</button>
+            </div>
+            <div class="product-card">
+                <h2>BeautyBite Subscription</h2>
+                <p class="price">$200/mouthguard</p>
+
+                <label>Quantity per period (1-1,000):
+                    <input type="number" id="sub-quantity" min="1" max="1000" value="5">
+                </label>
+
+                <label>Billing interval:
+                    <select id="sub-interval">
+                        <option value="12hour">Every 12 Hours (Testing)</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly" selected>Monthly</option>
+                    </select>
+                </label>
+
+                <label>Duration (1-36 periods):
+                    <input type="number" id="sub-duration" min="1" max="36" value="12">
+                </label>
+
+                <div id="subscription-summary"></div>
+
+                <div id="sub-payment-element" style="display: none;"></div>
+                <div id="sub-payment-status" style="min-height: 20px;"></div>
+                <button id="subscribe-now" type="button">Subscribe Now</button>
             </div>
         </section>
 
@@ -376,7 +402,7 @@
 
         async function createPayment(orderType, quantity, months) {
             currentOrderType = orderType;
-            
+
             try {
                 // Create PaymentIntent
                 const res = await fetch(`${API_BASE}/api/stripe/create-payment-intent`, {
@@ -385,7 +411,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         orderType: orderType,
                         quantity: quantity,
                         months: months
@@ -403,7 +429,7 @@
 
                 // Calculate total
                 const totalAmount = quantity * months * 200;
-                
+
                 // Show payment section
                 if (orderType === 'one-time') {
                     document.getElementById('payment-details').innerHTML = `
@@ -419,7 +445,7 @@
                         <strong>Total (Pay upfront):</strong> $${totalAmount.toLocaleString()}
                     `;
                 }
-                
+
                 document.getElementById('payment-section').style.display = 'block';
                 document.getElementById('products-section').style.display = 'none';
 
@@ -491,6 +517,20 @@
             document.getElementById('payment-section').style.display = 'none';
             document.getElementById('products-section').style.display = 'grid';
         };
+
+        // handleSubscribe for subscription
+        document.getElementById('subscribe-now').onclick = handleSubscribe;
+
+        async function handleSubscribe() {
+            const statusEl = document.getElementById('sub-payment-status');
+            const quantity = parseInt(document.getElementById('sub-quantity').value);
+            const duration = parseInt(document.getElementById('sub-duration').value);
+            if (quantity < 1 || quantity > 1000 || duration < 1 || duration > 36) {
+                statusEl.innerHTML = '<div style="color: red;">Invalid quantity (1-1000) or duration (1-36)</div>';
+                return;
+            }
+            // Core subscription logic (fetch to create-subscription-payment) follows here
+        }
     </script>
 </body>
 

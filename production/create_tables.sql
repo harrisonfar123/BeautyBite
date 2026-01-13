@@ -44,3 +44,40 @@ CREATE INDEX IF NOT EXISTS idx_deliveries_order_id ON scheduled_deliveries(order
 CREATE INDEX IF NOT EXISTS idx_deliveries_user_id ON scheduled_deliveries(user_id);
 CREATE INDEX IF NOT EXISTS idx_deliveries_date ON scheduled_deliveries(delivery_date);
 CREATE INDEX IF NOT EXISTS idx_deliveries_status ON scheduled_deliveries(status);
+
+CREATE TABLE IF NOT EXISTS customers (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) UNIQUE,
+    stripe_customer_id VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    stripe_customer_id VARCHAR(255) NOT NULL,
+    stripe_payment_method_id VARCHAR(255) NOT NULL,
+    quantity_per_period INTEGER NOT NULL,
+    amount_per_period DECIMAL(10,2) NOT NULL,
+    interval VARCHAR(50) NOT NULL, -- '12hour', 'weekly', 'monthly'
+    total_periods INTEGER NOT NULL,
+    periods_completed INTEGER DEFAULT 1, -- First payment already done
+    status VARCHAR(50) DEFAULT 'active', -- active, cancelled, completed
+    next_billing_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS subscription_payments (
+    id SERIAL PRIMARY KEY,
+    subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE CASCADE,
+    stripe_payment_intent_id VARCHAR(255) UNIQUE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(50) NOT NULL, -- succeeded, failed
+    period_number INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_subscriptions_next_billing ON subscriptions(next_billing_date, status);
+CREATE INDEX idx_subscriptions_customer ON subscriptions(stripe_customer_id);

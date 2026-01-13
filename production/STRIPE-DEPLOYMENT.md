@@ -128,3 +128,81 @@
    ```
 
 3. **Update webhook endpoint** in Stripe to use live secret (repeat Step 3 for live mode).
+
+## Embedded Subscription System
+
+### Prerequisites
+
+- Run [`create_tables.sql`](create_tables.sql) in PostgreSQL to add `customers`, `subscriptions`, `subscription_payments` tables and indexes.
+- Ensure Stripe keys in [`./.env`](.env).
+- Deploy [`server.js`](server.js) changes to Heroku.
+
+### Heroku Scheduler Setup (Recurring Charges)
+
+1. Install addon:
+
+   ```bash
+   heroku addons:create scheduler:standard -a beautybite
+   ```
+
+2. Configure job (Dashboard or CLI):
+
+   ```bash
+   heroku addons:open scheduler -a beautybite
+   ```
+
+   - **Frequency**: Every hour
+   - **Command**: `curl -X POST https://beautybite-36e5434be6c8.herokuapp.com/api/cron/process-subscriptions`
+
+   Replace URL with your Heroku app URL.
+
+### Testing Instructions
+
+#### 12-Hour Test Subscription (Quick Verification)
+
+- [`shop.html`](shop.html): Quantity=2, Duration=3, Interval=12-hour
+- **Expected**:
+  - First: $400 immediate charge
+  - After 12h: $400 (manual cron)
+  - After 24h: $400, completes
+- Total: $1,200
+
+#### Weekly Subscription
+
+- Quantity=5, Duration=4, Weekly
+- First: $1,000
+- Then weekly x3
+
+#### Check Progress
+
+- [`orders.html`](orders.html): View progress, next billing, total paid, status
+
+### Manual Operations
+
+**Trigger Cron**:
+
+   ```bash
+curl -X POST https://your-app.herokuapp.com/api/cron/process-subscriptions
+   ```
+
+**View Logs**:
+
+   ```bash
+heroku logs --tail -a beautybite | grep -i subscription
+   ```
+
+### Error Handling
+
+- **Payment Failures**: Cron marks `status='payment_failed'`, logs error
+- **Frontend**: User-friendly error messages in payment-status
+- **Backend**: Input validation, try-catch, 400/500 responses
+- **Webhook**: Not used (server cron handles billing)
+
+### Features Implemented
+
+✅ Embedded Payment Element (no redirects)  
+✅ 12-hour/weekly/monthly intervals  
+✅ Auto-charge & complete after duration  
+✅ Payment method saved  
+✅ Progress tracking in [`orders.html`](orders.html)  
+✅ Hybrid: PI + DB scheduling
