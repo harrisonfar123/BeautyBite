@@ -216,26 +216,6 @@
                 font-size: 0.9em;
             }
         }
-
-        .subscription-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .status-success { background-color: #28a745; }
-        .status-danger { background-color: #dc3545; }
-        .status-warning { background-color: #ffc107; color: black; }
-        .status-complete { background-color: #17a2b8; }
     </style>
 </head>
 
@@ -260,6 +240,42 @@
                         <th>Amount</th>
                         <th>Status</th>
                         <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="subscriptions-section" class="section" style="display: none;">
+            <h2>Active Subscriptions</h2>
+            <table id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>Started</th>
+                        <th>Qty/Period</th>
+                        <th>Amount/Period</th>
+                        <th>Interval</th>
+                        <th>Progress</th>
+                        <th>Next Billing</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <!-- Add this after the subscriptions section -->
+        <div id="order-log-section" class="section" style="display: none;">
+            <h2>Complete Order History</h2>
+            <table id="order-log-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -381,6 +397,83 @@
             }
         }
 
+        async function loadSubscriptions() {
+            try {
+                const res = await fetch(`${API_BASE}/api/subscriptions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const subscriptions = await res.json();
+
+                console.log('Loaded subscriptions:', subscriptions);
+
+                const tbody = document.querySelector('#subscriptions-table tbody');
+                tbody.innerHTML = '';
+
+                if (!subscriptions || subscriptions.length === 0) {
+                    return; // Hide subscriptions section if none exist
+                }
+
+                // Show subscriptions section
+                document.getElementById('subscriptions-section').style.display = 'block';
+
+                subscriptions.forEach(sub => {
+                    const tr = document.createElement('tr');
+
+                    // Started date
+                    const startTd = document.createElement('td');
+                    startTd.textContent = formatDate(sub.created_at);
+                    tr.appendChild(startTd);
+
+                    // Quantity per period
+                    const qtyTd = document.createElement('td');
+                    qtyTd.textContent = sub.quantity_per_period || '-';
+                    tr.appendChild(qtyTd);
+
+                    // Amount per period
+                    const amountTd = document.createElement('td');
+                    amountTd.textContent = formatAmount(sub.amount_per_period);
+                    tr.appendChild(amountTd);
+
+                    // Interval
+                    const intervalTd = document.createElement('td');
+                    const intervalText = {
+                        '12hour': 'Every 12 Hours',
+                        'weekly': 'Weekly',
+                        'monthly': 'Monthly'
+                    }[sub.interval] || sub.interval;
+                    intervalTd.textContent = intervalText;
+                    tr.appendChild(intervalTd);
+
+                    // Progress
+                    const progressTd = document.createElement('td');
+                    progressTd.textContent = `${sub.periods_completed || 1} of ${sub.total_periods}`;
+                    tr.appendChild(progressTd);
+
+                    // Next billing date
+                    const nextBillingTd = document.createElement('td');
+                    if (sub.status === 'active') {
+                        nextBillingTd.textContent = formatDate(sub.next_billing_date);
+                    } else {
+                        nextBillingTd.textContent = '-';
+                    }
+                    tr.appendChild(nextBillingTd);
+
+                    // Status
+                    const statusTd = document.createElement('td');
+                    const badge = document.createElement('span');
+                    badge.className = `status status-${sub.status.toLowerCase()}`;
+                    badge.textContent = sub.status.toUpperCase();
+                    statusTd.appendChild(badge);
+                    tr.appendChild(statusTd);
+
+                    tbody.appendChild(tr);
+                });
+
+            } catch (e) {
+                console.error('Error loading subscriptions:', e);
+            }
+        }
+
         async function loadDeliveries() {
             try {
                 const res = await fetch(`${API_BASE}/api/deliveries`, {
@@ -448,6 +541,7 @@
         // Load data on page load
         window.addEventListener('load', () => {
             loadOrders();
+            loadSubscriptions();
             loadDeliveries();
         });
     </script>

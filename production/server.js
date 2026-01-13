@@ -8,6 +8,52 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('./db'); // Database connection pool
+
+// Helper function to log orders
+async function logOrder(orderData) {
+    try {
+        const {
+            userId,
+            orderType, // 'one-time', 'subscription', 'subscription_renewal'
+            orderId = null,
+            stripePaymentIntentId,
+            stripeCustomerId = null,
+            quantity,
+            amount,
+            status = 'completed',
+            billingEmail = null,
+            billingName = null,
+            shippingAddress = null,
+            periodNumber = null,
+            totalPeriods = null,
+            interval = null,
+            notes = null
+        } = orderData;
+
+        const result = await pool.query(`
+            INSERT INTO order_log (
+                user_id, order_type, order_id,
+                stripe_payment_intent_id, stripe_customer_id,
+                quantity, amount, status,
+                billing_email, billing_name, shipping_address,
+                period_number, total_periods, interval, notes
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            RETURNING *
+        `, [
+            userId, orderType, orderId,
+            stripePaymentIntentId, stripeCustomerId,
+            quantity, amount, status,
+            billingEmail, billingName, shippingAddress,
+            periodNumber, totalPeriods, interval, notes
+        ]);
+
+        console.log(`✅ Order logged: ${orderType} - $${amount} (Log ID: ${result.rows[0].id})`);
+        return result.rows[0];
+    } catch (error) {
+        console.error('❌ Failed to log order:', error);
+        throw error;
+    }
+}
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
@@ -334,6 +380,8 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
     try {
         const { paymentIntentId } = req.body;
         const userId = req.user.id;
+        const userEmail = req.user.email;
+        const userName = req.user.name;
 
         // Retrieve PaymentIntent from Stripe
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -342,21 +390,45 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Payment not completed' });
         }
 
-        // Save order to database
-        const result = await pool.query(`
-            INSERT INTO orders (user_id, stripe_payment_intent_id, product_type, quantity, amount, status)
-            VALUES ($1, $2, $3, $4, $5, $6)
+        const quantity = parseInt(paymentIntent.metadata.quantity || 1);
+        const amountPaid = paymentIntent.amount / 100;
+
+        // Save to orders table
+        const orderResult = await pool.query(`
+            INSERT INTO orders (
+                user_id, stripe_payment_intent_id, product_type,
+                quantity, amount, status
+            ) VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
         `, [
             userId,
             paymentIntent.id,
-            paymentIntent.metadata.product_type,
-            parseInt(paymentIntent.metadata.quantity),
-            paymentIntent.amount / 100, // Convert cents to dollars
+            'one-time',
+            quantity,
+            amountPaid,
             'completed'
         ]);
 
-        res.json({ order: result.rows[0] });
+        const order = orderResult.rows[0];
+
+        // Log the order
+        await logOrder({
+            userId: userId,
+            orderType: 'one-time',
+            orderId: order.id,
+            stripePaymentIntentId: paymentIntent.id,
+            stripeCustomerId: paymentIntent.customer,
+            quantity: quantity,
+            amount: amountPaid,
+            status: 'completed',
+            billingEmail: userEmail,
+            billingName: userName,
+            notes: `One-time purchase of ${quantity} mouthguards`
+        });
+
+        console.log('✅ One-time order saved and logged');
+        res.json({ order: order });
+
     } catch (error) {
         console.error('Payment confirmation error:', error);
         res.status(500).json({ error: 'Failed to confirm payment' });
@@ -547,6 +619,104 @@ app.post('/api/stripe/confirm-subscription', authenticateToken, async (req, res)
             1
         ]);
 
+        // ADD THIS: Log the subscription creation
+        await logOrder({
+            userId: userId,
+            orderType: 'subscription',
+            orderId: subscription.rows[0].id,
+            stripePaymentIntentId: paymentIntent.id,
+            stripeCustomerId: subscription.rows[0].stripe_customer_id,
+            quantity: parseInt(quantity),
+            amount: amountPerPeriod,
+            status: 'completed',
+            billingEmail: req.user.email,
+            billingName: req.user.name,
+            periodNumber: 1,
+            totalPeriods: parseInt(duration),
+            interval: interval,
+            notes: `Subscription created: ${quantity} mouthguards ${interval}, Period 1 of ${duration}`
+        });
+
+        // GET /api/order-log - Returns user's order log
+        app.get('/api/order-log', authenticateToken, async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { limit = 50, offset = 0, status, orderType } = req.query;
+
+                let query = 'SELECT * FROM order_log WHERE user_id = $1';
+                let params = [userId];
+                let paramCount = 1;
+
+                if (status) {
+                    paramCount++;
+                    query += ` AND status = $${paramCount}`;
+                    params.push(status);
+                }
+
+                if (orderType) {
+                    paramCount++;
+                    query += ` AND order_type = $${paramCount}`;
+                    params.push(orderType);
+                }
+
+                query += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+                params.push(parseInt(limit), parseInt(offset));
+
+                const result = await pool.query(query, params);
+
+                res.json(result.rows);
+            } catch (error) {
+                console.error('Order log fetch error:', error);
+                res.status(500).json({ error: 'Failed to fetch order log' });
+            }
+        });
+
+        // GET /api/order-log/:id - Get specific order log entry
+        app.get('/api/order-log/:id', authenticateToken, async (req, res) => {
+            try {
+                const { id } = req.params;
+                const userId = req.user.id;
+
+                const result = await pool.query(
+                    'SELECT * FROM order_log WHERE id = $1 AND user_id = $2',
+                    [id, userId]
+                );
+
+                if (result.rows.length === 0) {
+                    return res.status(404).json({ error: 'Order log not found' });
+                }
+
+                res.json(result.rows[0]);
+            } catch (error) {
+                console.error('Order log fetch error:', error);
+                res.status(500).json({ error: 'Failed to fetch order log' });
+            }
+        });
+
+        // ADMIN: Get all order logs (for admin dashboard)
+        app.get('/api/admin/order-log', authenticateToken, async (req, res) => {
+            try {
+                // TODO: Add admin role check here
+                // if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+
+                const { limit = 100, offset = 0 } = req.query;
+
+                const result = await pool.query(`
+                    SELECT ol.*, u.email, u.name
+                    FROM order_log ol
+                    JOIN users u ON ol.user_id = u.id
+                    ORDER BY ol.created_at DESC
+                    LIMIT $1 OFFSET $2
+                `, [parseInt(limit), parseInt(offset)]);
+
+                res.json(result.rows);
+            } catch (error) {
+                console.error('Admin order log fetch error:', error);
+                res.status(500).json({ error: 'Failed to fetch order log' });
+            }
+        });
+
+        console.log('✅ Subscription created and logged');
         console.log('✅ Subscription created:', subscription.rows[0].id);
         res.json({ subscription: subscription.rows[0] });
 
