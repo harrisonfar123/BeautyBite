@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('./db'); // Database connection pool
 
+const { sendOrderConfirmationEmail, sendTestEmail } = require('./emailService');
+
 // Helper function to log orders
 async function logOrder(orderData) {
     try {
@@ -48,7 +50,15 @@ async function logOrder(orderData) {
         ]);
 
         console.log(`✅ Order logged: ${orderType} - $${amount} (Log ID: ${result.rows[0].id})`);
-        return result.rows[0];
+
+        const orderLog = result.rows[0];
+        try {
+            await sendOrderConfirmationEmail(orderLog);
+            await pool.query('UPDATE order_log SET email_sent = TRUE, email_sent_at = NOW() WHERE id = $1', [orderLog.id]);
+        } catch (emailError) {
+            console.error('⚠️  Email sending failed (order still logged):', emailError.message);
+        }
+        return orderLog;
     } catch (error) {
         console.error('❌ Failed to log order:', error);
         throw error;
@@ -859,6 +869,20 @@ app.get('/api/subscriptions', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Fetch subscriptions error:', error);
         res.status(500).json({ error: 'Failed to fetch subscriptions' });
+    }
+});
+
+app.post('/api/test-email', authenticateToken, async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || !emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Valid email required' });
+        }
+        await sendTestEmail(email);
+        res.json({ success: true, message: 'Test email sent successfully' });
+    } catch (error) {
+        console.error('Test email error:', error);
+        res.status(500).json({ error: 'Failed to send test email' });
     }
 });
 
