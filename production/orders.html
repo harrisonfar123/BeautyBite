@@ -270,6 +270,7 @@
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Product</th>
                         <th>Type</th>
                         <th>Quantity</th>
                         <th>Amount</th>
@@ -525,6 +526,82 @@
             }
         }
 
+        async function loadOrderLog() {
+            try {
+                const res = await fetch(`${API_BASE}/api/order_logs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const logs = await res.json();
+
+                const tbody = document.querySelector('#order-log-table tbody');
+                tbody.innerHTML = '';
+
+                if (!logs || logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No complete order history yet.</td></tr>';
+                    return;
+                }
+
+                document.getElementById('order-log-section').style.display = 'block';
+
+                logs.forEach(log => {
+                    const tr = document.createElement('tr');
+
+                    // Date
+                    const dateTd = document.createElement('td');
+                    dateTd.textContent = formatDate(log.created_at);
+                    tr.appendChild(dateTd);
+
+                    // Product Type (NEW)
+                    const productTd = document.createElement('td');
+                    const productNames = {
+                        'standard': 'BeautyBite Standard',
+                        'bulk': 'Bulk Clear',
+                        'custom': 'Custom 3D'
+                    };
+                    productTd.textContent = productNames[log.product_type] || log.product_type || 'Standard';
+                    tr.appendChild(productTd);
+
+                    // Type
+                    const typeTd = document.createElement('td');
+                    typeTd.textContent = log.type || '-';
+                    tr.appendChild(typeTd);
+
+                    // Quantity
+                    const qtyTd = document.createElement('td');
+                    qtyTd.textContent = log.quantity || '-';
+                    tr.appendChild(qtyTd);
+
+                    // Amount
+                    const amountTd = document.createElement('td');
+                    amountTd.textContent = formatAmount(log.amount);
+                    tr.appendChild(amountTd);
+
+                    // Period
+                    const periodTd = document.createElement('td');
+                    periodTd.textContent = log.period || '-';
+                    tr.appendChild(periodTd);
+
+                    // Status
+                    const statusTd = document.createElement('td');
+                    const badge = document.createElement('span');
+                    badge.className = `status status-${log.status.toLowerCase()}`;
+                    badge.textContent = log.status.toUpperCase();
+                    statusTd.appendChild(badge);
+                    tr.appendChild(statusTd);
+
+                    // Notes
+                    const notesTd = document.createElement('td');
+                    notesTd.textContent = log.notes || '';
+                    tr.appendChild(notesTd);
+
+                    tbody.appendChild(tr);
+                });
+
+            } catch (e) {
+                console.error('Error loading order log:', e);
+            }
+        }
+
         function showOrderDetails(order) {
             let details = `Order ID: ${order.id}\n`;
             details += `Date: ${formatDate(order.created_at)}\n`;
@@ -543,6 +620,7 @@
             loadOrders();
             loadSubscriptions();
             loadDeliveries();
+            loadOrderLog();
         });
     </script>
 </body>

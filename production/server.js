@@ -15,49 +15,45 @@ const { sendOrderConfirmationEmail, sendTestEmail, sendSupplierOrderLog } = requ
 async function logOrder(orderData) {
     try {
         const {
-            userId,
-            orderType, // 'one-time', 'subscription', 'subscription_renewal'
-            orderId = null,
-            stripePaymentIntentId,
-            stripeCustomerId = null,
-            quantity,
-            amount,
-            status = 'completed',
-            billingEmail = null,
-            billingName = null,
-            shippingAddress = null,
-            periodNumber = null,
-            totalPeriods = null,
-            interval = null,
-            notes = null
+            userId, orderType, orderId = null, stripePaymentIntentId,
+            stripeCustomerId = null, quantity, amount, status = 'completed',
+            billingEmail = null, billingName = null, shippingAddress = null,
+            periodNumber = null, totalPeriods = null, interval = null, notes = null,
+            productType = 'standard'
         } = orderData;
 
         const result = await pool.query(`
             INSERT INTO order_log (
-                user_id, order_type, order_id,
-                stripe_payment_intent_id, stripe_customer_id,
-                quantity, amount, status,
-                billing_email, billing_name, shipping_address,
-                period_number, total_periods, interval, notes
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                user_id, order_type, order_id, stripe_payment_intent_id,
+                stripe_customer_id, quantity, amount, status, billing_email,
+                billing_name, shipping_address, period_number, total_periods,
+                interval, notes, product_type
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
             RETURNING *
         `, [
-            userId, orderType, orderId,
-            stripePaymentIntentId, stripeCustomerId,
-            quantity, amount, status,
-            billingEmail, billingName, shippingAddress,
-            periodNumber, totalPeriods, interval, notes
+            userId, orderType, orderId, stripePaymentIntentId, stripeCustomerId,
+            quantity, amount, status, billingEmail, billingName, shippingAddress,
+            periodNumber, totalPeriods, interval, notes, productType
         ]);
 
-        console.log(`✅ Order logged: ${orderType} - $${amount} (Log ID: ${result.rows[0].id})`);
-
         const orderLog = result.rows[0];
+        console.log(`✅ Order logged: ${orderType} - ${productType} - $${amount} (Log ID: ${orderLog.id})`);
+
+        // Send confirmation email (skip if email not configured)
         try {
-            await sendOrderConfirmationEmail(orderLog);
-            await pool.query('UPDATE order_log SET email_sent = TRUE, email_sent_at = NOW() WHERE id = $1', [orderLog.id]);
+            if (process.env.EMAIL_HOST && process.env.EMAIL_USER) {
+                await sendOrderConfirmationEmail(orderLog);
+                await pool.query(
+                    'UPDATE order_log SET email_sent = TRUE, email_sent_at = NOW() WHERE id = $1',
+                    [orderLog.id]
+                );
+            } else {
+                console.log('⚠️  Email not configured, skipping email');
+            }
         } catch (emailError) {
             console.error('⚠️  Email sending failed (order still logged):', emailError.message);
         }
+
         return orderLog;
     } catch (error) {
         console.error('❌ Failed to log order:', error);
@@ -413,7 +409,7 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
         `, [
             userId,
             paymentIntent.id,
-            'one-time',
+            'standard',
             quantity,
             amountPaid,
             'completed'
@@ -433,7 +429,8 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
             status: 'completed',
             billingEmail: userEmail,
             billingName: userName,
-            notes: `One-time purchase of ${quantity} mouthguards`
+            productType: 'standard',
+            notes: `One-time purchase of ${quantity} BeautyBite mouthguards`
         });
 
         console.log('✅ One-time order saved and logged');
@@ -644,7 +641,8 @@ app.post('/api/stripe/confirm-subscription', authenticateToken, async (req, res)
             periodNumber: 1,
             totalPeriods: parseInt(duration),
             interval: interval,
-            notes: `Subscription created: ${quantity} mouthguards ${interval}, Period 1 of ${duration}`
+            productType: 'standard',
+            notes: `Subscription created: ${quantity} BeautyBite mouthguards ${interval}, Period 1 of ${duration}`
         });
 
         // GET /api/order-log - Returns user's order log
@@ -849,7 +847,13 @@ app.post('/api/cron/send-supplier-log', async (req, res) => {
         const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const endDate = new Date();
         const ordersResult = await pool.query(
-            `SELECT * FROM order_log WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at ASC`,
+            `SELECT
+                id, order_type, order_id, quantity, amount,
+                billing_email, billing_name, period_number,
+                total_periods, interval, status, created_at,
+                product_type
+            FROM order_log
+            WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at ASC`,
             [startDate, endDate]
         );
         const orders = ordersResult.rows;

@@ -365,18 +365,19 @@ function generateSupplierOrderLogEmail(orders, startDate, endDate) {
     const oneTimeOrders = orders.filter(o => o.order_type === 'one-time');
     const subscriptionOrders = orders.filter(o => o.order_type === 'subscription');
     const renewalOrders = orders.filter(o => o.order_type === 'subscription_renewal');
-    
+
     const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.amount), 0);
     const totalQuantity = orders.reduce((sum, o) => sum + parseInt(o.quantity), 0);
-    
+
     const formatDate = (date) => new Date(date).toLocaleDateString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-    
+
     const orderRows = orders.map(order => `
     <tr>
             <td style="padding:10px;border-bottom:1px solid #eee">${order.id}</td>
             <td style="padding:10px;border-bottom:1px solid #eee">${formatDate(order.created_at)}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee">${order.product_type || 'standard'}</td>
             <td style="padding:10px;border-bottom:1px solid #eee">${order.order_type === 'one-time' ? 'One-Time' : order.order_type === 'subscription' ? 'Subscription' : 'Renewal'}</td>
             <td style="padding:10px;border-bottom:1px solid #eee">${order.quantity}</td>
             <td style="padding:10px;border-bottom:1px solid #eee">${formatCurrency(order.amount)}</td>
@@ -384,7 +385,7 @@ function generateSupplierOrderLogEmail(orders, startDate, endDate) {
             <td style="padding:10px;border-bottom:1px solid #eee">${order.period_number && order.total_periods ? `${order.period_number}/${order.total_periods}` : '-'}</td>
         </tr>
     `).join('');
-    
+
     return `<!DOCTYPE html><html><head><style>
     body{font-family:Arial,sans-serif;line-height:1.6;color:#333}
     .container{max-width:900px;margin:0 auto;padding:20px}
@@ -445,6 +446,7 @@ function generateSupplierOrderLogEmail(orders, startDate, endDate) {
                         <tr>
                             <th>ID</th>
                             <th>Date</th>
+                            <th>Product</th>
                             <th>Type</th>
                             <th>Qty</th>
                             <th>Amount</th>
@@ -478,21 +480,21 @@ async function sendSupplierOrderLog(orders, supplierEmail, startDate, endDate) {
             console.log('⚠️  No orders to send to supplier');
             return null;
         }
-        
+
         const subject = `📦 BeautyBite Order Log - ${orders.length} Orders (${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()})`;
         const html = generateSupplierOrderLogEmail(orders, startDate, endDate);
-        
+
         const mailOptions = {
             from: process.env.EMAIL_FROM || 'BeautyBite Orders <orderlog@beautybite.co>',
             to: supplierEmail,
             subject: subject,
             html: html
         };
-        
+
         const info = await transporter.sendMail(mailOptions);
         console.log(`✅ Supplier order log sent to ${supplierEmail}: ${info.messageId}`);
         return info;
-        
+
     } catch (error) {
         console.error('❌ Failed to send supplier order log:', error);
         throw error;
