@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('./db'); // Database connection pool
 
-const { sendOrderConfirmationEmail, sendTestEmail } = require('./emailService');
+const { sendOrderConfirmationEmail, sendTestEmail, sendSupplierOrderLog } = require('./emailService');
 
 // Helper function to log orders
 async function logOrder(orderData) {
