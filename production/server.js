@@ -843,6 +843,29 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
     }
 });
 
+app.post('/api/cron/send-supplier-log', async (req, res) => {
+    try {
+        console.log('📧 Sending supplier log...');
+        const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const endDate = new Date();
+        const ordersResult = await pool.query(
+            `SELECT * FROM order_log WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at ASC`,
+            [startDate, endDate]
+        );
+        const orders = ordersResult.rows;
+        const supplierEmail = process.env.SUPPLIER_EMAIL || 'supplier@beautybite.co';
+        if (orders.length > 0) {
+            await sendSupplierOrderLog(orders, supplierEmail, startDate, endDate);
+        } else {
+            console.log('ℹ️ No orders in last 24h for supplier log');
+        }
+        res.json({ success: true, ordersCount: orders.length });
+    } catch (error) {
+        console.error('❌ Cron send-supplier-log failed:', error.message);
+        res.json({ success: true });
+    }
+});
+
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
