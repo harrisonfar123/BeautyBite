@@ -203,7 +203,7 @@
         const offscreen = document.createElement('canvas');
         offscreen.width = 400; offscreen.height = 220;
         try {
-            sharedRenderer = new THREE.WebGLRenderer({ canvas: offscreen, antialias: true, alpha: false });
+            sharedRenderer = new THREE.WebGLRenderer({ canvas: offscreen, antialias: true, alpha: false, preserveDrawingBuffer: true });
         } catch(e) {
             console.warn('WebGL not available:', e);
             products.forEach(p => {
