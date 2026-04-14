@@ -663,21 +663,25 @@
         renderer.toneMappingExposure = 1.1;
 
         // Lights
-        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambient = new THREE.AmbientLight(0xffffff, 2.0);
         scene.add(ambient);
 
-        const key = new THREE.DirectionalLight(0xffffff, 0.9);
+        const key = new THREE.DirectionalLight(0xffffff, 3.0);
         key.position.set(4, 6, 4);
         key.castShadow = true;
         scene.add(key);
 
-        const fill = new THREE.DirectionalLight(0x4DA6FF, 0.35);
+        const fill = new THREE.DirectionalLight(0x4DA6FF, 1.5);
         fill.position.set(-4, 2, -3);
         scene.add(fill);
 
-        const rim = new THREE.DirectionalLight(0x14B8A6, 0.2);
+        const rim = new THREE.DirectionalLight(0x14B8A6, 1.0);
         rim.position.set(0, -2, -5);
         scene.add(rim);
+
+        const back = new THREE.DirectionalLight(0x8bb8cc, 0.8);
+        back.position.set(0, -4, -6);
+        scene.add(back);
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -739,17 +743,24 @@
             switch (state.material) {
                 case 'glossy':
                     mat = new THREE.MeshPhysicalMaterial({
-                        color, roughness: 0.05, metalness: 0.0, reflectivity: 1, clearcoat: 1.0, clearcoatRoughness: 0.05
+                        color, roughness: 0.05, metalness: 0.0,
+                        clearcoat: 0.8, clearcoatRoughness: 0.1,
+                        emissive: color.clone().multiplyScalar(0.15),
+                        emissiveIntensity: 1.0
                     });
                     break;
                 case 'metallic':
                     mat = new THREE.MeshStandardMaterial({
-                        color, roughness: 0.2, metalness: 0.85
+                        color, roughness: 0.1, metalness: 0.95,
+                        emissive: color.clone().multiplyScalar(0.2),
+                        emissiveIntensity: 1.0
                     });
                     break;
                 default: // matte / standard
                     mat = new THREE.MeshStandardMaterial({
-                        color, roughness: 0.75, metalness: 0.0
+                        color, roughness: 0.7, metalness: 0.0,
+                        emissive: color.clone().multiplyScalar(0.1),
+                        emissiveIntensity: 1.0
                     });
             }
 
@@ -871,33 +882,35 @@
     const TIER_MATERIALS = {
         'clear-bulk': {
             badge: 'Tier 1 — Clear',
-            bgColor: 0x0d1f3c,
+            bgColor: 0x0a1929,
             apply: (child) => {
                 child.material = new THREE.MeshPhysicalMaterial({
-                    color: new THREE.Color(0xddeeff),
+                    color: new THREE.Color(0xb8e4ff),
                     roughness: 0.05, metalness: 0.0,
-                    transmission: 0.88,
-                    clearcoat: 1.0, clearcoatRoughness: 0.05,
-                    transparent: true, opacity: 0.55,
-                    side: THREE.DoubleSide
+                    clearcoat: 0.8, clearcoatRoughness: 0.1,
+                    transparent: true, opacity: 0.85,
+                    side: THREE.DoubleSide,
+                    emissive: new THREE.Color(0x1a4060),
+                    emissiveIntensity: 0.2
                 });
             }
         },
         'beautybite-branded': {
             badge: 'Tier 2 — Branded',
-            bgColor: 0x0a1929,
+            bgColor: 0x081422,
             apply: (child) => {
-                child.material = new THREE.MeshPhysicalMaterial({
-                    color: new THREE.Color(0x1B2D3E),
-                    roughness: 0.1, metalness: 0.15,
-                    clearcoat: 1.0, clearcoatRoughness: 0.08
+                child.material = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(0x2B5C8E),
+                    roughness: 0.2, metalness: 0.6,
+                    emissive: new THREE.Color(0x0d2a50),
+                    emissiveIntensity: 0.5
                 });
             }
         },
         'custom-branded': {
             badge: 'Tier 3 — Custom',
-            bgColor: 0x111827,
-            apply: null // uses state-driven applyMaterialSettings
+            bgColor: 0x080f1e,
+            apply: null  // Uses editor-controlled material
         }
     };
 

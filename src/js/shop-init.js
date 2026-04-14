@@ -125,31 +125,54 @@
 
     const TIER_CONFIGS = {
         'clear-bulk': {
-            bgColor: 0x0d1f3c,
+            bgColor: 0x0a1929,
             makeMat: () => new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color(0xddeeff),
-                roughness: 0.05, metalness: 0.0, clearcoat: 1.0, clearcoatRoughness: 0.05,
-                transparent: true, opacity: 0.6, side: THREE.DoubleSide
+                color: new THREE.Color(0xb8e4ff),
+                roughness: 0.05, metalness: 0.0,
+                clearcoat: 0.8, clearcoatRoughness: 0.1,
+                transparent: true, opacity: 0.85,
+                side: THREE.DoubleSide,
+                emissive: new THREE.Color(0x1a4060),
+                emissiveIntensity: 0.2
             }),
-            lights: [['ambient',0xffffff,0.8],['key',0xffffff,1.2,[4,6,4]],['fill',0xaaddff,0.6,[-4,2,-3]],['rim',0x88bbff,0.3,[0,-2,-5]]],
+            lights: [
+                ['ambient',0xd0e8ff,2.2],
+                ['key',0xffffff,3.0,[4,6,4]],
+                ['fill',0x88ccff,1.8,[-4,2,-3]],
+                ['rim',0x44aaff,1.0,[0,-2,-5]]
+            ],
             rotSpeed: 0.007
         },
         'beautybite-branded': {
-            bgColor: 0x0a1929,
-            makeMat: () => new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color(0x1B2D3E),
-                roughness: 0.1, metalness: 0.15, clearcoat: 1.0, clearcoatRoughness: 0.08
+            bgColor: 0x081422,
+            makeMat: () => new THREE.MeshStandardMaterial({
+                color: new THREE.Color(0x2B5C8E),
+                roughness: 0.2, metalness: 0.6,
+                emissive: new THREE.Color(0x0d2a50),
+                emissiveIntensity: 0.5
             }),
-            lights: [['ambient',0xffffff,0.6],['key',0xffffff,1.4,[4,6,4]],['fill',0x8BB8CC,0.5,[-4,2,-3]],['rim',0x14B8A6,0.35,[0,-2,-5]]],
+            lights: [
+                ['ambient',0xffffff,2.0],
+                ['key',0xffffff,3.5,[4,6,4]],
+                ['fill',0x8BB8CC,1.5,[-4,2,-3]],
+                ['rim',0x14B8A6,1.0,[0,-2,-5]]
+            ],
             rotSpeed: 0.006
         },
         'custom-branded': {
-            bgColor: 0x0f1a2e,
+            bgColor: 0x080f1e,
             makeMat: () => new THREE.MeshStandardMaterial({
                 color: new THREE.Color(0x0066CC),
-                roughness: 0.2, metalness: 0.85
+                roughness: 0.1, metalness: 0.95,
+                emissive: new THREE.Color(0x001a3d),
+                emissiveIntensity: 0.35
             }),
-            lights: [['ambient',0xffffff,0.5],['key',0xffffff,1.3,[4,6,4]],['fill',0x14B8A6,0.6,[-4,2,-3]],['rim',0xf59e0b,0.4,[2,-3,-4]]],
+            lights: [
+                ['ambient',0xffffff,1.8],
+                ['key',0xffffff,3.0,[4,6,4]],
+                ['fill',0x14B8A6,1.8,[-4,2,-3]],
+                ['rim',0xf59e0b,1.2,[2,-3,-4]]
+            ],
             rotSpeed: 0.013
         }
     };
@@ -272,6 +295,22 @@
                 if (v.canvas2d.width !== w) v.canvas2d.width = w;
                 if (v.canvas2d.height !== h) v.canvas2d.height = h;
                 ctx.drawImage(sharedRenderer.domElement, 0, 0, w, h);
+                // Overlay "Beauty Bite" brand text on the branded tier
+                if (v.id === 'beautybite-branded') {
+                    ctx.save();
+                    const fontSize = Math.max(11, Math.round(w * 0.052));
+                    ctx.font = `bold ${fontSize}px 'Pacifico', cursive`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const cx = w / 2;
+                    const cy = Math.round(h * 0.58);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+                    ctx.lineWidth = 3;
+                    ctx.strokeText('Beauty Bite', cx, cy);
+                    ctx.fillStyle = '#14B8A6';
+                    ctx.fillText('Beauty Bite', cx, cy);
+                    ctx.restore();
+                }
             });
         }
         loop();
