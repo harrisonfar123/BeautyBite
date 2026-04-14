@@ -1,0 +1,529 @@
+<header>
+    <div class="header-container">
+        <div class="logo-section">
+            <h1 class="site-title"><a href="index.html" style="text-decoration: none; color: inherit;">BeautyBite</a>
+            </h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="customize.html">Customize</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+
+                <!-- Authentication Links -->
+                <li class="auth-links" id="authLinks">
+                    <div class="guest-links" id="guestLinks">
+                        <button class="auth-link login-btn" id="loginBtn">Sign In</button>
+                        <button class="auth-link primary register-btn" id="registerBtn">Create Account</button>
+                    </div>
+
+                    <div class="user-links" id="userLinks" style="display: none;">
+                        <div class="user-dropdown">
+                            <button class="user-menu-btn" id="userMenuBtn">
+                                <span class="user-avatar" id="userAvatar">U</span>
+                                <span class="user-name" id="userName">User</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </button>
+                            <div class="user-dropdown-menu" id="userDropdownMenu">
+                                <a href="profile.html" class="dropdown-item">My Profile</a>
+                                <a href="dashboard.html" class="dropdown-item">Dashboard</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item logout-btn" id="logoutBtn">Sign Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="cart-icon" id="cart-icon" title="View cart">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        <span class="cart-count" id="cart-count" data-cart-count>0</span>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+<!-- Authentication Modals -->
+<div id="loginModal" class="auth-modal" style="display: none;">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <h3>Sign In</h3>
+            <button class="auth-modal-close" id="loginModalClose">&times;</button>
+        </div>
+        <form id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" name="email" required>
+                <div class="error-message" id="loginEmailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" name="password" required>
+                <div class="error-message" id="loginPasswordError"></div>
+            </div>
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-password-link">Forgot password?</a>
+            </div>
+            <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
+                <span>Sign In</span>
+                <div class="loading-spinner" style="display: none;"></div>
+            </button>
+        </form>
+        <div class="auth-modal-footer">
+            <p>Don't have an account? <button class="auth-switch-btn" id="switchToRegister">Create Account</button></p>
+        </div>
+    </div>
+</div>
+
+<div id="registerModal" class="auth-modal" style="display: none;">
+    <div class="auth-modal-content">
+        <div class="auth-modal-header">
+            <h3>Create Account</h3>
+            <button class="auth-modal-close" id="registerModalClose">&times;</button>
+        </div>
+        <form id="registerForm" class="auth-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="registerFirstName">First Name</label>
+                    <input type="text" id="registerFirstName" name="firstName" required>
+                    <div class="error-message" id="registerFirstNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="registerLastName">Last Name</label>
+                    <input type="text" id="registerLastName" name="lastName" required>
+                    <div class="error-message" id="registerLastNameError"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail">Email Address</label>
+                <input type="email" id="registerEmail" name="email" required>
+                <div class="error-message" id="registerEmailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registerPhone">Phone Number (Optional)</label>
+                <input type="tel" id="registerPhone" name="phone">
+                <div class="error-message" id="registerPhoneError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" name="password" required>
+                <div class="password-strength" id="passwordStrength"></div>
+                <div class="error-message" id="registerPasswordError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registerConfirmPassword">Confirm Password</label>
+                <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
+                <div class="error-message" id="registerConfirmPasswordError"></div>
+            </div>
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <span>I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#"
+                            class="privacy-link">Privacy Policy</a></span>
+                </label>
+                <div class="error-message" id="agreeTermsError"></div>
+            </div>
+            <button type="submit" class="auth-submit-btn" id="registerSubmitBtn">
+                <span>Create Account</span>
+                <div class="loading-spinner" style="display: none;"></div>
+            </button>
+        </form>
+        <div class="auth-modal-footer">
+            <p>Already have an account? <button class="auth-switch-btn" id="switchToLogin">Sign In</button></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load AuthSystem and initialize authentication
+    document.addEventListener('DOMContentLoaded', function () {
+        // Use header-init.js (if available) to attach auth behavior; otherwise fall back to loading auth directly
+        if (typeof window.initHeader === 'function') {
+            try { window.initHeader(); } catch (e) { console.warn(e); }
+        } else {
+            // Load AuthSystem if not already loaded (absolute paths)
+            if (typeof AuthSystem === 'undefined') {
+                const script = document.createElement('script');
+                script.src = '/js/auth.js';
+                script.onload = function () {
+                    // Load additional dependencies
+                    loadAuthDependencies().then(initializeAuth).catch(() => initializeAuth && initializeAuth());
+                };
+                document.head.appendChild(script);
+            } else {
+                loadAuthDependencies().then(initializeAuth).catch(() => initializeAuth && initializeAuth());
+            }
+        }
+    });
+
+    function loadAuthDependencies() {
+        return new Promise((resolve) => {
+            // Load cart utilities
+            if (typeof window.cartUtils === 'undefined') {
+                const cartUtilsScript = document.createElement('script');
+                cartUtilsScript.src = '/js/cartUtils.js';
+                document.head.appendChild(cartUtilsScript);
+            }
+
+            // Load auth integration
+            if (typeof AuthIntegration === 'undefined') {
+                const authIntScript = document.createElement('script');
+                authIntScript.src = '/js/auth-integration.js';
+                document.head.appendChild(authIntScript);
+            }
+
+            // Load backend integration
+            if (typeof window.backendIntegration === 'undefined') {
+                const backendScript = document.createElement('script');
+                backendScript.src = '/js/backend-integration.js';
+                document.head.appendChild(backendScript);
+            }
+
+            // Give scripts time to load
+            setTimeout(resolve, 120);
+        });
+    }
+
+    function initializeAuth() {
+        // Initialize modal functionality
+        initAuthModals();
+
+        // Update navigation based on current auth state
+        updateAuthNavigation();
+
+        // Initialize auth system
+        if (typeof AuthSystem !== 'undefined') {
+            AuthSystem.init();
+        }
+
+        // Initialize auth integration
+        if (typeof AuthIntegration !== 'undefined') {
+            AuthIntegration.init();
+        }
+
+        // Check auth status periodically
+        setInterval(() => {
+            if (typeof AuthSystem !== 'undefined') {
+                AuthSystem.validateSession();
+            }
+            updateAuthNavigation();
+        }, 60000); // Check every minute
+    }
+
+    function initAuthModals() {
+        // Modal elements
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const loginModalClose = document.getElementById('loginModalClose');
+        const registerModalClose = document.getElementById('registerModalClose');
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        // Open modals
+        loginBtn?.addEventListener('click', () => openModal(loginModal));
+        registerBtn?.addEventListener('click', () => openModal(registerModal));
+
+        // Close modals
+        loginModalClose?.addEventListener('click', () => closeModal(loginModal));
+        registerModalClose?.addEventListener('click', () => closeModal(registerModal));
+
+        // Switch between modals
+        switchToRegister?.addEventListener('click', () => {
+            closeModal(loginModal);
+            openModal(registerModal);
+        });
+        switchToLogin?.addEventListener('click', () => {
+            closeModal(registerModal);
+            openModal(loginModal);
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) closeModal(loginModal);
+            if (e.target === registerModal) closeModal(registerModal);
+        });
+
+        // Form submissions
+        loginForm?.addEventListener('submit', handleLogin);
+        registerForm?.addEventListener('submit', handleRegister);
+
+        // Password strength indicator
+        const passwordInput = document.getElementById('registerPassword');
+        passwordInput?.addEventListener('input', updatePasswordStrength);
+
+        // Handle logout
+        document.getElementById('logoutBtn')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            AuthSystem.logout();
+            updateAuthNavigation();
+            showNotification('Logged out successfully', 'success');
+        });
+    }
+
+    function openModal(modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        clearFormErrors(modal);
+    }
+
+    function clearFormErrors(modal) {
+        const errorMessages = modal.querySelectorAll('.error-message');
+        errorMessages.forEach(error => error.textContent = '');
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const submitBtn = form.querySelector('.auth-submit-btn');
+        const spinner = submitBtn.querySelector('.loading-spinner');
+        const buttonText = submitBtn.querySelector('span');
+
+        // Get form data
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        // Clear previous errors
+        clearFormErrors(document.getElementById('loginModal'));
+
+        // Show loading state
+        submitBtn.disabled = true;
+        buttonText.textContent = 'Signing In...';
+        spinner.style.display = 'inline-block';
+
+        try {
+            const result = await AuthManager.login(email, password, rememberMe);
+
+            if (result.success) {
+                // Close modal and update navigation
+                closeModal(document.getElementById('loginModal'));
+                updateAuthNavigation();
+
+                // Show success message
+                showNotification('Login successful!', 'success');
+            } else {
+                // Show error message
+                showNotification(result.error, 'error');
+                document.getElementById('loginEmailError').textContent = result.error;
+            }
+        } catch (error) {
+            showNotification('Login failed. Please try again.', 'error');
+            document.getElementById('loginEmailError').textContent = 'Login failed. Please try again.';
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            buttonText.textContent = 'Sign In';
+            spinner.style.display = 'none';
+        }
+    }
+
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const submitBtn = form.querySelector('.auth-submit-btn');
+        const spinner = submitBtn.querySelector('.loading-spinner');
+        const buttonText = submitBtn.querySelector('span');
+
+        // Get form data
+        const userData = {
+            firstName: document.getElementById('registerFirstName').value,
+            lastName: document.getElementById('registerLastName').value,
+            email: document.getElementById('registerEmail').value,
+            phone: document.getElementById('registerPhone').value,
+            password: document.getElementById('registerPassword').value,
+            confirmPassword: document.getElementById('registerConfirmPassword').value
+        };
+
+        // Clear previous errors
+        clearFormErrors(document.getElementById('registerModal'));
+
+        // Validate form
+        const validation = validateRegistration(userData);
+        if (!validation.isValid) {
+            Object.keys(validation.errors).forEach(field => {
+                const errorElement = document.getElementById(`register${field.charAt(0).toUpperCase() + field.slice(1)}Error`);
+                if (errorElement) {
+                    errorElement.textContent = validation.errors[field];
+                }
+            });
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        buttonText.textContent = 'Creating Account...';
+        spinner.style.display = 'inline-block';
+
+        try {
+            const result = await AuthManager.register(userData);
+
+            if (result.success) {
+                // Close modal and update navigation
+                closeModal(document.getElementById('registerModal'));
+                updateAuthNavigation();
+
+                // Show success message
+                showNotification('Account created successfully!', 'success');
+            } else {
+                // Show error message
+                showNotification(result.error, 'error');
+                document.getElementById('registerEmailError').textContent = result.error;
+            }
+        } catch (error) {
+            showNotification('Registration failed. Please try again.', 'error');
+            document.getElementById('registerEmailError').textContent = 'Registration failed. Please try again.';
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            buttonText.textContent = 'Create Account';
+            spinner.style.display = 'none';
+        }
+    }
+
+    function validateRegistration(userData) {
+        const errors = {};
+
+        // Name validation
+        if (!userData.firstName.trim()) {
+            errors.firstName = 'First name is required';
+        }
+        if (!userData.lastName.trim()) {
+            errors.lastName = 'Last name is required';
+        }
+
+        // Email validation
+        if (!userData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!isValidEmail(userData.email)) {
+            errors.email = 'Please enter a valid email address';
+        }
+
+        // Password validation
+        if (!userData.password) {
+            errors.password = 'Password is required';
+        } else if (userData.password.length < 8) {
+            errors.password = 'Password must be at least 8 characters';
+        }
+
+        // Confirm password validation
+        if (userData.password !== userData.confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
+        }
+
+        return {
+            isValid: Object.keys(errors).length === 0,
+            errors
+        };
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function updatePasswordStrength() {
+        const password = document.getElementById('registerPassword').value;
+        const strengthElement = document.getElementById('passwordStrength');
+
+        if (!password) {
+            strengthElement.textContent = '';
+            strengthElement.className = 'password-strength';
+            return;
+        }
+
+        let strength = 'weak';
+        let score = 0;
+
+        // Length check
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+
+        // Complexity checks
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+
+        if (score >= 5) strength = 'strong';
+        else if (score >= 3) strength = 'medium';
+
+        strengthElement.textContent = `Password strength: ${strength}`;
+        strengthElement.className = `password-strength ${strength}`;
+    }
+
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+
+        // Add the appropriate class for styling
+        notification.classList.add(`notification-${type}`);
+
+        // Add to page
+        document.body.appendChild(notification);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Global function to update navigation (called by AuthManager)
+    window.updateAuthNavigation = function () {
+        const guestLinks = document.getElementById('guestLinks');
+        const userLinks = document.getElementById('userLinks');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+
+        if (AuthManager.isAuthenticated) {
+            // User is logged in
+            const user = AuthManager.currentUser;
+            if (user) {
+                // Update user info
+                userAvatar.textContent = AuthManager.getUserInitials();
+                userName.textContent = AuthManager.getUserFullName();
+            }
+
+            // Show user links, hide guest links
+            guestLinks.style.display = 'none';
+            userLinks.style.display = 'flex';
+        } else {
+            // User is not logged in
+            guestLinks.style.display = 'flex';
+            userLinks.style.display = 'none';
+        }
+    };
+</script>

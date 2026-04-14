@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment & secrets
+.env
+*.env
+production/.env
+production/heroku_config.txt
+backend/.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+deployment.log
+
+# Claude/MCP tooling
+.claude-flow/
+.mcp.json
+
+# Build artifacts
+dist/
+build/

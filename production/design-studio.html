@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Studio — BeautyBite Custom Branded</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --secondary-blue: #4DA6FF;
+            --teal: #14B8A6;
+            --teal-dark: #0e9c96;
+            --text-primary: #1a2332;
+            --text-secondary: #64748b;
+            --border-light: #e2e8f0;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0f1a2e;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top bar */
+        .topbar {
+            background: rgba(255,255,255,0.97);
+            border-bottom: 1px solid var(--border-light);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            z-index: 10;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .topbar-brand img { width: 28px; height: 28px; }
+
+        .topbar-brand-name {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+        }
+
+        .topbar-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .topbar-badge {
+            background: #ccfbf1;
+            color: #0d7a73;
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Main layout */
+        .studio-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Controls panel */
+        .controls-panel {
+            width: 300px;
+            flex-shrink: 0;
+            background: white;
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .panel-section:last-child { border-bottom: none; }
+
+        .panel-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.875rem;
+        }
+
+        /* Color swatches */
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .swatch:hover { transform: scale(1.15); }
+        .swatch.active { border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(0,102,204,0.3); }
+
+        .color-custom-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-custom-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        input[type="color"] {
+            width: 36px;
+            height: 28px;
+            border: 1.5px solid var(--border-light);
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 2px;
+            background: white;
+        }
+
+        /* Material buttons */
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .material-btn {
+            padding: 0.6rem 0.4rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: white;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .material-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .material-btn.active { border-color: var(--primary-blue); background: #dbeafe; color: var(--primary-blue); font-weight: 600; }
+
+        .material-icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
+
+        /* Text input */
+        .studio-input {
+            width: 100%;
+            padding: 0.65rem 0.875rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .studio-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .studio-input::placeholder { color: #aab; }
+
+        /* Logo upload */
+        .upload-zone {
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--teal);
+            background: #f0fdfb;
+        }
+
+        .upload-zone.has-logo {
+            border-color: var(--teal);
+            background: #f0fdfb;
+        }
+
+        .upload-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .upload-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-text strong { color: var(--teal); }
+
+        #logo-preview {
+            max-width: 80px;
+            max-height: 60px;
+            margin: 0 auto 0.4rem;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        /* Quantity & pricing */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .qty-input {
+            width: 90px;
+            padding: 0.65rem 0.875rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .qty-min-hint {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .price-summary {
+            background: var(--gray-50);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .price-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            border-top: 1px solid var(--border-light);
+            padding-top: 0.5rem;
+            margin-top: 0.4rem;
+        }
+
+        /* Purchase button */
+        .purchase-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .purchase-btn:hover:not(:disabled) {
+            background: var(--teal-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(20,184,166,0.35);
+        }
+
+        .purchase-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .qty-error {
+            font-size: 0.78rem;
+            color: #dc2626;
+            margin-top: 0.35rem;
+            display: none;
+        }
+
+        .qty-error.visible { display: block; }
+
+        /* 3D Viewport */
+        .viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .viewport-hint {
+            position: absolute;
+            bottom: 1.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.55);
+            color: rgba(255,255,255,0.85);
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15,26,46,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            gap: 1rem;
+            z-index: 5;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text { font-size: 0.9rem; }
+
+        .tier-tab {
+            padding: 0.45rem 0.9rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        .tier-tab:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .tier-tab.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+        .tier-preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            flex: 1;
+            gap: 1rem;
+            background: #f9fafb;
+        }
+
+        .tier-preview-info {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 280px;
+            width: 100%;
+        }
+
+        .tier-preview-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-preview-info .tier-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-preview-info p {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 1rem;
+        }
+
+        .tier-preview-info .cta-btn {
+            display: inline-block;
+            padding: 0.6rem 1.4rem;
+            background: var(--teal);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .tier-preview-info .cta-btn:hover { background: var(--teal-dark); }
+
+        @media (max-width: 768px) {
+            .studio-layout { flex-direction: column; }
+            .controls-panel { width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid var(--border-light); }
+            .viewport { height: 50vh; }
+            body { overflow: auto; height: auto; }
+            .tier-tab { font-size: 0.72rem; padding: 0.35rem 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+    <a href="/" class="topbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:30px;width:auto;border-radius:4px;">
+    </a>
+    <div style="display:flex;gap:0.35rem;align-items:center;">
+        <button class="tier-tab active" data-tier="custom-branded" onclick="switchTier('custom-branded',this)">
+            Tier 3 — Custom Editor
+        </button>
+        <button class="tier-tab" data-tier="beautybite-branded" onclick="switchTier('beautybite-branded',this)">
+            Tier 2 — Branded
+        </button>
+        <button class="tier-tab" data-tier="clear-bulk" onclick="switchTier('clear-bulk',this)">
+            Tier 1 — Clear
+        </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+        <a href="/shop" style="font-size:0.8rem;color:var(--text-secondary);text-decoration:none;">← Back to Shop</a>
+        <span class="topbar-badge" id="topbar-badge">Tier 3 — Custom</span>
+    </div>
+</div>
+
+<!-- Main layout -->
+<div class="studio-layout">
+
+    <!-- Controls panel -->
+    <div class="controls-panel">
+
+        <!-- Brand color -->
+        <div class="panel-section">
+            <div class="panel-section-title">Brand Color</div>
+            <div class="color-swatches" id="swatches">
+                <div class="swatch active" style="background:#ffffff;" data-color="#ffffff" title="White"></div>
+                <div class="swatch" style="background:#000000;" data-color="#000000" title="Black"></div>
+                <div class="swatch" style="background:#0066CC;" data-color="#0066CC" title="Royal Blue"></div>
+                <div class="swatch" style="background:#14B8A6;" data-color="#14B8A6" title="Teal"></div>
+                <div class="swatch" style="background:#e11d48;" data-color="#e11d48" title="Red"></div>
+                <div class="swatch" style="background:#f59e0b;" data-color="#f59e0b" title="Amber"></div>
+                <div class="swatch" style="background:#16a34a;" data-color="#16a34a" title="Green"></div>
+                <div class="swatch" style="background:#7c3aed;" data-color="#7c3aed" title="Purple"></div>
+                <div class="swatch" style="background:#1e293b;" data-color="#1e293b" title="Dark Navy"></div>
+                <div class="swatch" style="background:#f1f5f9;" data-color="#f1f5f9" title="Light Gray"></div>
+                <div class="swatch" style="background:#fce7f3;" data-color="#fce7f3" title="Pink"></div>
+                <div class="swatch" style="background:#fef08a;" data-color="#fef08a" title="Yellow"></div>
+            </div>
+            <div class="color-custom-row">
+                <span class="color-custom-label">Custom color:</span>
+                <input type="color" id="colorPicker" value="#ffffff" title="Pick custom color">
+            </div>
+        </div>
+
+        <!-- Material -->
+        <div class="panel-section">
+            <div class="panel-section-title">Material Finish</div>
+            <div class="material-grid">
+                <button class="material-btn active" data-material="standard" onclick="setMaterial('standard', this)">
+                    <span class="material-icon">○</span>Matte
+                </button>
+                <button class="material-btn" data-material="glossy" onclick="setMaterial('glossy', this)">
+                    <span class="material-icon">◉</span>Glossy
+                </button>
+                <button class="material-btn" data-material="metallic" onclick="setMaterial('metallic', this)">
+                    <span class="material-icon">◈</span>Metallic
+                </button>
+            </div>
+        </div>
+
+        <!-- Brand text -->
+        <div class="panel-section">
+            <div class="panel-section-title">Brand Text (Engraving)</div>
+            <input type="text" class="studio-input" id="brandText" placeholder="Your company name" maxlength="40">
+        </div>
+
+        <!-- Logo upload -->
+        <div class="panel-section">
+            <div class="panel-section-title">Logo Upload</div>
+            <input type="file" id="logoFile" accept="image/*" style="display:none;">
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('logoFile').click()">
+                <div id="upload-default">
+                    <div class="upload-icon">⬆</div>
+                    <div class="upload-text"><strong>Click to upload</strong> your logo<br>PNG, SVG, JPG accepted</div>
+                </div>
+                <div id="upload-preview" style="display:none;">
+                    <img id="logo-preview" src="" alt="Logo preview">
+                    <div class="upload-text" style="color:var(--teal);"><strong>Logo uploaded</strong> — click to change</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quantity & pricing -->
+        <div class="panel-section">
+            <div class="panel-section-title">Order Quantity</div>
+            <div class="qty-row">
+                <input type="number" class="qty-input" id="quantity" min="50" value="50" step="1">
+                <span class="qty-min-hint">Min. 50 units</span>
+            </div>
+            <div class="qty-error" id="qty-error">Minimum order is 50 units</div>
+
+            <div class="price-summary" id="priceSummary">
+                <div class="price-row">
+                    <span>Unit price</span>
+                    <span>$300.00</span>
+                </div>
+                <div class="price-row">
+                    <span>Quantity</span>
+                    <span id="price-qty">50</span>
+                </div>
+                <div class="price-total-row">
+                    <span>Total</span>
+                    <span id="price-total">$15,000.00</span>
+                </div>
+            </div>
+
+            <button class="purchase-btn" id="purchaseBtn" onclick="goToPurchase()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Proceed to Purchase
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 3D Viewport -->
+    <div class="viewport" id="viewport">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <span class="loading-text">Loading 3D model…</span>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="viewport-hint">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Right-drag to pan</div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+    // ─── State ───────────────────────────────────────────────────────────────
+    const state = {
+        color: '#ffffff',
+        material: 'standard',
+        brandText: '',
+        logoFile: null,
+        logoDataUrl: null,
+        quantity: 50
+    };
+
+    const UNIT_PRICE = 300;
+
+    // ─── Three.js Scene ───────────────────────────────────────────────────────
+    let scene, camera, renderer, controls, model;
+
+    function initScene() {
+        const viewport = document.getElementById('viewport');
+        const canvas   = document.getElementById('canvas');
+
+        scene    = new THREE.Scene();
+        scene.background = new THREE.Color(0x111827);
+
+        // Subtle grid / environment
+        const gridHelper = new THREE.GridHelper(6, 12, 0x1e293b, 0x1e293b);
+        scene.add(gridHelper);
+
+        camera = new THREE.PerspectiveCamera(45, viewport.clientWidth / viewport.clientHeight, 0.1, 100);
+        camera.position.set(0, 1.5, 5);
+
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+
+        // Lights
+        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambient);
+
+        const key = new THREE.DirectionalLight(0xffffff, 0.9);
+        key.position.set(4, 6, 4);
+        key.castShadow = true;
+        scene.add(key);
+
+        const fill = new THREE.DirectionalLight(0x4DA6FF, 0.35);
+        fill.position.set(-4, 2, -3);
+        scene.add(fill);
+
+        const rim = new THREE.DirectionalLight(0x14B8A6, 0.2);
+        rim.position.set(0, -2, -5);
+        scene.add(rim);
+
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.minDistance = 1;
+        controls.maxDistance = 12;
+        controls.enablePan = true;
+
+        loadModel();
+        animate();
+
+        window.addEventListener('resize', onResize);
+    }
+
+    function loadModel() {
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+            '/Meshy_AI_Dental_Guard_Design_D_0118023519_generate.glb',
+            (gltf) => {
+                model = gltf.scene;
+
+                // Center & fit
+                const box    = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size   = box.getSize(new THREE.Vector3());
+                model.position.sub(center);
+                const scale = 2.5 / Math.max(size.x, size.y, size.z);
+                model.scale.setScalar(scale);
+                model.position.y += 0.1;
+
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(model);
+                applyMaterialSettings();
+                document.getElementById('loadingOverlay').style.display = 'none';
+            },
+            undefined,
+            (err) => {
+                console.error('Model load error:', err);
+                document.getElementById('loadingOverlay').innerHTML =
+                    '<div style="color:#f87171;font-size:0.9rem;">Could not load 3D model. Check that the .glb file is in the production/ folder.</div>';
+            }
+        );
+    }
+
+    function applyMaterialSettings() {
+        if (!model) return;
+        const color = new THREE.Color(state.color);
+
+        model.traverse((child) => {
+            if (!child.isMesh) return;
+
+            let mat;
+            switch (state.material) {
+                case 'glossy':
+                    mat = new THREE.MeshPhysicalMaterial({
+                        color, roughness: 0.05, metalness: 0.0, reflectivity: 1, clearcoat: 1.0, clearcoatRoughness: 0.05
+                    });
+                    break;
+                case 'metallic':
+                    mat = new THREE.MeshStandardMaterial({
+                        color, roughness: 0.2, metalness: 0.85
+                    });
+                    break;
+                default: // matte / standard
+                    mat = new THREE.MeshStandardMaterial({
+                        color, roughness: 0.75, metalness: 0.0
+                    });
+            }
+
+            child.material = mat;
+        });
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    function onResize() {
+        const vp = document.getElementById('viewport');
+        camera.aspect = vp.clientWidth / vp.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(vp.clientWidth, vp.clientHeight);
+    }
+
+    // ─── UI Controls ──────────────────────────────────────────────────────────
+
+    // Color swatches
+    document.querySelectorAll('.swatch').forEach(s => {
+        s.addEventListener('click', () => {
+            document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
+            s.classList.add('active');
+            state.color = s.dataset.color;
+            document.getElementById('colorPicker').value = state.color;
+            applyMaterialSettings();
+        });
+    });
+
+    // Custom color picker
+    document.getElementById('colorPicker').addEventListener('input', (e) => {
+        state.color = e.target.value;
+        document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
+        applyMaterialSettings();
+    });
+
+    // Material
+    function setMaterial(type, btn) {
+        state.material = type;
+        document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyMaterialSettings();
+    }
+
+    // Brand text
+    document.getElementById('brandText').addEventListener('input', (e) => {
+        state.brandText = e.target.value.trim();
+    });
+
+    // Logo upload
+    document.getElementById('logoFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file (PNG, SVG, JPG).');
+            return;
+        }
+        state.logoFile = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            state.logoDataUrl = ev.target.result;
+            document.getElementById('logo-preview').src = ev.target.result;
+            document.getElementById('upload-default').style.display = 'none';
+            document.getElementById('upload-preview').style.display = 'block';
+            document.getElementById('uploadZone').classList.add('has-logo');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Quantity & pricing
+    document.getElementById('quantity').addEventListener('input', updatePricing);
+
+    function updatePricing() {
+        const qty    = parseInt(document.getElementById('quantity').value, 10) || 0;
+        state.quantity = qty;
+        const errEl  = document.getElementById('qty-error');
+        const buyBtn = document.getElementById('purchaseBtn');
+
+        if (qty < 50) {
+            errEl.classList.add('visible');
+            buyBtn.disabled = true;
+        } else {
+            errEl.classList.remove('visible');
+            buyBtn.disabled = false;
+        }
+
+        document.getElementById('price-qty').textContent   = qty.toLocaleString();
+        document.getElementById('price-total').textContent = '$' + (qty * UNIT_PRICE).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    // ─── Navigate to purchase ─────────────────────────────────────────────────
+    function goToPurchase() {
+        if (state.quantity < 50) return;
+
+        const config = {
+            color:      state.color,
+            material:   state.material,
+            brandText:  state.brandText,
+            logoFile:   state.logoFile ? state.logoFile.name : null,
+            quantity:   state.quantity,
+            unitPrice:  UNIT_PRICE,
+            totalPrice: state.quantity * UNIT_PRICE
+        };
+
+        // Store logo data in sessionStorage (it's too large for URL params)
+        if (state.logoDataUrl) {
+            try { sessionStorage.setItem('bb_logo_dataurl', state.logoDataUrl); }
+            catch (e) { /* storage full — skip */ }
+        }
+
+        window.location.href = '/checkout?config=' + encodeURIComponent(JSON.stringify(config));
+    }
+
+    // ─── Tier Switcher ────────────────────────────────────────────────────────
+    const TIER_MATERIALS = {
+        'clear-bulk': {
+            badge: 'Tier 1 — Clear',
+            bgColor: 0x0d1f3c,
+            apply: (child) => {
+                child.material = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color(0xddeeff),
+                    roughness: 0.05, metalness: 0.0,
+                    transmission: 0.88,
+                    clearcoat: 1.0, clearcoatRoughness: 0.05,
+                    transparent: true, opacity: 0.55,
+                    side: THREE.DoubleSide
+                });
+            }
+        },
+        'beautybite-branded': {
+            badge: 'Tier 2 — Branded',
+            bgColor: 0x0a1929,
+            apply: (child) => {
+                child.material = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color(0x1B2D3E),
+                    roughness: 0.1, metalness: 0.15,
+                    clearcoat: 1.0, clearcoatRoughness: 0.08
+                });
+            }
+        },
+        'custom-branded': {
+            badge: 'Tier 3 — Custom',
+            bgColor: 0x111827,
+            apply: null // uses state-driven applyMaterialSettings
+        }
+    };
+
+    let currentTier = 'custom-branded';
+
+    function switchTier(tierId, btn) {
+        currentTier = tierId;
+
+        // Update tab states
+        document.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        // Update badge
+        const badge = document.getElementById('topbar-badge');
+        if (badge) badge.textContent = TIER_MATERIALS[tierId]?.badge || tierId;
+
+        // Show/hide controls panel (only for custom editor)
+        const controls = document.querySelector('.controls-panel');
+        const isEditor = tierId === 'custom-branded';
+        if (controls) controls.style.display = isEditor ? '' : 'none';
+
+        // Show/hide preview info panel
+        let previewPanel = document.getElementById('tier-preview-panel');
+        if (!isEditor) {
+            if (!previewPanel) {
+                previewPanel = document.createElement('div');
+                previewPanel.id = 'tier-preview-panel';
+                previewPanel.className = 'tier-preview-panel';
+                document.querySelector('.studio-layout').prepend(previewPanel);
+            }
+            const infos = {
+                'clear-bulk': {
+                    name: 'Clear Mouthguard', price: '$100', unit: '/unit',
+                    minOrder: 'Min. 1,000 units',
+                    desc: 'Crystal-clear, unbranded finish using patented medical-grade material. Ideal for clinics, distributors, and bulk wholesale channels.',
+                    cta: 'Order Clear Bulk', href: '/checkout?tier=clear-bulk'
+                },
+                'beautybite-branded': {
+                    name: 'Beauty Bite Branded', price: '$200', unit: '/unit',
+                    minOrder: 'No minimum',
+                    desc: 'Full Beauty Bite branding with premium retail-ready packaging. Ready for retail and spa channels in any quantity.',
+                    cta: 'Order Branded', href: '/checkout?tier=beautybite-branded'
+                }
+            };
+            const info = infos[tierId] || {};
+            previewPanel.innerHTML = `
+                <div class="tier-preview-info">
+                    <h3>${info.name}</h3>
+                    <div class="tier-price">${info.price}<span style="font-size:1rem;font-weight:400;color:#64748b;">${info.unit}</span></div>
+                    <div style="font-size:0.78rem;color:#14B8A6;font-weight:600;margin-bottom:0.75rem;">📦 ${info.minOrder}</div>
+                    <p>${info.desc}</p>
+                    <a href="${info.href}" class="cta-btn">${info.cta} →</a>
+                </div>
+            `;
+            previewPanel.style.display = 'flex';
+        } else {
+            if (previewPanel) previewPanel.style.display = 'none';
+        }
+
+        // Update 3D model materials
+        if (model) {
+            const tierCfg = TIER_MATERIALS[tierId];
+            if (tierCfg) {
+                if (scene) scene.background = new THREE.Color(tierCfg.bgColor);
+                if (tierCfg.apply) {
+                    model.traverse(child => {
+                        if (child.isMesh) tierCfg.apply(child);
+                    });
+                } else {
+                    // Reset to editor-driven materials
+                    scene.background = new THREE.Color(0x111827);
+                    applyMaterialSettings();
+                }
+            }
+        }
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
+    updatePricing();
+    initScene();
+
+    // Check URL param for auto-selecting tier
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const tier = params.get('tier');
+        if (tier && TIER_MATERIALS[tier]) {
+            const btn = document.querySelector(`.tier-tab[data-tier="${tier}"]`);
+            // Delay until model is loaded
+            setTimeout(() => switchTier(tier, btn), 800);
+        }
+    })();
+</script>
+</body>
+</html>

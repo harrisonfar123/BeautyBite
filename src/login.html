@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - BeautyBite</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 450px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--gradient-2);
+            border-radius: 20px;
+            box-shadow: var(--shadow-3);
+            border: 1px solid var(--accent-teal);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--accent-red);
+        }
+
+        .error-message {
+            color: var(--accent-red);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .forgot-link {
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem 2rem;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .auth-footer a {
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border-light);
+            border-top: 3px solid var(--accent-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-message {
+            display: none;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .demo-account {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .demo-account h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .demo-account p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .social-login {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .social-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .social-divider::before,
+        .social-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-light);
+        }
+
+        .social-divider span {
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            border-color: var(--accent-teal);
+            transform: translateY(-1px);
+        }
+
+        .social-btn.google {
+            color: #DB4437;
+        }
+
+        .social-btn.facebook {
+            color: #4267B2;
+        }
+
+        .guest-option {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .guest-btn {
+            background: transparent;
+            border: 2px solid var(--accent-teal);
+            color: var(--accent-teal);
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .guest-btn:hover {
+            background: var(--accent-teal);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .remember-forgot {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .social-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header"></div>
+
+    <main class="main-content">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo">BeautyBite</div>
+                <h1 class="auth-subtitle">Welcome Back</h1>
+            </div>
+
+            <!-- Check for URL parameters for success messages -->
+            <div class="success-message" id="successMessage">
+                <!-- Message will be set dynamically based on URL parameters -->
+            </div>
+
+            <!-- Demo account info -->
+            <div class="demo-account">
+                <h3>Demo Account</h3>
+                <p>Email: demo@beautybite.com | Password: any password</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" required value="demo@beautybite.com">
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                    <div class="error-message" id="passwordError">Please enter your password</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rememberMe" name="rememberMe" class="checkbox-input">
+                        <label for="rememberMe" class="checkbox-label">Remember me</label>
+                    </div>
+                    <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Signing you in...</p>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="social-login">
+                <div class="social-divider">
+                    <span>Or sign in with</span>
+                </div>
+                <div class="social-buttons">
+                    <button type="button" class="social-btn google" onclick="socialLogin('google')">
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="currentColor"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="currentColor"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="currentColor"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Google
+                    </button>
+                    <button type="button" class="social-btn facebook" onclick="socialLogin('facebook')">
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        Facebook
+                    </button>
+                </div>
+            </div>
+
+            <div class="guest-option">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Don't want to create an account?</p>
+                <button type="button" class="guest-btn" onclick="continueAsGuest()">
+                    Continue as Guest
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="register.html">Create one here</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer"></div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Load header and footer
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+
+                // Initialize header behavior (auth modals / links)
+                const s = document.createElement('script');
+                s.src = '/js/header-init.js';
+                s.onload = () => { if (typeof initHeader === 'function') initHeader(); if (typeof updateAuthNavigation === 'function') updateAuthNavigation(); };
+                document.body.appendChild(s);
+            });
+
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer').innerHTML = data;
+            });
+
+        // Check for URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+
+        if (message === 'account_created') {
+            document.getElementById('successMessage').textContent = 'Account created successfully! Please sign in.';
+            document.getElementById('successMessage').style.display = 'block';
+        } else if (message === 'password_reset') {
+            document.getElementById('successMessage').textContent = 'Password reset successfully! Please sign in with your new password.';
+            document.getElementById('successMessage').style.display = 'block';
+        } else if (message === 'logged_out') {
+            document.getElementById('successMessage').textContent = 'You have been logged out successfully.';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        // Auto-login if session exists
+        if (AuthSystem.isAuthenticated()) {
+            const session = AuthSystem.getSession();
+            if (session.user) {
+                // Redirect to dashboard or previous page
+                const redirectTo = urlParams.get('redirect') || 'dashboard.html';
+                window.location.href = redirectTo;
+            }
+        }
+
+        // Form validation and submission
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            handleLogin();
+        });
+
+        // Real-time form validation
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('blur', function () {
+                validateField(this);
+            });
+        });
+
+        function validateField(field) {
+            const errorElement = document.getElementById(field.id + 'Error');
+
+            switch (field.id) {
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(field.value)) {
+                        showError(field, errorElement, 'Please enter a valid email address');
+                    } else {
+                        clearError(field, errorElement);
+                    }
+                    break;
+
+                case 'password':
+                    if (!field.value) {
+                        showError(field, errorElement, 'Please enter your password');
+                    } else {
+                        clearError(field, errorElement);
+                    }
+                    break;
+            }
+        }
+
+        function showError(field, errorElement, message) {
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function clearError(field, errorElement) {
+            field.classList.remove('error');
+            errorElement.style.display = 'none';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Validate fields
+            let isValid = true;
+            document.querySelectorAll('.form-input').forEach(field => {
+                validateField(field);
+                if (field.classList.contains('error')) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            // Login user
+            AuthSystem.login(email, password, rememberMe)
+                .then(result => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+
+                    // Show success message
+                    document.getElementById('successMessage').textContent = 'Login successful! Redirecting...';
+                    document.getElementById('successMessage').style.display = 'block';
+
+                    // Redirect to dashboard or previous page
+                    const redirectTo = urlParams.get('redirect') || 'dashboard.html';
+                    setTimeout(() => {
+                        window.location.href = redirectTo;
+                    }, 1000);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+
+                    // Show specific error messages
+                    let errorMessage = 'Login failed. Please try again.';
+
+                    if (error.message.includes('locked')) {
+                        errorMessage = 'Account temporarily locked due to multiple failed attempts. Please try again in 30 minutes.';
+                    } else if (error.message.includes('Invalid email or password')) {
+                        errorMessage = 'Invalid email or password. Please try again.';
+                    } else {
+                        errorMessage = error.message;
+                    }
+
+                    alert(errorMessage);
+                });
+        }
+
+        function socialLogin(provider) {
+            alert(`Social login with ${provider} would be implemented here. For demo purposes, this is a placeholder.`);
+        }
+
+        function continueAsGuest() {
+            // Set guest session
+            const guestSession = {
+                isLoggedIn: false,
+                user: null,
+                role: 'guest',
+                token: 'guest_' + Date.now()
+            };
+
+            localStorage.setItem('beautybite_guest_session', JSON.stringify(guestSession));
+
+            // Redirect to shop or continue shopping
+            const redirectTo = urlParams.get('redirect') || 'shop.html';
+            window.location.href = redirectTo + '?guest=true';
+        }
+
+        function updateAuthNavigation() {
+            // This function will be implemented when we update the navigation
+        }
+    </script>
+</body>
+
+</html>

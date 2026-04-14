@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — BeautyBite Custom Order</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stripe.js — loaded from official CDN only, never self-hosted -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --teal: #14B8A6;
+            --teal-dark: #0e9c96;
+            --text-primary: #1a2332;
+            --text-secondary: #64748b;
+            --border-light: #e2e8f0;
+            --gray-50: #f9fafb;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--gray-50);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Top bar */
+        .topbar {
+            background: white;
+            border-bottom: 1px solid var(--border-light);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .topbar-brand img { width: 28px; height: 28px; }
+
+        .topbar-brand-name {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main layout */
+        .checkout-layout {
+            max-width: 960px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .checkout-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--gray-50);
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-body { padding: 1.75rem; }
+
+        /* Order summary */
+        .design-spec-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.9rem;
+        }
+
+        .design-spec-row:last-child { border-bottom: none; }
+
+        .spec-label { color: var(--text-secondary); }
+        .spec-value { font-weight: 600; color: var(--text-primary); }
+
+        .color-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid var(--border-light);
+            vertical-align: middle;
+            margin-right: 0.4rem;
+        }
+
+        .logo-thumb {
+            width: 40px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Shipping form */
+        .form-group { margin-bottom: 1.1rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: white;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+        /* Stripe card element */
+        #card-element {
+            padding: 0.8rem 0.9rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        #card-element.StripeElement--focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        #card-element.StripeElement--invalid { border-color: #dc2626; }
+
+        #card-errors {
+            color: #dc2626;
+            font-size: 0.82rem;
+            margin-top: 0.4rem;
+            min-height: 1.2em;
+        }
+
+        .test-hint {
+            background: #fef9c3;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            color: #92400e;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Price summary sidebar */
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .price-line:last-of-type { border-bottom: none; }
+
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            border-top: 2px solid var(--border-light);
+            padding-top: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: var(--teal-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(20,184,166,0.35);
+        }
+
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-top: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--primary-blue); }
+
+        /* Success state */
+        .success-panel {
+            text-align: center;
+            padding: 3rem 2rem;
+            display: none;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 1.75rem;
+        }
+
+        .success-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .success-panel p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .checkout-layout { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+    <a href="/" class="topbar-brand">
+        <img src="/Untitled design.jpg" alt="Beauty Bite" style="height:26px;width:auto;border-radius:3px;">
+    </a>
+    <div class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured by Stripe
+    </div>
+</div>
+
+<!-- Checkout layout -->
+<div class="checkout-layout">
+
+    <!-- Left: forms -->
+    <div>
+        <!-- Shipping info -->
+        <div class="checkout-card" style="margin-bottom:1.5rem;">
+            <div class="card-header"><h2>Shipping Information</h2></div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input class="form-input" id="firstName" type="text" placeholder="Jane" autocomplete="given-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-input" id="lastName" type="text" placeholder="Smith" autocomplete="family-name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input class="form-input" id="company" type="text" placeholder="Acme Corp" autocomplete="organization">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input class="form-input" id="email" type="email" placeholder="you@company.com" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Street Address</label>
+                    <input class="form-input" id="address" type="text" placeholder="123 Main St" autocomplete="street-address" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input class="form-input" id="city" type="text" placeholder="New York" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ZIP / Postal Code</label>
+                        <input class="form-input" id="zip" type="text" placeholder="10001" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <input class="form-input" id="state" type="text" placeholder="NY">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input class="form-input" id="country" type="text" value="US" placeholder="US">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="checkout-card">
+            <div class="card-header"><h2>Payment Details</h2></div>
+            <div class="card-body">
+                <div id="form-panel">
+                    <div class="test-hint">
+                        <strong>Test mode:</strong> Use card <code>4242 4242 4242 4242</code>, any future expiry, any 3-digit CVC.
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Card Details</label>
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">
+                        <div class="spinner" id="btnSpinner"></div>
+                        <span id="btnText">Pay &amp; Place Order</span>
+                    </button>
+                    <a href="/design-studio" class="back-link">
+                        ← Back to Design Studio
+                    </a>
+                </div>
+
+                <div class="success-panel" id="successPanel">
+                    <div class="success-icon">✓</div>
+                    <h2>Order Placed!</h2>
+                    <p>Your custom order has been confirmed. You'll receive an email confirmation shortly.</p>
+                    <a href="/" style="color:var(--teal);font-weight:600;text-decoration:none;">← Return to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: order summary -->
+    <div>
+        <div class="checkout-card">
+            <div class="card-header"><h2>Order Summary</h2></div>
+            <div class="card-body">
+
+                <div style="margin-bottom:1.25rem;">
+                    <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.75rem;">Design Specs</div>
+                    <div class="design-spec-row">
+                        <span class="spec-label">Product</span>
+                        <span class="spec-value">Custom Branded Mouthguard</span>
+                    </div>
+                    <div class="design-spec-row">
+                        <span class="spec-label">Color</span>
+                        <span class="spec-value">
+                            <span class="color-dot" id="spec-color-dot"></span>
+                            <span id="spec-color">—</span>
+                        </span>
+                    </div>
+                    <div class="design-spec-row">
+                        <span class="spec-label">Material</span>
+                        <span class="spec-value" id="spec-material">—</span>
+                    </div>
+                    <div class="design-spec-row" id="spec-text-row" style="display:none;">
+                        <span class="spec-label">Engraving</span>
+                        <span class="spec-value" id="spec-text">—</span>
+                    </div>
+                    <div class="design-spec-row" id="spec-logo-row" style="display:none;">
+                        <span class="spec-label">Logo</span>
+                        <span class="spec-value">
+                            <img class="logo-thumb" id="spec-logo" src="" alt="Logo">
+                        </span>
+                    </div>
+                    <div class="design-spec-row">
+                        <span class="spec-label">Quantity</span>
+                        <span class="spec-value" id="spec-qty">—</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="price-line">
+                        <span>Unit price</span>
+                        <span>$300.00</span>
+                    </div>
+                    <div class="price-line">
+                        <span>Quantity</span>
+                        <span id="price-qty">—</span>
+                    </div>
+                    <div class="price-line">
+                        <span>Subtotal</span>
+                        <span id="price-subtotal">—</span>
+                    </div>
+                    <div class="price-total">
+                        <span>Total</span>
+                        <span id="price-total">—</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ─── Parse config from URL ────────────────────────────────────────────────
+    let orderConfig = { color: '#ffffff', material: 'standard', brandText: '', quantity: 50, unitPrice: 300, totalPrice: 15000 };
+
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const raw = params.get('config');
+        if (raw) orderConfig = { ...orderConfig, ...JSON.parse(decodeURIComponent(raw)) };
+    } catch (e) {
+        console.warn('Could not parse config:', e);
+    }
+
+    // Enforce minimum
+    if (orderConfig.quantity < 50) orderConfig.quantity = 50;
+    orderConfig.totalPrice = orderConfig.quantity * (orderConfig.unitPrice || 300);
+
+    // ─── Populate summary ─────────────────────────────────────────────────────
+    function populateSummary() {
+        const colorDot = document.getElementById('spec-color-dot');
+        const colorEl  = document.getElementById('spec-color');
+        colorDot.style.background = orderConfig.color || '#fff';
+        colorEl.textContent = orderConfig.color || '—';
+
+        const matLabels = { standard: 'Matte', glossy: 'Glossy', metallic: 'Metallic' };
+        document.getElementById('spec-material').textContent = matLabels[orderConfig.material] || orderConfig.material || '—';
+
+        if (orderConfig.brandText) {
+            document.getElementById('spec-text').textContent = orderConfig.brandText;
+            document.getElementById('spec-text-row').style.display = 'flex';
+        }
+
+        // Try to restore logo from sessionStorage
+        const logoData = sessionStorage.getItem('bb_logo_dataurl');
+        if (logoData) {
+            const img = document.getElementById('spec-logo');
+            img.src = logoData;
+            document.getElementById('spec-logo-row').style.display = 'flex';
+        } else if (orderConfig.logoFile) {
+            document.getElementById('spec-logo-row').style.display = 'flex';
+            document.getElementById('spec-logo').style.display = 'none';
+            document.getElementById('spec-logo').insertAdjacentText('afterend', orderConfig.logoFile);
+        }
+
+        const qty = orderConfig.quantity;
+        document.getElementById('spec-qty').textContent    = qty.toLocaleString() + ' units';
+        document.getElementById('price-qty').textContent   = qty.toLocaleString();
+        document.getElementById('price-subtotal').textContent = '$' + orderConfig.totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('price-total').textContent    = '$' + orderConfig.totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    // ─── Stripe setup ─────────────────────────────────────────────────────────
+    let stripe, cardElement;
+
+    async function initStripe() {
+        let publishableKey = null;
+
+        // Try to load key from backend
+        try {
+            const res = await fetch('/api/config/stripe-publishable-key');
+            if (res.ok) {
+                const data = await res.json();
+                publishableKey = data.publishableKey;
+            }
+        } catch (e) {
+            // Backend not running locally — fall back to a placeholder so the
+            // UI still renders (payment will fail gracefully with a clear error)
+            console.warn('Could not reach backend for Stripe key. Start the server with: cd production && node server.js');
+        }
+
+        if (!publishableKey || publishableKey.startsWith('pk_test_51QABC')) {
+            document.getElementById('card-errors').textContent =
+                'Stripe not configured. Add STRIPE_PUBLISHABLE_KEY to production/.env and restart the server.';
+            document.getElementById('submitBtn').disabled = true;
+            return;
+        }
+
+        stripe = Stripe(publishableKey);
+        const elements = stripe.elements();
+
+        cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '15px',
+                    color: '#1a2332',
+                    '::placeholder': { color: '#94a3b8' }
+                },
+                invalid: { color: '#dc2626' }
+            }
+        });
+
+        cardElement.mount('#card-element');
+
+        cardElement.on('change', (e) => {
+            document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+        });
+    }
+
+    // ─── Submit order ─────────────────────────────────────────────────────────
+    async function submitOrder() {
+        const btn      = document.getElementById('submitBtn');
+        const spinner  = document.getElementById('btnSpinner');
+        const btnText  = document.getElementById('btnText');
+        const errEl    = document.getElementById('card-errors');
+
+        // Basic field validation
+        const required = ['firstName','lastName','email','address','city','zip'];
+        for (const id of required) {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) {
+                el.focus();
+                errEl.textContent = 'Please fill in all required shipping fields.';
+                return;
+            }
+        }
+
+        // Email format
+        const emailVal = document.getElementById('email').value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            errEl.textContent = 'Please enter a valid email address.';
+            return;
+        }
+
+        if (!stripe || !cardElement) {
+            errEl.textContent = 'Payment system not initialized. Check Stripe configuration.';
+            return;
+        }
+
+        // Disable button, show spinner
+        btn.disabled = true;
+        spinner.style.display = 'block';
+        btnText.textContent = 'Processing…';
+        errEl.textContent = '';
+
+        try {
+            // 1. Create PaymentIntent on backend (guest-accessible endpoint, server validates pricing)
+            const piRes = await fetch('/api/stripe/create-payment-intent-custom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productType: 'custom-branded',
+                    quantity:    orderConfig.quantity,
+                    currency:    'usd',
+                    metadata: {
+                        brandColor:   orderConfig.color,
+                        materialType: orderConfig.material,
+                        brandText:    orderConfig.brandText || '',
+                        logoFile:     orderConfig.logoFile  || ''
+                    }
+                })
+            });
+
+            if (!piRes.ok) {
+                const errData = await piRes.json().catch(() => ({}));
+                throw new Error(errData.error || 'Failed to create payment intent');
+            }
+
+            const { clientSecret } = await piRes.json();
+
+            // 2. Confirm card payment via Stripe
+            const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name:  `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`.trim(),
+                        email: emailVal,
+                        address: {
+                            line1:       document.getElementById('address').value,
+                            city:        document.getElementById('city').value,
+                            postal_code: document.getElementById('zip').value,
+                            state:       document.getElementById('state').value,
+                            country:     document.getElementById('country').value || 'US'
+                        }
+                    }
+                }
+            });
+
+            if (confirmError) throw new Error(confirmError.message);
+
+            // 3. Record custom order design details on backend
+            await fetch('/api/orders/custom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    stripePaymentIntentId: paymentIntent.id,
+                    quantity:     orderConfig.quantity,
+                    brandColor:   orderConfig.color,
+                    materialType: orderConfig.material,
+                    brandText:    orderConfig.brandText || '',
+                    logoFilename: orderConfig.logoFile  || null,
+                    billingEmail: emailVal,
+                    billingName:  `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`.trim(),
+                    shippingAddress: [
+                        document.getElementById('address').value,
+                        document.getElementById('city').value,
+                        document.getElementById('state').value,
+                        document.getElementById('zip').value,
+                        document.getElementById('country').value
+                    ].filter(Boolean).join(', ')
+                })
+            }).catch(e => console.warn('Order logging request failed:', e));
+
+            // 4. Show success
+            document.getElementById('form-panel').style.display = 'none';
+            document.getElementById('successPanel').style.display = 'block';
+
+            // Clear logo from session storage
+            sessionStorage.removeItem('bb_logo_dataurl');
+
+        } catch (err) {
+            errEl.textContent = err.message || 'Payment failed. Please try again.';
+            btn.disabled = false;
+            spinner.style.display = 'none';
+            btnText.textContent = 'Pay & Place Order';
+        }
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
+    populateSummary();
+    initStripe();
+</script>
+</body>
+</html>

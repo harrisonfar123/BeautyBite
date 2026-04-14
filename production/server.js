@@ -7,6 +7,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const path = require('path');
 const pool = require('./db'); // Database connection pool
 
 const { sendOrderConfirmationEmail, sendTestEmail, sendSupplierOrderLog } = require('./emailService');
@@ -64,6 +65,12 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Serve frontend static files (src/ directory)
+app.use(express.static(path.join(__dirname, '../src')));
+// Serve production HTML pages (design-studio, purchase) under /studio and /checkout
+app.use('/studio', express.static(path.join(__dirname)));
+app.use('/assets', express.static(path.join(__dirname)));
 
 // Middleware
 // CORS for development (frontend on localhost any port)
@@ -378,6 +385,59 @@ app.post('/api/stripe/create-payment-intent', authenticateToken, async (req, res
         res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
         console.error('PaymentIntent creation error:', error);
+        res.status(500).json({ error: 'Failed to create payment intent' });
+    }
+});
+
+// Guest-accessible payment intent for custom (Tier 3) orders
+// Amount is validated server-side against the known unit price to prevent tampering
+app.post('/api/stripe/create-payment-intent-custom', async (req, res) => {
+    try {
+        const { quantity, productType, currency = 'usd', metadata = {} } = req.body;
+
+        // Server-side pricing validation — never trust client-supplied amount
+        const UNIT_PRICES = {
+            'custom-branded':      30000, // $300.00 in cents
+            'beautybite-branded':  20000, // $200.00 in cents
+            'clear-bulk':          10000  // $100.00 in cents
+        };
+
+        const unitPrice = UNIT_PRICES[productType];
+        if (!unitPrice) {
+            return res.status(400).json({ error: `Unknown productType: ${productType}` });
+        }
+
+        // Validate quantity per tier rules
+        const MIN_QUANTITIES = { 'custom-branded': 50, 'beautybite-branded': 1, 'clear-bulk': 1000 };
+        const minQty = MIN_QUANTITIES[productType] || 1;
+        if (!quantity || quantity < minQty) {
+            return res.status(400).json({ error: `Minimum quantity for ${productType} is ${minQty}` });
+        }
+
+        const amount = quantity * unitPrice;
+
+        // Sanitise metadata values
+        const safeMetadata = {};
+        for (const [k, v] of Object.entries(metadata)) {
+            const key = String(k).replace(/[^a-zA-Z0-9_]/g, '').slice(0, 40);
+            const val = String(v).slice(0, 500);
+            if (key) safeMetadata[key] = val;
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency,
+            automatic_payment_methods: { enabled: true },
+            metadata: {
+                product_type: productType,
+                quantity:     String(quantity),
+                ...safeMetadata
+            }
+        });
+
+        res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+        console.error('Custom PaymentIntent creation error:', error);
         res.status(500).json({ error: 'Failed to create payment intent' });
     }
 });
@@ -844,8 +904,8 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
 app.post('/api/cron/send-supplier-log', async (req, res) => {
     try {
         console.log('📧 Sending supplier log...');
-        const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const endDate = new Date();
+        
+        // Query only UNSENT orders (no time limit - sends all pending)
         const ordersResult = await pool.query(
             `SELECT
                 id, order_type, order_id, quantity, amount,
@@ -853,20 +913,54 @@ app.post('/api/cron/send-supplier-log', async (req, res) => {
                 total_periods, interval, status, created_at,
                 product_type
             FROM order_log
-            WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at ASC`,
-            [startDate, endDate]
+            WHERE supplier_log_sent = FALSE
+              AND status = 'completed'
+            ORDER BY created_at ASC`
         );
+        
         const orders = ordersResult.rows;
-        const supplierEmail = process.env.SUPPLIER_EMAIL || 'supplier@beautybite.co';
+        const supplierEmail = process.env.SUPPLIER_EMAIL || 'Harrisonfarrell716@gmail.com';
+        
         if (orders.length > 0) {
+            console.log(`📦 Found ${orders.length} new unsent orders`);
+            
+            // Calculate date range from actual orders
+            const startDate = new Date(Math.min(...orders.map(o => new Date(o.created_at))));
+            const endDate = new Date(Math.max(...orders.map(o => new Date(o.created_at))));
+            
+            // Send the email
             await sendSupplierOrderLog(orders, supplierEmail, startDate, endDate);
+            
+            // Mark all these orders as sent
+            const orderIds = orders.map(o => o.id);
+            await pool.query(
+                `UPDATE order_log
+                 SET supplier_log_sent = TRUE,
+                     supplier_log_sent_at = NOW()
+                 WHERE id = ANY($1)`,
+                [orderIds]
+            );
+            
+            console.log(`✅ Marked ${orderIds.length} orders as sent`);
+            res.json({
+                success: true,
+                ordersCount: orders.length,
+                orderIds: orderIds
+            });
         } else {
-            console.log('ℹ️ No orders in last 24h for supplier log');
+            console.log('ℹ️  No new orders to send in supplier log');
+            res.json({
+                success: true,
+                ordersCount: 0,
+                message: 'No new orders'
+            });
         }
-        res.json({ success: true, ordersCount: orders.length });
     } catch (error) {
         console.error('❌ Cron send-supplier-log failed:', error.message);
-        res.json({ success: true });
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
 
@@ -913,6 +1007,113 @@ app.post('/api/test-email', authenticateToken, async (req, res) => {
     }
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Stripe publishable key endpoint
+// Safe to expose — this is the public key, never the secret key
+// ─────────────────────────────────────────────────────────────────────────────
+app.get('/api/config/stripe-publishable-key', (req, res) => {
+    const key = process.env.STRIPE_PUBLISHABLE_KEY;
+    if (!key) {
+        return res.status(503).json({ error: 'Stripe not configured. Add STRIPE_PUBLISHABLE_KEY to .env' });
+    }
+    res.json({ publishableKey: key });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Custom order recording endpoint (Tier 3)
+// Called after Stripe payment succeeds on the frontend
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/api/orders/custom', async (req, res) => {
+    const {
+        stripePaymentIntentId,
+        quantity,
+        brandColor,
+        materialType,
+        brandText,
+        logoFilename,
+        billingEmail,
+        billingName,
+        shippingAddress
+    } = req.body;
+
+    // Basic validation
+    if (!stripePaymentIntentId || !quantity || quantity < 50) {
+        return res.status(400).json({ error: 'stripePaymentIntentId and quantity (min 50) are required' });
+    }
+
+    // Sanitise text fields — prevent stored XSS
+    const safeBrandText   = brandText    ? String(brandText).replace(/[<>"'&]/g, '').slice(0, 100) : null;
+    const safeBrandColor  = brandColor   && /^#[0-9A-Fa-f]{3,6}$/.test(brandColor) ? brandColor : '#ffffff';
+    const safeMaterial    = ['standard','glossy','metallic'].includes(materialType) ? materialType : 'standard';
+    const safeLogoFile    = logoFilename ? String(logoFilename).replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 255) : null;
+
+    const unitPrice  = 300.00;
+    const totalPrice = quantity * unitPrice;
+
+    try {
+        // 1. Log to order_log (existing table)
+        const orderLogResult = await logOrder({
+            userId:                null,    // guest checkout — no account required
+            orderType:             'one_time',
+            stripePaymentIntentId,
+            quantity,
+            amount:                totalPrice,
+            status:                'completed',
+            billingEmail:          billingEmail  || null,
+            billingName:           billingName   || null,
+            shippingAddress:       shippingAddress || null,
+            productType:           'custom-branded',
+            notes:                 `Custom order: color=${safeBrandColor} material=${safeMaterial}`
+        });
+
+        // 2. Store design details in custom_order_designs
+        const designResult = await pool.query(`
+            INSERT INTO custom_order_designs
+                (order_log_id, brand_color, material_type, brand_text, logo_filename, quantity, unit_price)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *
+        `, [
+            orderLogResult.id,
+            safeBrandColor,
+            safeMaterial,
+            safeBrandText,
+            safeLogoFile,
+            quantity,
+            unitPrice
+        ]);
+
+        console.log(`✅ Custom order design saved: ID ${designResult.rows[0].id} — qty ${quantity} — ${safeBrandColor}`);
+
+        res.json({
+            success:     true,
+            orderLogId:  orderLogResult.id,
+            designId:    designResult.rows[0].id,
+            totalPrice
+        });
+
+    } catch (error) {
+        console.error('❌ Custom order recording failed:', error);
+        // Still return 200 so the frontend shows success — payment already completed
+        // The order will show up in Stripe dashboard even if our DB write fails
+        res.status(500).json({ error: 'Order recorded in Stripe but failed to save design details. Contact support.' });
+    }
+});
+
+// ── HTML page routes ──────────────────────────────────────────────────────────
+app.get('/design-studio', (req, res) => res.sendFile(path.join(__dirname, 'design-studio.html')));
+app.get('/checkout',      (req, res) => res.sendFile(path.join(__dirname, 'purchase.html')));
+app.get('/shop',          (req, res) => res.sendFile(path.join(__dirname, '../src/shop.html')));
+app.get('/login',         (req, res) => res.sendFile(path.join(__dirname, '../src/login.html')));
+app.get('/register',      (req, res) => res.sendFile(path.join(__dirname, '../src/register.html')));
+app.get('/cart',          (req, res) => res.sendFile(path.join(__dirname, '../src/cart.html')));
+app.get('/dashboard',     (req, res) => res.sendFile(path.join(__dirname, '../src/dashboard.html')));
+
+// Catch-all: serve index.html for any unmatched GET (SPA-style)
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(__dirname, '../src/index.html'));
+});
+
 // Error handling middleware (catch-all)
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
@@ -921,6 +1122,5 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-    console.log('Auth endpoints ready: /api/auth/register, /api/auth/login, /api/auth/verify, /api/auth/logout');
+    console.log(`\n🦷  BeautyBite running at http://localhost:${PORT}\n`);
 });

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Your Mouthguard - BeautyBite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/customize.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <main class="customize-layout">
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Loading 3D Editor...</p>
+        </div>
+
+        <!-- Error Overlay -->
+        <div id="error-overlay" class="error-overlay" style="display: none;">
+            <div class="error-content">
+                <h3>Something went wrong</h3>
+                <p id="error-message">Unable to load the 3D editor. Please try refreshing the page.</p>
+                <button class="btn-primary" onclick="window.location.reload()">Reload Page</button>
+            </div>
+        </div>
+
+        <section class="customize-viewer-panel" id="viewerPanel">
+            <!-- Reused: 3D Editor (kept intact for three-editor.js) -->
+            <section class="editor-container" aria-label="3D preview area">
+                <div class="editor-header">
+                    <h3>3D Preview</h3>
+                    <div class="view-controls">
+                        <button id="reset-view" class="btn-secondary">Reset View</button>
+                        <select id="lighting-preset">
+                            <option value="studio">Studio Lighting</option>
+                            <option value="natural">Natural Lighting</option>
+                            <option value="dramatic">Dramatic Lighting</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="model-container" role="region" aria-label="3D canvas">
+                    <canvas id="threejs-canvas"></canvas>
+                    <div class="model-controls">
+                        <button id="rotate-model" class="control-btn active">Rotate</button>
+                        <button id="zoom-model" class="control-btn">Zoom</button>
+                        <button id="pan-model" class="control-btn">Pan</button>
+                    </div>
+                </div>
+
+                <div class="editor-actions">
+                    <button id="export-image" class="btn-secondary">Export Image</button>
+                    <button id="share-design" class="btn-secondary">Share Design</button>
+                    <button id="proceed-checkout" class="btn-primary">Proceed to Checkout</button>
+                </div>
+            </section>
+        </section>
+
+        <aside class="customize-controls-panel" id="controlsPanel" aria-label="Customization controls">
+            <header class="customize-controls-header">
+                <h1 class="customize-title">Customize</h1>
+                <div class="customize-price" id="priceDisplay">$0.00</div>
+            </header>
+
+            <!-- Controls content (carded sections) -->
+            <div class="customize-controls-content">
+                <!-- Color / Appearance -->
+                <section class="customize-section" id="colorSection" aria-labelledby="colorSectionTitle">
+                    <h2 class="customize-section-title" id="colorSectionTitle">Colors & Pattern</h2>
+                    <div class="control-group">
+                        <label for="base-color">Base Color</label>
+                        <input type="color" id="base-color" value="#00a8ff" class="customize-control">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="accent-color">Accent Color</label>
+                        <input type="color" id="accent-color" value="#00d2d3" class="customize-control">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="color-pattern">Pattern</label>
+                        <select id="color-pattern" class="customize-control">
+                            <option value="solid">Solid</option>
+                            <option value="gradient">Gradient</option>
+                            <option value="pattern">Pattern</option>
+                        </select>
+                    </div>
+
+                    <div id="gradient-controls" class="control-group" style="display:none;">
+                        <label>Gradient Direction</label>
+                        <select id="gradient-direction" class="customize-control">
+                            <option value="horizontal">Horizontal</option>
+                            <option value="vertical">Vertical</option>
+                            <option value="diagonal">Diagonal</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="opacity">Opacity</label>
+                        <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="1"
+                            class="customize-control">
+                        <span id="opacity-value">100%</span>
+                    </div>
+
+                    <div class="customize-options gap-sm" role="list" aria-label="color presets">
+                        <!-- lightweight swatches -->
+                        <button type="button" class="customize-option customize-swatch" data-value="#00a8ff"
+                            title="Default blue" style="background:#00a8ff"></button>
+                        <button type="button" class="customize-option customize-swatch" data-value="#14B8A6"
+                            title="Teal" style="background:#14B8A6"></button>
+                        <button type="button" class="customize-option customize-swatch" data-value="#8B5CF6"
+                            title="Purple" style="background:#8B5CF6"></button>
+                        <button type="button" class="customize-option customize-swatch" data-value="#EF4444" title="Red"
+                            style="background:#EF4444"></button>
+                    </div>
+                </section>
+
+                <!-- Size / Fit / Material -->
+                <section class="customize-section" id="sizeSection" aria-labelledby="sizeSectionTitle">
+                    <h2 class="customize-section-title" id="sizeSectionTitle">Material & Size</h2>
+
+                    <div class="control-group">
+                        <label for="material-type">Material</label>
+                        <select id="material-type" class="customize-control">
+                            <option value="">Select material</option>
+                            <option value="matte">Matte</option>
+                            <option value="glossy">Glossy</option>
+                            <option value="metallic">Metallic (+$20)</option>
+                            <option value="transparent">Transparent</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="size-select">Size</label>
+                        <select id="size-select" class="customize-control">
+                            <option value="">Select size</option>
+                            <option value="standard">Standard</option>
+                            <option value="small">Small (-$10)</option>
+                            <option value="large">Large (+$10)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="engrave-option">Engraving</label>
+                        <select id="engrave-option" class="customize-control">
+                            <option value="none">None</option>
+                            <option value="text">Text (+$15)</option>
+                            <option value="pattern">Pattern (+$25)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Text / Engrave -->
+                <section class="customize-section" id="engraveSection" aria-labelledby="engraveSectionTitle">
+                    <h2 class="customize-section-title" id="engraveSectionTitle">Text & Image</h2>
+
+                    <div class="control-group">
+                        <label for="text-input">Your Text</label>
+                        <input type="text" id="text-input" placeholder="Enter custom text" maxlength="20"
+                            class="customize-control">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="font-select">Font</label>
+                        <select id="font-select" class="customize-control">
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Bukhari Script">Bukhari Script</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="font-size">Font Size</label>
+                        <input type="range" id="font-size" min="8" max="20" value="12" class="customize-control">
+                        <span id="font-size-value">12px</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="text-color">Text Color</label>
+                        <input type="color" id="text-color" value="#000000" class="customize-control">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Upload Image</label>
+                        <div class="file-upload-area" id="image-upload-area">
+                            <input type="file" id="image-upload" accept=".png,.jpg,.jpeg,.svg" style="display:none;">
+                            <div class="upload-placeholder">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                                <p>Drag & drop or click to upload</p>
+                                <small>PNG, JPG, SVG up to 5MB</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="image-scale">Scale</label>
+                        <input type="range" id="image-scale" min="0.5" max="2" step="0.1" value="1"
+                            class="customize-control">
+                        <span id="image-scale-value">100%</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="image-rotation">Rotation</label>
+                        <input type="range" id="image-rotation" min="0" max="360" value="0" class="customize-control">
+                        <span id="image-rotation-value">0°</span>
+                    </div>
+
+                    <div class="customize-options gap-sm">
+                        <button id="add-text" class="btn btn-primary" disabled>Add Text</button>
+                        <button id="apply-image" class="btn" disabled>Apply Image</button>
+                    </div>
+                </section>
+            </div>
+
+            <div class="customize-actions" role="region" aria-label="Actions">
+                <button class="btn btn-primary" id="addToCartBtn" disabled>Add to Cart</button>
+                <button class="btn" id="resetBtn">Reset</button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Load header and footer
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-container').innerHTML = data;
+
+                // Initialize header (attach event listeners)
+                const s = document.createElement('script');
+                s.src = '/js/header-init.js';
+                s.onload = () => { if (typeof initHeader === 'function') initHeader(); };
+                document.body.appendChild(s);
+            });
+
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+            });
+    </script>
+
+    <script src="/js/three-editor.js"></script>
+    <script src="/js/customization.js"></script>
+    <script src="/js/design-manager.js"></script>
+    <script src="/js/shop-init.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeautyBite - System Monitoring Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: var(--dark-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .status-card {
+            background: var(--light-color);
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-card.healthy {
+            border-left-color: var(--success-color);
+        }
+
+        .status-card.degraded {
+            border-left-color: var(--warning-color);
+        }
+
+        .status-card.unhealthy {
+            border-left-color: var(--danger-color);
+        }
+
+        .status-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.healthy {
+            background: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+
+        .status-indicator.degraded {
+            background: var(--warning-color);
+            box-shadow: 0 0 10px var(--warning-color);
+        }
+
+        .status-indicator.unhealthy {
+            background: var(--danger-color);
+            box-shadow: 0 0 10px var(--danger-color);
+        }
+
+        .metric {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid var(--info-color);
+        }
+
+        .metric .label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .metric .value {
+            float: right;
+            font-weight: 500;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 30px 30px;
+        }
+
+        .chart {
+            background: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .chart h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: var(--light-color);
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .last-updated {
+            margin-left: auto;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .last-updated {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: var(--danger-color);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1>🚀 BeautyBite Monitoring</h1>
+            <div class="subtitle">Real-time System Health & Performance Dashboard</div>
+        </div>
+
+        <div class="status-grid" id="statusGrid">
+            <div class="loading">Loading system status...</div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart">
+                <h3>📊 Response Times</h3>
+                <canvas id="responseTimeChart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>💾 Memory Usage</h3>
+                <canvas id="memoryUsageChart"></canvas>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh Data</button>
+            <button class="btn btn-success" onclick="runHealthCheck()">🔍 Run Health Check</button>
+            <button class="btn btn-warning" onclick="showLogs()">📋 View Logs</button>
+            <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let responseTimeChart, memoryUsageChart;
+        let healthData = {};
+        // Allow the page to be configured to point to a deployed backend at runtime:
+        // set window.API_BASE = 'https://your-backend.example.com' before loading this page.
+        const backendUrl = (window.API_BASE ? window.API_BASE : 'http://localhost:5001');
+
+        // Initialize charts
+        function initializeCharts() {
+            const responseCtx = document.getElementById('responseTimeChart').getContext('2d');
+            responseTimeChart = new Chart(responseCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'API Response Time (ms)',
+                        data: [],
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'API Performance Over Time'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const memoryCtx = document.getElementById('memoryUsageChart').getContext('2d');
+            memoryUsageChart = new Chart(memoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Used', 'Free'],
+                    datasets: [{
+                        data: [50, 50],
+                        backgroundColor: ['#dc3545', '#28a745'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Memory Utilization'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch health data
+        async function fetchHealthData() {
+            try {
+                const response = await fetch(`${backendUrl}/health`);
+                if (!response.ok) throw new Error('Health check failed');
+
+                healthData = await response.json();
+                updateDashboard(healthData);
+                updateCharts(healthData);
+
+                document.getElementById('lastUpdated').textContent =
+                    `Last updated: ${new Date().toLocaleTimeString()}`;
+
+            } catch (error) {
+                showError('Failed to fetch health data: ' + error.message);
+            }
+        }
+
+        // Update dashboard with health data
+        function updateDashboard(data) {
+            const statusGrid = document.getElementById('statusGrid');
+
+            const cards = [
+                {
+                    title: '🌐 Overall System',
+                    status: data.status,
+                    metrics: [
+                        { label: 'Uptime', value: `${Math.round(data.uptime)}s` },
+                        { label: 'Environment', value: data.environment },
+                        { label: 'Response Time', value: `${data.response_time}ms` }
+                    ]
+                },
+                {
+                    title: '🗄️ Database',
+                    status: data.database.status,
+                    metrics: [
+                        { label: 'Connection State', value: getConnectionState(data.database.ready_state) },
+                        { label: 'Ping Time', value: `${data.database.ping_time}ms` },
+                        { label: 'Host', value: data.database.host || 'N/A' }
+                    ]
+                },
+                {
+                    title: '💻 System Resources',
+                    status: 'healthy',
+                    metrics: [
+                        { label: 'Memory Used', value: data.system.memory.used },
+                        { label: 'Memory Free', value: data.system.memory.system_free },
+                        { label: 'CPU Cores', value: data.system.cpu.cores },
+                        { label: 'Load Average', value: data.system.cpu.load_average.join(', ') }
+                    ]
+                },
+                {
+                    title: '🔧 Services',
+                    status: 'healthy',
+                    metrics: Object.entries(data.services.api_endpoints).map(([name, endpoint]) => ({
+                        label: name,
+                        value: 'Available'
+                    }))
+                }
+            ];
+
+            statusGrid.innerHTML = cards.map(card => `
+                <div class="status-card ${card.status}">
+                    <h3>
+                        <span class="status-indicator ${card.status}"></span>
+                        ${card.title}
+                    </h3>
+                    ${card.metrics.map(metric => `
+                        <div class="metric">
+                            <span class="label">${metric.label}</span>
+                            <span class="value">${metric.value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        // Update charts with new data
+        function updateCharts(data) {
+            const now = new Date().toLocaleTimeString();
+
+            // Update response time chart
+            if (responseTimeChart.data.labels.length > 10) {
+                responseTimeChart.data.labels.shift();
+                responseTimeChart.data.datasets[0].data.shift();
+            }
+
+            responseTimeChart.data.labels.push(now);
+            responseTimeChart.data.datasets[0].data.push(data.response_time);
+            responseTimeChart.update();
+
+            // Update memory usage chart
+            const usedMem = parseInt(data.system.memory.used);
+            const totalMem = parseInt(data.system.memory.system_total);
+            const freeMem = totalMem - usedMem;
+
+            memoryUsageChart.data.datasets[0].data = [usedMem, freeMem];
+            memoryUsageChart.update();
+        }
+
+        // Get connection state from readyState code
+        function getConnectionState(readyState) {
+            const states = {
+                0: 'Disconnected',
+                1: 'Connected',
+                2: 'Connecting',
+                3: 'Disconnecting'
+            };
+            return states[readyState] || 'Unknown';
+        }
+
+        // Show error message
+        function showError(message) {
+            const statusGrid = document.getElementById('statusGrid');
+            statusGrid.innerHTML = `
+                <div class="error">
+                    ❌ ${message}
+                </div>
+            `;
+        }
+
+        // Control functions
+        function refreshData() {
+            fetchHealthData();
+        }
+
+        async function runHealthCheck() {
+            try {
+                const response = await fetch(`${backendUrl}/health/ping`);
+                const result = await response.json();
+
+                if (result.status === 'ok') {
+                    alert('✅ Health check passed! System is healthy.');
+                } else {
+                    alert('❌ Health check failed! System has issues.');
+                }
+            } catch (error) {
+                alert('❌ Health check failed: ' + error.message);
+            }
+        }
+
+        function showLogs() {
+            window.open(`${backendUrl}/health/metrics`, '_blank');
+        }
+
+        // Auto-refresh every 30 seconds
+        function startAutoRefresh() {
+            setInterval(fetchHealthData, 30000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+            fetchHealthData();
+            startAutoRefresh();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - BeautyBite</title>
+    <meta name="description" content="Manage your orders, subscriptions, and custom designs with BeautyBite">
+
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' blob:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Performance Optimization -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+
+</head>
+
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" style="display: none;">
+        ☰
+    </button>
+
+    <!-- Load header and footer, then initialize header behavior and dashboard scripts -->
+    <script>
+        // Load header HTML into the header container and run header initializer
+        (function () {
+            fetch('header.html')
+                .then(r => r.text())
+                .then(html => {
+                    document.getElementById('header-container').innerHTML = html;
+                    // Ensure header initializer script is present and run it
+                    // Prefer src-relative paths; match any existing header-init by tail to avoid duplicates
+                    if (!document.querySelector('script[src$="js/header-init.js"]')) {
+                        const s = document.createElement('script');
+                        s.src = 'js/header-init.js';
+                        s.onload = () => {
+                            try { if (window.initHeader) window.initHeader(); } catch (e) { /* ignore */ }
+                        };
+                        document.head.appendChild(s);
+                    } else {
+                        try { if (window.initHeader) window.initHeader(); } catch (e) { /* ignore */ }
+                    }
+
+                    // Load auth shim to provide stable AuthSystem API for legacy code
+                    if (!document.querySelector('script[src$="js/auth-shim.js"]')) {
+                        const a = document.createElement('script');
+                        a.src = 'js/auth-shim.js';
+                        document.head.appendChild(a);
+                    }
+                })
+                .catch(err => console.error('Error loading header:', err));
+
+            // Load footer if exists
+            fetch('footer.html')
+                .then(r => r.text())
+                .then(html => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    if (footerPlaceholder) footerPlaceholder.innerHTML = html;
+                })
+                .catch(() => { /* footer optional */ });
+
+            // Load dashboard script and small visual initializers
+            function loadScript(src) {
+                return new Promise((resolve, reject) => {
+                    if (document.querySelector('script[src="' + src + '"]')) return resolve();
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.onload = resolve;
+                    s.onerror = reject;
+                    document.body.appendChild(s);
+                });
+            }
+
+            Promise.all([
+                loadScript('js/dashboard.js').catch(() => { }),
+                loadScript('js/shop-init.js').catch(() => { })
+            ]).then(() => {
+                // Dashboard.init is called within js/dashboard.js when DOMContentLoaded fires.
+            });
+        })();
+    </script>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-info">
+                        <h3 id="userName">John Doe</h3>
+                        <p id="userEmail">john.doe@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-section="overview">
+                    <i>📊</i> Overview
+                </a>
+                <a href="#orders" class="nav-item" data-section="orders">
+                    <i>📦</i> Orders
+                </a>
+                <a href="#subscriptions" class="nav-item" data-section="subscriptions">
+                    <i>🔄</i> Subscriptions
+                </a>
+                <a href="#designs" class="nav-item" data-section="designs">
+                    <i>🎨</i> My Designs
+                </a>
+                <a href="#tracking" class="nav-item" data-section="tracking">
+                    <i>🚚</i> Track Orders
+                </a>
+                <a href="#profile" class="nav-item" data-section="profile">
+                    <i>👤</i> Profile
+                </a>
+                <a href="#billing" class="nav-item" data-section="billing">
+                    <i>💳</i> Billing
+                </a>
+                <a href="#payments" class="nav-item" data-section="payments">
+                    <i>💰</i> Payment History
+                </a>
+                <a href="/index.html" class="nav-item" style="margin-top: 2rem; color: var(--medium-gray);">
+                    <i>🏠</i> Back to Site
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title" id="sectionTitle">Dashboard Overview</h1>
+                <div class="dashboard-actions">
+                    <button class="btn btn-secondary" id="refreshBtn">
+                        <i>🔄</i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview" class="dashboard-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalOrders">12</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeSubscriptions">3</div>
+                        <div class="stat-label">Active Subscriptions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="savedDesigns">8</div>
+                        <div class="stat-label">Saved Designs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSpent">$2,847.50</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">Recent Orders</h3>
+                        <div class="table-controls">
+                            <a href="#orders" class="btn btn-secondary btn-small">View All Orders</a>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <!-- Recent orders will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="subscription-card">
+                        <div class="card-content">
+                            <h3 class="card-title">Upcoming Deliveries</h3>
+                            <div class="card-description">
+                                Next subscription delivery scheduled
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-primary btn-small">Manage Subscriptions</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="design-card">
+                        <div class="card-content">
+                            <h3 class="card-title">Quick Actions</h3>
+                            <div class="card-actions" style="flex-direction: column; gap: 0.5rem;">
+                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
+                                    <i>🔄</i> Reorder Last Purchase
+                                </button>
+                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
+                                    <i>🎨</i> Create New Design
+                                </button>
+                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
+                                    <i>📋</i> Manage Subscriptions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders" class="dashboard-section">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">Order History</h3>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search orders..." id="orderSearch">
+                            <select class="filter-select" id="orderFilter">
+                                <option value="all">All Orders</option>
+                                <option value="one-time">One-time</option>
+                                <option value="subscription">Subscription</option>
+                            </select>
+                            <select class="filter-select" id="orderSort">
+                                <option value="date-desc">Newest First</option>
+                                <option value="date-asc">Oldest First</option>
+                                <option value="amount-desc">Highest Amount</option>
+                                <option value="amount-asc">Lowest Amount</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <!-- Orders will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Subscriptions Section -->
+            <section id="subscriptions" class="dashboard-section">
+                <div class="cards-grid" id="subscriptionsGrid">
+                    <!-- Subscription cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Designs Section -->
+            <section id="designs" class="dashboard-section">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">My Designs</h3>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search designs..." id="designSearch">
+                            <button class="btn btn-primary" id="newDesignBtn">New Design</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="cards-grid" id="designsGrid">
+                    <!-- Design cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Order Tracking Section -->
+            <section id="tracking" class="dashboard-section">
+                <div class="cards-grid" id="trackingGrid">
+                    <!-- Tracking cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="dashboard-section">
+                <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="form-section">
+                    <h3>Address Management</h3>
+                    <div id="addressesList">
+                        <!-- Addresses will be populated by JavaScript -->
+                    </div>
+                    <button class="btn btn-secondary mt-2" id="addAddressBtn">Add New Address</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Change Password</h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Billing Section -->
+            <section id="billing" class="dashboard-section">
+                <div class="form-section">
+                    <h3>Payment Methods</h3>
+                    <div id="paymentMethodsList">
+                        <!-- Payment methods will be populated by JavaScript -->
+                    </div>
+                    <button class="btn btn-secondary mt-2" id="addPaymentMethodBtn">Add Payment Method</button>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">Billing History</h3>
+                    </div>
+                    <div class="table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billingHistoryTable">
+                                <!-- Billing history will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment History Section -->
+            <section id="payments" class="dashboard-section">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">Payment History</h3>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search payments..." id="paymentSearch">
+                            <select class="filter-select" id="paymentFilter">
+                                <option value="all">All Payments</option>
+                                <option value="one-time">One-time</option>
+                                <option value="subscription">Subscription</option>
+                                <option value="successful">Successful</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <select class="filter-select" id="paymentSort">
+                                <option value="date-desc">Newest First</option>
+                                <option value="date-asc">Oldest First</option>
+                                <option value="amount-desc">Highest Amount</option>
+                                <option value="amount-asc">Lowest Amount</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Order ID</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Method</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTable">
+                                <!-- Payment history will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPayments">0</div>
+                        <div class="stat-label">Total Payments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="successfulPayments">0</div>
+                        <div class="stat-label">Successful</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="failedPayments">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAmount">$0.00</div>
+                        <div class="stat-label">Total Amount</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+
+</html>

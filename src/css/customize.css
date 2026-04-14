@@ -1,0 +1,444 @@
+:root {
+    --bb-bg: var(--bg, #0f0f10);
+    --bb-surface: var(--surface, #151518);
+    --bb-surface-alt: var(--surface-alt, #1b1c20);
+    --bb-border: var(--border, #2a2a2e);
+    --bb-text: var(--text, #e8e8ea);
+    --bb-muted: var(--muted, #9aa0a6);
+    --bb-primary: var(--primary, var(--primary-blue, #7a5af8));
+    --bb-accent: var(--accent, #00d4ff);
+    --bb-danger: var(--danger, #ef4444);
+    --bb-radius: var(--radius, 12px);
+    --bb-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, .35));
+    --bb-gap: var(--gap, 16px);
+    --bb-header-offset: var(--header-offset, 84px);
+}
+
+/* Layout */
+.customize-layout {
+    display: grid;
+    gap: calc(var(--bb-gap) * 1.25);
+    padding: clamp(12px, 2vw, 24px);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Default: single column */
+.customize-layout>.customize-viewer-panel,
+.customize-layout>.customize-controls-panel {
+    min-width: 0;
+}
+
+/* ≥768px: attempt two columns if space permits */
+@media (min-width: 768px) {
+    .customize-layout {
+        grid-template-columns: 1fr minmax(320px, 360px);
+        align-items: start;
+    }
+}
+
+/* 1024–1199px */
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+    .customize-layout {
+        grid-template-columns: 1fr 340px;
+    }
+}
+
+/* ≥1200px */
+@media (min-width: 1200px) {
+    .customize-layout {
+        grid-template-columns: 1fr 380px;
+        gap: 28px;
+    }
+}
+
+/* Viewer Panel */
+.customize-viewer-panel {
+    background: var(--bb-surface, #151518);
+    border: 1px solid var(--bb-border, #2a2a2e);
+    border-radius: var(--bb-radius);
+    box-shadow: var(--bb-shadow);
+    overflow: hidden;
+    color: var(--bb-text);
+}
+
+/* Allow existing editor container styles to function inside */
+.customize-viewer-panel .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(10px, 1.5vw, 16px) clamp(12px, 2vw, 20px);
+    border-bottom: 1px solid var(--bb-border);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.02), transparent);
+}
+
+.customize-viewer-panel .editor-header h3 {
+    margin: 0;
+    color: var(--bb-text);
+    font-weight: 600;
+}
+
+.customize-viewer-panel .view-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.customize-viewer-panel .model-container {
+    background: #0d0f13;
+    aspect-ratio: 16/9;
+    min-height: 360px;
+}
+
+@media (min-width: 1200px) {
+    .customize-viewer-panel .model-container {
+        min-height: 480px;
+    }
+}
+
+/* Controls Panel */
+.customize-controls-panel {
+    position: sticky;
+    top: var(--bb-header-offset);
+    align-self: start;
+    max-height: calc(100vh - var(--bb-header-offset) - 24px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--bb-gap);
+}
+
+@media (max-width: 767.98px) {
+    .customize-controls-panel {
+        position: static;
+        max-height: none;
+    }
+}
+
+.customize-controls-header {
+    background: var(--bb-surface);
+    color: var(--bb-text);
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius);
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    box-shadow: var(--bb-shadow);
+}
+
+.customize-title {
+    font-size: clamp(18px, 2.2vw, 22px);
+    line-height: 1.2;
+    margin: 0;
+    color: var(--bb-text);
+}
+
+.customize-price {
+    font-weight: 700;
+    color: var(--bb-primary);
+    background: rgba(122, 90, 248, 0.08);
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(122, 90, 248, 0.25);
+}
+
+/* Controls scroll area */
+.customize-controls-content {
+    display: grid;
+    gap: var(--bb-gap);
+    overflow: auto;
+    padding-right: 4px;
+    /* keep scrollbar off edge */
+}
+
+/* Section cards */
+.customize-section {
+    background: var(--bb-surface);
+    color: var(--bb-text);
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius);
+    box-shadow: var(--bb-shadow);
+    padding: clamp(12px, 2vw, 16px);
+}
+
+.customize-section-title {
+    margin: 0 0 10px 0;
+    font-size: clamp(15px, 2vw, 18px);
+    font-weight: 600;
+    color: var(--bb-text);
+}
+
+/* Form controls */
+.customize-control,
+.customize-layout select,
+.customize-layout input[type="text"],
+.customize-layout input[type="color"],
+.customize-layout input[type="range"] {
+    width: 100%;
+    color-scheme: dark;
+}
+
+.customize-layout label {
+    display: block;
+    font-size: 13px;
+    color: var(--bb-muted);
+    margin-bottom: 6px;
+}
+
+.customize-layout input[type="text"],
+.customize-layout select {
+    background: var(--bb-surface-alt);
+    color: var(--bb-text);
+    border: 1px solid var(--bb-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.customize-layout input[type="text"]:focus,
+.customize-layout select:focus {
+    border-color: var(--bb-primary);
+    box-shadow: 0 0 0 3px rgba(122, 90, 248, 0.25);
+}
+
+.customize-layout input[type="color"] {
+    height: 40px;
+    background: var(--bb-surface-alt);
+    border: 1px solid var(--bb-border);
+    border-radius: 10px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.customize-layout input[type="range"] {
+    appearance: none;
+    height: 6px;
+    background: var(--bb-border);
+    border-radius: 999px;
+    outline: none;
+}
+
+.customize-layout input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bb-primary);
+    border: 2px solid #fff1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Options grid (buttons/swatches) */
+.customize-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 10px;
+}
+
+.customize-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bb-surface-alt);
+    color: var(--bb-text);
+    border: 1px solid var(--bb-border);
+    border-radius: 10px;
+    padding: 8px;
+    cursor: pointer;
+    transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+    min-height: 36px;
+}
+
+.customize-option:hover {
+    transform: translateY(-1px);
+    border-color: var(--bb-primary);
+}
+
+.customize-option.is-active {
+    border-color: var(--bb-primary);
+    box-shadow: 0 0 0 3px rgba(122, 90, 248, 0.25) inset;
+}
+
+/* Color swatches */
+.customize-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid #0003;
+    padding: 0;
+}
+
+.customize-swatch.is-active {
+    border-color: var(--bb-accent);
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+}
+
+/* File upload area */
+.file-upload-area {
+    background: var(--bb-surface-alt);
+    border: 1px dashed var(--bb-border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    color: var(--bb-muted);
+    cursor: pointer;
+}
+
+.file-upload-area.drag-over {
+    border-color: var(--bb-primary);
+    background: rgba(122, 90, 248, 0.08);
+}
+
+/* Actions (CTA) */
+.customize-actions {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(21, 21, 24, 0.65) 0%, rgba(21, 21, 24, 0.95) 60%);
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius);
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Buttons (scoped, minimal) */
+.customize-layout .btn {
+    appearance: none;
+    border: 1px solid var(--bb-border);
+    background: var(--bb-surface-alt);
+    color: var(--bb-text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.customize-layout .btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--bb-primary);
+}
+
+.customize-layout .btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.customize-layout .btn-primary,
+.customize-actions .btn.btn-primary {
+    background: var(--bb-primary);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(122, 90, 248, 0.35);
+}
+
+.customize-layout .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 14px 28px rgba(122, 90, 248, 0.45);
+}
+
+.customize-actions .btn {
+    flex: 1;
+}
+
+.customize-actions .btn.btn-primary {
+    flex: 2;
+}
+
+/* Utility spacing */
+.gap-xs {
+    gap: 6px;
+}
+
+.gap-sm {
+    gap: 10px;
+}
+
+.gap-md {
+    gap: 14px;
+}
+
+.gap-lg {
+    gap: 20px;
+}
+
+/* Accessibility and focus */
+.customize-layout :is(a, button, input, select, textarea, .customize-option) {
+    outline: none;
+}
+
+.customize-layout :is(a, button, input, select, textarea, .customize-option):focus-visible {
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.35);
+    border-color: var(--bb-accent);
+}
+
+/* High-contrast selected option */
+.customize-option.is-active {
+    background: linear-gradient(180deg, rgba(122, 90, 248, 0.15), rgba(122, 90, 248, 0.08));
+}
+
+/* Info items in design-info on the right (kept styled subtly if present) */
+.customize-layout .info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--bb-muted);
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--bb-border);
+}
+
+.customize-layout .info-item:last-child {
+    border-bottom: none;
+}
+
+/* Mobile: single column, full-width sticky actions */
+@media (max-width: 767.98px) {
+    .customize-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .customize-actions {
+        position: sticky;
+        inset-block-end: 0;
+        border-radius: 12px;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    .customize-layout .btn,
+    .customize-option {
+        transition: none;
+    }
+}
+
+/* Ensure content respects global light theme when present */
+@media (prefers-color-scheme: light) {
+
+    .customize-viewer-panel,
+    .customize-section,
+    .customize-controls-header,
+    .customize-actions,
+    .file-upload-area,
+    .customize-layout input[type="text"],
+    .customize-layout select,
+    .customize-layout input[type="color"] {
+        background: var(--bb-surface, #ffffff);
+        color: var(--text-primary, #1E293B);
+        border-color: var(--border-gray, #E2E8F0);
+    }
+
+    .customize-layout .btn {
+        background: #ffffff;
+        color: var(--text-primary, #1E293B);
+        border-color: var(--border-gray, #E2E8F0);
+    }
+
+    .customize-layout .btn-primary {
+        color: #ffffff;
+    }
+}
