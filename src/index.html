@@ -502,9 +502,14 @@ window.addEventListener('load', function() {
   try {
     const oc = document.createElement('canvas');
     oc.width = 380; oc.height = HERO_H;
-    renderer = new THREE.WebGLRenderer({canvas: oc, antialias: true, alpha: false, preserveDrawingBuffer: true});
+    renderer = new THREE.WebGLRenderer({
+      canvas: oc, antialias: false, alpha: false,
+      preserveDrawingBuffer: true,
+      powerPreference: 'low-power',
+      failIfMajorPerformanceCaveat: false
+    });
   } catch(e) {
-    console.warn('WebGL unavailable', e);
+    console.warn('WebGL unavailable — using 2D fallback', e);
     ids.forEach(id => {
       const el = document.getElementById(id + '-loading');
       const canvas = document.getElementById(id);

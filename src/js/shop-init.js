@@ -216,6 +216,70 @@
         return clone;
     }
 
+    // Canvas-2D mouthguard illustration — used when WebGL is unavailable
+    function draw2DGuard(canvas, tierId) {
+        const w = canvas.parentElement ? (canvas.parentElement.clientWidth || 380) : 380;
+        const h = 200;
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const cfg2d = {
+            'clear-bulk':        { bg: '#0a1929', fill: 'rgba(184,228,255,0.72)', shine: 'rgba(200,240,255,0.45)', edge: '#44aaff', label: null },
+            'beautybite-branded':{ bg: '#081422', fill: '#2B5C8E',               shine: 'rgba(100,180,255,0.3)',  edge: '#14B8A6', label: 'Beauty Bite' },
+            'custom-branded':    { bg: '#080f1e', fill: '#0066CC',               shine: 'rgba(0,160,255,0.25)',   edge: '#f59e0b', label: null }
+        };
+        const c = cfg2d[tierId] || cfg2d['beautybite-branded'];
+
+        // Background
+        ctx.fillStyle = c.bg;
+        ctx.fillRect(0, 0, w, h);
+
+        // Mouthguard U-shape
+        const cx = w / 2, cy = h * 0.54;
+        const rx = w * 0.36, ry = h * 0.3, t = h * 0.1;
+
+        ctx.beginPath();
+        // Outer arch
+        ctx.ellipse(cx, cy, rx, ry, 0, Math.PI, 0, false);
+        // Right side down
+        ctx.lineTo(cx + rx, cy + ry * 0.55);
+        // Bottom outer arc (right to left)
+        ctx.arc(cx, cy + ry * 0.55, rx, 0, Math.PI, false);
+        // Left side up
+        ctx.lineTo(cx - rx, cy);
+        // Inner arch (right to left — go backwards)
+        ctx.ellipse(cx, cy, rx - t, ry - t, 0, Math.PI, 0, true);
+        ctx.closePath();
+
+        ctx.fillStyle = c.fill;
+        ctx.fill();
+
+        // Shine gradient
+        const grad = ctx.createLinearGradient(cx - rx, cy - ry, cx + rx * 0.3, cy);
+        grad.addColorStop(0, c.shine);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Edge stroke
+        ctx.strokeStyle = c.edge;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // "Beauty Bite" label for branded tier
+        if (c.label) {
+            ctx.font = 'bold ' + Math.round(w * 0.055) + 'px Pacifico, cursive';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+            ctx.lineWidth = 3;
+            ctx.strokeText(c.label, cx, cy + ry * 0.1);
+            ctx.fillStyle = '#14B8A6';
+            ctx.fillText(c.label, cx, cy + ry * 0.1);
+        }
+    }
+
     function initAll3DViewers(products) {
         if (typeof THREE === 'undefined') {
             setTimeout(() => initAll3DViewers(products), 400);
@@ -226,12 +290,19 @@
         const offscreen = document.createElement('canvas');
         offscreen.width = 400; offscreen.height = 220;
         try {
-            sharedRenderer = new THREE.WebGLRenderer({ canvas: offscreen, antialias: true, alpha: false, preserveDrawingBuffer: true });
+            sharedRenderer = new THREE.WebGLRenderer({
+                canvas: offscreen, antialias: false, alpha: false,
+                preserveDrawingBuffer: true,
+                powerPreference: 'low-power',
+                failIfMajorPerformanceCaveat: false
+            });
         } catch(e) {
-            console.warn('WebGL not available:', e);
+            console.warn('WebGL not available — using 2D fallback:', e);
             products.forEach(p => {
                 const el = document.getElementById('loading3d-' + p.id);
+                const cv = document.getElementById('canvas3d-' + p.id);
                 if (el) el.style.display = 'none';
+                if (cv) draw2DGuard(cv, p.id);
             });
             return;
         }

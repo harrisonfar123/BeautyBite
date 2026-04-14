@@ -653,7 +653,12 @@
         camera = new THREE.PerspectiveCamera(45, viewport.clientWidth / viewport.clientHeight, 0.1, 100);
         camera.position.set(0, 1.5, 5);
 
-        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: false,
+            powerPreference: 'low-power',
+            failIfMajorPerformanceCaveat: false
+        });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(viewport.clientWidth, viewport.clientHeight);
         renderer.shadowMap.enabled = true;
@@ -990,7 +995,13 @@
 
     // ─── Init ─────────────────────────────────────────────────────────────────
     updatePricing();
-    initScene();
+    try {
+        initScene();
+    } catch(e) {
+        console.error('3D editor init failed:', e);
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.innerHTML = '<div style="color:#f87171;font-size:0.9rem;padding:1rem;text-align:center;">WebGL not available in this browser.<br>Try enabling GPU acceleration in Chrome settings.</div>';
+    }
 
     // Check URL param for auto-selecting tier
     (function() {
