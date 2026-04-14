@@ -1099,6 +1099,59 @@ app.post('/api/orders/custom', async (req, res) => {
     }
 });
 
+// ── Saved Designs ──────────────────────────────────────────────────────────
+// Auto-create table on first use
+(async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS saved_designs (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                name VARCHAR(255) NOT NULL DEFAULT 'My Design',
+                config JSONB NOT NULL DEFAULT '{}',
+                thumbnail_data TEXT,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+    } catch(e) { console.warn('saved_designs table creation skipped:', e.message); }
+})();
+
+app.get('/api/designs', authenticateToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT id, name, config, thumbnail_data, created_at, updated_at FROM saved_designs WHERE user_id = $1 ORDER BY updated_at DESC LIMIT 50',
+            [req.user.id]
+        );
+        res.json({ designs: result.rows });
+    } catch(e) {
+        res.status(500).json({ error: 'Failed to fetch designs' });
+    }
+});
+
+app.post('/api/designs', authenticateToken, async (req, res) => {
+    const { name, config, thumbnail_data } = req.body;
+    if (!config) return res.status(400).json({ error: 'config required' });
+    try {
+        const result = await pool.query(
+            'INSERT INTO saved_designs (user_id, name, config, thumbnail_data) VALUES ($1, $2, $3, $4) RETURNING id, name, created_at',
+            [req.user.id, name || 'My Design', JSON.stringify(config), thumbnail_data || null]
+        );
+        res.json({ design: result.rows[0] });
+    } catch(e) {
+        res.status(500).json({ error: 'Failed to save design' });
+    }
+});
+
+app.delete('/api/designs/:id', authenticateToken, async (req, res) => {
+    try {
+        await pool.query('DELETE FROM saved_designs WHERE id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+        res.json({ success: true });
+    } catch(e) {
+        res.status(500).json({ error: 'Failed to delete design' });
+    }
+});
+
 // ── HTML page routes ──────────────────────────────────────────────────────────
 app.get('/design-studio', (req, res) => res.sendFile(path.join(__dirname, 'design-studio.html')));
 app.get('/checkout',      (req, res) => res.sendFile(path.join(__dirname, 'purchase.html')));

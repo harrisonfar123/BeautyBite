@@ -1,448 +1,978 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard - BeautyBite</title>
+    <title>Dashboard - BeautyBite</title>
     <meta name="description" content="Manage your orders, subscriptions, and custom designs with BeautyBite">
-
-    <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' blob:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+        content="default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Performance Optimization -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+        :root {
+            --navy: #1B2D3E;
+            --teal: #14B8A6;
+            --teal-light: #CCFBF1;
+            --bg: #F8FAFC;
+            --white: #FFFFFF;
+            --border: #E2E8F0;
+            --text: #1B2D3E;
+            --text-muted: #64748B;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --sidebar-w: 240px;
+        }
 
-</head>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
 
-<body>
-    <!-- Header -->
-    <div id="header-container"></div>
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
 
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" style="display: none;">
-        ☰
-    </button>
+        .sidebar-brand {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
 
-    <!-- Load header and footer, then initialize header behavior and dashboard scripts -->
-    <script>
-        // Load header HTML into the header container and run header initializer
-        (function () {
-            fetch('header.html')
-                .then(r => r.text())
-                .then(html => {
-                    document.getElementById('header-container').innerHTML = html;
-                    // Ensure header initializer script is present and run it
-                    // Prefer src-relative paths; match any existing header-init by tail to avoid duplicates
-                    if (!document.querySelector('script[src$="js/header-init.js"]')) {
-                        const s = document.createElement('script');
-                        s.src = 'js/header-init.js';
-                        s.onload = () => {
-                            try { if (window.initHeader) window.initHeader(); } catch (e) { /* ignore */ }
-                        };
-                        document.head.appendChild(s);
-                    } else {
-                        try { if (window.initHeader) window.initHeader(); } catch (e) { /* ignore */ }
-                    }
+        .sidebar-brand a {
+            font-family: 'Pacifico', cursive;
+            font-size: 20px;
+            color: var(--navy);
+            text-decoration: none;
+        }
 
-                    // Load auth shim to provide stable AuthSystem API for legacy code
-                    if (!document.querySelector('script[src$="js/auth-shim.js"]')) {
-                        const a = document.createElement('script');
-                        a.src = 'js/auth-shim.js';
-                        document.head.appendChild(a);
-                    }
-                })
-                .catch(err => console.error('Error loading header:', err));
+        .sidebar-brand a span {
+            color: var(--teal);
+        }
 
-            // Load footer if exists
-            fetch('footer.html')
-                .then(r => r.text())
-                .then(html => {
-                    const footerPlaceholder = document.getElementById('footer-placeholder');
-                    if (footerPlaceholder) footerPlaceholder.innerHTML = html;
-                })
-                .catch(() => { /* footer optional */ });
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+        }
 
-            // Load dashboard script and small visual initializers
-            function loadScript(src) {
-                return new Promise((resolve, reject) => {
-                    if (document.querySelector('script[src="' + src + '"]')) return resolve();
-                    const s = document.createElement('script');
-                    s.src = src;
-                    s.onload = resolve;
-                    s.onerror = reject;
-                    document.body.appendChild(s);
-                });
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: color 0.15s, background 0.15s, border-color 0.15s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg);
+            color: var(--navy);
+        }
+
+        .nav-item.active {
+            border-left-color: var(--teal);
+            color: var(--teal);
+            background: var(--teal-light);
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 20px;
+        }
+
+        .nav-signout {
+            margin-top: auto;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Main content ── */
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 32px;
+            background: var(--bg);
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* ── Section headings ── */
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* ── Stat cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        /* ── Quick actions ── */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+
+        .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--navy);
+            border: 1px solid var(--border);
+        }
+
+        .btn-danger {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* ── Table ── */
+        .table-wrap {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-head h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td {
+            padding: 14px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #F8FAFC; }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active { background: #CCFBF1; color: #0F766E; }
+        .badge-paused { background: #FEF3C7; color: #92400E; }
+        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+        .badge-completed { background: #DBEAFE; color: #1E40AF; }
+        .badge-pending { background: #F3F4F6; color: #374151; }
+
+        /* ── Sub cards (subscriptions, designs) ── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .sub-card, .design-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .sub-card h3, .design-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .sub-card p, .design-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .card-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ── Account form ── */
+        .form-section {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--navy);
+            background: var(--bg);
+            transition: border-color 0.15s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--teal);
+            background: var(--white);
+        }
+
+        .form-control[readonly] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .form-msg {
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .form-msg.success { background: #CCFBF1; color: #0F766E; display: block; }
+        .form-msg.error   { background: #FEE2E2; color: #991B1B; display: block; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Loading spinner ── */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-row td {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+        }
+
+        /* ── Mobile toggle ── */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+
+            .sidebar {
+                position: fixed;
+                left: -var(--sidebar-w);
+                top: 0;
+                z-index: 100;
+                transform: translateX(calc(-1 * var(--sidebar-w)));
+                transition: transform 0.25s ease;
             }
 
-            Promise.all([
-                loadScript('js/dashboard.js').catch(() => { }),
-                loadScript('js/shop-init.js').catch(() => { })
-            ]).then(() => {
-                // Dashboard.init is called within js/dashboard.js when DOMContentLoaded fires.
-            });
-        })();
-    </script>
+            .sidebar.open { transform: translateX(0); }
 
-    <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
-        <aside class="dashboard-sidebar" id="dashboardSidebar">
-            <div class="sidebar-header">
-                <div class="user-profile">
-                    <div class="user-avatar" id="userAvatar">JD</div>
-                    <div class="user-info">
-                        <h3 id="userName">John Doe</h3>
-                        <p id="userEmail">john.doe@example.com</p>
-                    </div>
-                </div>
-            </div>
+            .mobile-toggle { display: flex; }
 
-            <nav class="sidebar-nav">
-                <a href="#overview" class="nav-item active" data-section="overview">
-                    <i>📊</i> Overview
-                </a>
-                <a href="#orders" class="nav-item" data-section="orders">
-                    <i>📦</i> Orders
-                </a>
-                <a href="#subscriptions" class="nav-item" data-section="subscriptions">
-                    <i>🔄</i> Subscriptions
-                </a>
-                <a href="#designs" class="nav-item" data-section="designs">
-                    <i>🎨</i> My Designs
-                </a>
-                <a href="#tracking" class="nav-item" data-section="tracking">
-                    <i>🚚</i> Track Orders
-                </a>
-                <a href="#profile" class="nav-item" data-section="profile">
-                    <i>👤</i> Profile
-                </a>
-                <a href="#billing" class="nav-item" data-section="billing">
-                    <i>💳</i> Billing
-                </a>
-                <a href="#payments" class="nav-item" data-section="payments">
-                    <i>💰</i> Payment History
-                </a>
-                <a href="/index.html" class="nav-item" style="margin-top: 2rem; color: var(--medium-gray);">
-                    <i>🏠</i> Back to Site
-                </a>
-            </nav>
-        </aside>
+            .main { padding: 16px; padding-top: 60px; }
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title" id="sectionTitle">Dashboard Overview</h1>
-                <div class="dashboard-actions">
-                    <button class="btn btn-secondary" id="refreshBtn">
-                        <i>🔄</i> Refresh
-                    </button>
-                </div>
-            </div>
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
 
-            <!-- Overview Section -->
-            <section id="overview" class="dashboard-section active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalOrders">12</div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="activeSubscriptions">3</div>
-                        <div class="stat-label">Active Subscriptions</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="savedDesigns">8</div>
-                        <div class="stat-label">Saved Designs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalSpent">$2,847.50</div>
-                        <div class="stat-label">Total Spent</div>
-                    </div>
-                </div>
+<button class="mobile-toggle" id="mobileToggle" aria-label="Open menu">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+</button>
 
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">Recent Orders</h3>
-                        <div class="table-controls">
-                            <a href="#orders" class="btn btn-secondary btn-small">View All Orders</a>
-                        </div>
-                    </div>
-                    <div class="table-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Date</th>
-                                    <th>Items</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentOrdersTable">
-                                <!-- Recent orders will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="cards-grid">
-                    <div class="subscription-card">
-                        <div class="card-content">
-                            <h3 class="card-title">Upcoming Deliveries</h3>
-                            <div class="card-description">
-                                Next subscription delivery scheduled
-                            </div>
-                            <div class="card-actions">
-                                <button class="btn btn-primary btn-small">Manage Subscriptions</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="design-card">
-                        <div class="card-content">
-                            <h3 class="card-title">Quick Actions</h3>
-                            <div class="card-actions" style="flex-direction: column; gap: 0.5rem;">
-                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
-                                    <i>🔄</i> Reorder Last Purchase
-                                </button>
-                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
-                                    <i>🎨</i> Create New Design
-                                </button>
-                                <button class="btn btn-secondary btn-small" style="width: 100%; text-align: left;">
-                                    <i>📋</i> Manage Subscriptions
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Orders Section -->
-            <section id="orders" class="dashboard-section">
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">Order History</h3>
-                        <div class="table-controls">
-                            <input type="text" class="search-box" placeholder="Search orders..." id="orderSearch">
-                            <select class="filter-select" id="orderFilter">
-                                <option value="all">All Orders</option>
-                                <option value="one-time">One-time</option>
-                                <option value="subscription">Subscription</option>
-                            </select>
-                            <select class="filter-select" id="orderSort">
-                                <option value="date-desc">Newest First</option>
-                                <option value="date-asc">Oldest First</option>
-                                <option value="amount-desc">Highest Amount</option>
-                                <option value="amount-asc">Lowest Amount</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Date</th>
-                                    <th>Items</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ordersTable">
-                                <!-- Orders will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Subscriptions Section -->
-            <section id="subscriptions" class="dashboard-section">
-                <div class="cards-grid" id="subscriptionsGrid">
-                    <!-- Subscription cards will be populated by JavaScript -->
-                </div>
-            </section>
-
-            <!-- Designs Section -->
-            <section id="designs" class="dashboard-section">
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">My Designs</h3>
-                        <div class="table-controls">
-                            <input type="text" class="search-box" placeholder="Search designs..." id="designSearch">
-                            <button class="btn btn-primary" id="newDesignBtn">New Design</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="cards-grid" id="designsGrid">
-                    <!-- Design cards will be populated by JavaScript -->
-                </div>
-            </section>
-
-            <!-- Order Tracking Section -->
-            <section id="tracking" class="dashboard-section">
-                <div class="cards-grid" id="trackingGrid">
-                    <!-- Tracking cards will be populated by JavaScript -->
-                </div>
-            </section>
-
-            <!-- Profile Section -->
-            <section id="profile" class="dashboard-section">
-                <div class="form-section">
-                    <h3>Personal Information</h3>
-                    <form id="profileForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </form>
-                </div>
-
-                <div class="form-section">
-                    <h3>Address Management</h3>
-                    <div id="addressesList">
-                        <!-- Addresses will be populated by JavaScript -->
-                    </div>
-                    <button class="btn btn-secondary mt-2" id="addAddressBtn">Add New Address</button>
-                </div>
-
-                <div class="form-section">
-                    <h3>Change Password</h3>
-                    <form id="passwordForm">
-                        <div class="form-group">
-                            <label for="currentPassword">Current Password</label>
-                            <input type="password" id="currentPassword" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">New Password</label>
-                            <input type="password" id="newPassword" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm New Password</label>
-                            <input type="password" id="confirmPassword" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Password</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- Billing Section -->
-            <section id="billing" class="dashboard-section">
-                <div class="form-section">
-                    <h3>Payment Methods</h3>
-                    <div id="paymentMethodsList">
-                        <!-- Payment methods will be populated by JavaScript -->
-                    </div>
-                    <button class="btn btn-secondary mt-2" id="addPaymentMethodBtn">Add Payment Method</button>
-                </div>
-
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">Billing History</h3>
-                    </div>
-                    <div class="table-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Invoice</th>
-                                </tr>
-                            </thead>
-                            <tbody id="billingHistoryTable">
-                                <!-- Billing history will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Payment History Section -->
-            <section id="payments" class="dashboard-section">
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">Payment History</h3>
-                        <div class="table-controls">
-                            <input type="text" class="search-box" placeholder="Search payments..." id="paymentSearch">
-                            <select class="filter-select" id="paymentFilter">
-                                <option value="all">All Payments</option>
-                                <option value="one-time">One-time</option>
-                                <option value="subscription">Subscription</option>
-                                <option value="successful">Successful</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                            <select class="filter-select" id="paymentSort">
-                                <option value="date-desc">Newest First</option>
-                                <option value="date-asc">Oldest First</option>
-                                <option value="amount-desc">Highest Amount</option>
-                                <option value="amount-asc">Lowest Amount</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Payment ID</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Order ID</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Method</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="paymentsTable">
-                                <!-- Payment history will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalPayments">0</div>
-                        <div class="stat-label">Total Payments</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="successfulPayments">0</div>
-                        <div class="stat-label">Successful</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="failedPayments">0</div>
-                        <div class="stat-label">Failed</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalAmount">$0.00</div>
-                        <div class="stat-label">Total Amount</div>
-                    </div>
-                </div>
-            </section>
-        </main>
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <a href="/">Beauty<span>Bite</span></a>
     </div>
 
-</body>
+    <nav class="sidebar-nav">
+        <a class="nav-item active" data-section="section-overview" href="#overview">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Overview
+        </a>
+        <a class="nav-item" data-section="section-orders" href="#orders">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+            Orders
+        </a>
+        <a class="nav-item" data-section="section-subscriptions" href="#subscriptions">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+            Subscriptions
+        </a>
+        <a class="nav-item" data-section="section-designs" href="#designs">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            Saved Designs
+        </a>
 
+        <div class="nav-divider"></div>
+
+        <a class="nav-item" data-section="section-account" href="#account">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Account
+        </a>
+    </nav>
+
+    <div class="nav-signout">
+        <a class="nav-item" id="signOutBtn" href="#">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</aside>
+
+<!-- Main content -->
+<main class="main">
+
+    <!-- Overview -->
+    <section class="section active" id="section-overview">
+        <div class="section-header">
+            <h1 id="welcomeHeading">Hello!</h1>
+            <p>Here's a summary of your account.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="statOrders">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Subscriptions</div>
+                <div class="stat-value" id="statSubs">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Saved Designs</div>
+                <div class="stat-value" id="statDesigns">—</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <a class="btn btn-primary" href="/shop">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                Shop Products
+            </a>
+            <a class="btn btn-secondary" href="/design-studio">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+                </svg>
+                Design Studio
+            </a>
+            <a class="btn btn-secondary" href="/shop">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                New Order
+            </a>
+        </div>
+    </section>
+
+    <!-- Orders -->
+    <section class="section" id="section-orders">
+        <div class="section-header">
+            <h1>Your Orders</h1>
+        </div>
+        <div class="table-wrap">
+            <div class="table-head">
+                <h2>Order History</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr class="loading-row"><td colspan="4"><span class="spinner"></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Subscriptions -->
+    <section class="section" id="section-subscriptions">
+        <div class="section-header">
+            <h1>Subscriptions &amp; Recurring Orders</h1>
+        </div>
+        <div id="subsContainer">
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <polyline points="1 20 1 14 7 14"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                <p>Loading subscriptions...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Saved Designs -->
+    <section class="section" id="section-designs">
+        <div class="section-header">
+            <h1>Saved Designs</h1>
+        </div>
+        <div id="designsContainer">
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <p>Loading designs...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Account -->
+    <section class="section" id="section-account">
+        <div class="section-header">
+            <h1>Account Settings</h1>
+        </div>
+
+        <div class="form-section">
+            <h2>Your Details</h2>
+            <div class="form-group">
+                <label>Name</label>
+                <input class="form-control" id="accountName" type="text" readonly>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input class="form-control" id="accountEmail" type="email" readonly>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Change Password</h2>
+            <form id="passwordForm" novalidate>
+                <div class="form-group">
+                    <label for="oldPassword">Current Password</label>
+                    <input class="form-control" id="oldPassword" type="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input class="form-control" id="newPassword" type="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input class="form-control" id="confirmPassword" type="password" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Update Password</button>
+                <div class="form-msg" id="pwMsg"></div>
+            </form>
+        </div>
+    </section>
+
+</main>
+
+<script>
+(function () {
+    'use strict';
+
+    const API = '/api';
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    const token = localStorage.getItem('bb_token');
+    if (!token) { window.location.href = '/login'; return; }
+
+    function decodeJwt(t) {
+        try {
+            const payload = t.split('.')[1];
+            const b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(
+                atob(b64).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join('')
+            );
+            return JSON.parse(json);
+        } catch { return {}; }
+    }
+
+    const user = decodeJwt(token);
+    const userName = user.name || user.email || 'there';
+
+    // Populate user info
+    document.getElementById('welcomeHeading').textContent = 'Hello, ' + (user.name || 'there') + '!';
+    document.getElementById('accountName').value  = user.name  || '';
+    document.getElementById('accountEmail').value = user.email || '';
+
+    // ── Fetch helper ─────────────────────────────────────────────────────────
+    async function fetchWithAuth(url, opts = {}) {
+        const headers = Object.assign({ 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, opts.headers || {});
+        const res = await fetch(url, Object.assign({}, opts, { headers }));
+        if (res.status === 401) { localStorage.removeItem('bb_token'); window.location.href = '/login'; }
+        return res;
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    const navItems = document.querySelectorAll('.nav-item[data-section]');
+    const sections = document.querySelectorAll('.section');
+
+    function showSection(id) {
+        sections.forEach(s => s.classList.remove('active'));
+        navItems.forEach(n => n.classList.remove('active'));
+        const sec = document.getElementById(id);
+        if (sec) sec.classList.add('active');
+        navItems.forEach(n => { if (n.dataset.section === id) n.classList.add('active'); });
+        window.scrollTo(0, 0);
+        // Lazy-load section data on first visit
+        if (id === 'section-orders'        && !ordersLoaded)       loadOrders();
+        if (id === 'section-subscriptions' && !subsLoaded)         loadSubscriptions();
+        if (id === 'section-designs'       && !designsLoaded)      loadDesigns();
+    }
+
+    navItems.forEach(item => {
+        item.addEventListener('click', e => {
+            e.preventDefault();
+            showSection(item.dataset.section);
+            document.getElementById('sidebar').classList.remove('open');
+        });
+    });
+
+    // Mobile sidebar toggle
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // Sign out
+    document.getElementById('signOutBtn').addEventListener('click', e => {
+        e.preventDefault();
+        localStorage.removeItem('bb_token');
+        localStorage.removeItem('bb_cart');
+        window.location.href = '/';
+    });
+
+    // ── Overview stats ────────────────────────────────────────────────────────
+    let ordersLoaded = false, subsLoaded = false, designsLoaded = false;
+
+    async function loadOverviewStats() {
+        try {
+            const [oRes, sRes, dRes] = await Promise.all([
+                fetchWithAuth(API + '/orders'),
+                fetchWithAuth(API + '/subscriptions'),
+                fetchWithAuth(API + '/designs')
+            ]);
+            const oData = oRes.ok ? await oRes.json() : { orders: [] };
+            const sData = sRes.ok ? await sRes.json() : { subscriptions: [] };
+            const dData = dRes.ok ? await dRes.json() : { designs: [] };
+
+            document.getElementById('statOrders').textContent  = (oData.orders  || []).length;
+            document.getElementById('statSubs').textContent    = (sData.subscriptions || []).filter(s => s.status === 'active').length;
+            document.getElementById('statDesigns').textContent = (dData.designs || []).length;
+
+            // Cache for section views
+            window._cachedOrders  = oData.orders  || [];
+            window._cachedSubs    = sData.subscriptions || [];
+            window._cachedDesigns = dData.designs || [];
+        } catch { /* stats stay as — */ }
+    }
+
+    loadOverviewStats();
+
+    // ── Orders ────────────────────────────────────────────────────────────────
+    function statusBadge(status) {
+        const map = { completed: 'badge-completed', active: 'badge-active', pending: 'badge-pending', cancelled: 'badge-cancelled' };
+        const cls = map[(status || '').toLowerCase()] || 'badge-pending';
+        return '<span class="badge ' + cls + '">' + (status || 'Pending') + '</span>';
+    }
+
+    function formatDate(d) {
+        if (!d) return '—';
+        return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatMoney(n) {
+        if (n == null) return '—';
+        return '$' + Number(n).toFixed(2);
+    }
+
+    async function loadOrders() {
+        ordersLoaded = true;
+        const tbody = document.getElementById('ordersTableBody');
+        try {
+            const res = await fetchWithAuth(API + '/orders');
+            const data = res.ok ? await res.json() : { orders: [] };
+            const orders = data.orders || window._cachedOrders || [];
+            if (!orders.length) {
+                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state" style="padding:32px 0"><p>No orders yet. <a href="/shop" style="color:var(--teal)">Shop our products</a> to get started.</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td>${formatDate(o.created_at || o.date)}</td>
+                    <td>${o.product_name || o.description || '—'}</td>
+                    <td>${formatMoney(o.amount || o.total_price)}</td>
+                    <td>${statusBadge(o.status)}</td>
+                </tr>
+            `).join('');
+        } catch {
+            tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Failed to load orders.</td></tr>';
+        }
+    }
+
+    // ── Subscriptions ─────────────────────────────────────────────────────────
+    async function loadSubscriptions() {
+        subsLoaded = true;
+        const container = document.getElementById('subsContainer');
+        try {
+            const res = await fetchWithAuth(API + '/subscriptions');
+            const data = res.ok ? await res.json() : { subscriptions: [] };
+            const subs = data.subscriptions || window._cachedSubs || [];
+            if (!subs.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <polyline points="1 20 1 14 7 14"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        <p>No active subscriptions yet.</p>
+                        <a class="btn btn-primary" href="/shop">Browse Plans</a>
+                    </div>`;
+                return;
+            }
+            const subBadge = s => {
+                if (s === 'active')    return '<span class="badge badge-active">Active</span>';
+                if (s === 'paused')    return '<span class="badge badge-paused">Paused</span>';
+                if (s === 'cancelled') return '<span class="badge badge-cancelled">Cancelled</span>';
+                return '<span class="badge badge-pending">' + (s || 'Unknown') + '</span>';
+            };
+            container.innerHTML = '<div class="cards-grid">' + subs.map(s => `
+                <div class="sub-card">
+                    <h3>${s.product_name || s.plan || 'Subscription'}</h3>
+                    <p>${subBadge(s.status)}</p>
+                    <p>Next billing: ${formatDate(s.next_billing_date || s.next_payment)}</p>
+                    ${s.status === 'active' ? `<div class="card-actions"><button class="btn btn-danger btn-sm" data-cancel="${s.id}">Cancel</button></div>` : ''}
+                </div>
+            `).join('') + '</div>';
+
+            // Cancel handlers
+            container.querySelectorAll('[data-cancel]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Cancel this subscription?')) return;
+                    btn.textContent = '...';
+                    btn.disabled = true;
+                    try {
+                        await fetchWithAuth(API + '/subscriptions/' + btn.dataset.cancel + '/cancel', { method: 'POST' });
+                        loadSubscriptions();
+                    } catch { btn.textContent = 'Error'; }
+                });
+            });
+        } catch {
+            container.innerHTML = '<div class="empty-state"><p>Failed to load subscriptions.</p></div>';
+        }
+    }
+
+    // ── Designs ───────────────────────────────────────────────────────────────
+    async function loadDesigns() {
+        designsLoaded = true;
+        const container = document.getElementById('designsContainer');
+        try {
+            const res = await fetchWithAuth(API + '/designs');
+            const data = res.ok ? await res.json() : { designs: [] };
+            const designs = data.designs || window._cachedDesigns || [];
+            if (!designs.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        <p>Create your first custom design in the Design Studio.</p>
+                        <a class="btn btn-primary" href="/design-studio">Open Design Studio</a>
+                    </div>`;
+                return;
+            }
+            container.innerHTML = '<div class="cards-grid">' + designs.map(d => `
+                <div class="design-card">
+                    <h3>${escHtml(d.name || 'My Design')}</h3>
+                    <p>Created ${formatDate(d.created_at)}</p>
+                    <div class="card-actions">
+                        <a class="btn btn-primary btn-sm" href="/design-studio">Open in Studio</a>
+                        <button class="btn btn-danger btn-sm" data-delete="${d.id}">Delete</button>
+                    </div>
+                </div>
+            `).join('') + '</div>';
+
+            // Delete handlers
+            container.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Delete this design?')) return;
+                    btn.textContent = '...';
+                    btn.disabled = true;
+                    try {
+                        await fetchWithAuth(API + '/designs/' + btn.dataset.delete, { method: 'DELETE' });
+                        designsLoaded = false;
+                        loadDesigns();
+                    } catch { btn.textContent = 'Error'; }
+                });
+            });
+        } catch {
+            container.innerHTML = '<div class="empty-state"><p>Failed to load designs.</p></div>';
+        }
+    }
+
+    function escHtml(str) {
+        return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    // ── Change password ───────────────────────────────────────────────────────
+    document.getElementById('passwordForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const msg    = document.getElementById('pwMsg');
+        const oldPw  = document.getElementById('oldPassword').value;
+        const newPw  = document.getElementById('newPassword').value;
+        const confPw = document.getElementById('confirmPassword').value;
+
+        msg.className = 'form-msg';
+        if (newPw !== confPw) { msg.className = 'form-msg error'; msg.textContent = 'Passwords do not match.'; return; }
+        if (newPw.length < 8) { msg.className = 'form-msg error'; msg.textContent = 'Password must be at least 8 characters.'; return; }
+
+        try {
+            const res = await fetchWithAuth(API + '/auth/change-password', {
+                method: 'POST',
+                body: JSON.stringify({ oldPassword: oldPw, newPassword: newPw })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                msg.className = 'form-msg success';
+                msg.textContent = 'Password updated successfully.';
+                e.target.reset();
+            } else {
+                msg.className = 'form-msg error';
+                msg.textContent = data.error || 'Failed to update password.';
+            }
+        } catch {
+            msg.className = 'form-msg error';
+            msg.textContent = 'Network error. Please try again.';
+        }
+    });
+
+    // ── Hash routing ──────────────────────────────────────────────────────────
+    const hashMap = { '#overview': 'section-overview', '#orders': 'section-orders', '#subscriptions': 'section-subscriptions', '#designs': 'section-designs', '#account': 'section-account' };
+    function routeFromHash() {
+        const id = hashMap[window.location.hash];
+        if (id) showSection(id);
+    }
+    window.addEventListener('hashchange', routeFromHash);
+    routeFromHash();
+
+})();
+</script>
+</body>
 </html>

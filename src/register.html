@@ -563,20 +563,37 @@
             AuthSystem.register(formData)
                 .then(result => {
                     document.getElementById('loading').style.display = 'none';
+
+                    if (result && result.success === false) {
+                        document.getElementById('submitBtn').disabled = false;
+                        alert('Registration failed: ' + (result.error || 'Unknown error'));
+                        return;
+                    }
+
+                    // Store bb_token for server API calls
+                    if (result && result.token) {
+                        localStorage.setItem('bb_token', result.token);
+                    } else {
+                        const existingToken = localStorage.getItem('beautybite_jwt_token');
+                        if (existingToken) localStorage.setItem('bb_token', existingToken);
+                    }
+                    localStorage.setItem('bb_user', JSON.stringify({
+                        name: formData.firstName + ' ' + formData.lastName,
+                        email: formData.email
+                    }));
+
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('registerForm').style.display = 'none';
 
-                    // Redirect to login after 3 seconds
+                    // Redirect to dashboard
                     setTimeout(() => {
-                        window.location.href = 'login.html?message=account_created';
-                    }, 3000);
+                        window.location.href = '/dashboard';
+                    }, 1500);
                 })
                 .catch(error => {
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submitBtn').disabled = false;
-
-                    // Show error message
-                    alert('Registration failed: ' + error.message);
+                    alert('Registration failed: ' + (error.message || 'Please try again.'));
                 });
         }
 

@@ -526,28 +526,47 @@
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submitBtn').disabled = false;
 
+                    if (result && result.success === false) {
+                        let errorMessage = result.error || 'Login failed. Please try again.';
+                        if (errorMessage.includes('locked')) {
+                            errorMessage = 'Account temporarily locked due to multiple failed attempts. Please try again in 30 minutes.';
+                        } else if (errorMessage.includes('Invalid email or password')) {
+                            errorMessage = 'Invalid email or password. Please try again.';
+                        }
+                        alert(errorMessage);
+                        return;
+                    }
+
+                    // Store bb_token for server API calls
+                    const data = result && result.user ? result : {};
+                    if (data && data.token) {
+                        localStorage.setItem('bb_token', data.token);
+                    } else {
+                        // Fallback: copy from AuthSystem storage key if available
+                        const existingToken = localStorage.getItem('beautybite_jwt_token');
+                        if (existingToken) localStorage.setItem('bb_token', existingToken);
+                    }
+                    localStorage.setItem('bb_user', JSON.stringify({
+                        name: (result && result.user && result.user.name) || '',
+                        email: email
+                    }));
+
                     // Show success message
                     document.getElementById('successMessage').textContent = 'Login successful! Redirecting...';
                     document.getElementById('successMessage').style.display = 'block';
 
-                    // Redirect to dashboard or previous page
-                    const redirectTo = urlParams.get('redirect') || 'dashboard.html';
-                    setTimeout(() => {
-                        window.location.href = redirectTo;
-                    }, 1000);
+                    window.location.href = '/dashboard';
                 })
                 .catch(error => {
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submitBtn').disabled = false;
 
-                    // Show specific error messages
                     let errorMessage = 'Login failed. Please try again.';
-
-                    if (error.message.includes('locked')) {
+                    if (error.message && error.message.includes('locked')) {
                         errorMessage = 'Account temporarily locked due to multiple failed attempts. Please try again in 30 minutes.';
-                    } else if (error.message.includes('Invalid email or password')) {
+                    } else if (error.message && error.message.includes('Invalid email or password')) {
                         errorMessage = 'Invalid email or password. Please try again.';
-                    } else {
+                    } else if (error.message) {
                         errorMessage = error.message;
                     }
 

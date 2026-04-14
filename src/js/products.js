@@ -4,77 +4,76 @@ window.productCatalog = {
     products: {
         'beautybite-branded': {
             id: 'beautybite-branded',
-            name: 'BeautyBite Branded Mouthguard',
-            description: 'Premium mouthguard featuring the BeautyBite brand, logo, and professional packaging.',
+            name: 'BeautyBite Branded',
+            tagline: 'Professional protection with our signature look',
+            description: 'Medical-grade mouthguard featuring the BeautyBite brand identity. Perfect for athletes, coaches, and health-conscious individuals who want premium protection without compromise.',
             basePrice: 200,
-            image: '/src/icon.svg',
+            badge: 'Most Popular',
+            badgeClass: 'badge-tier2',
             features: [
-                'BeautyBite brand & logo',
-                'Premium packaging included',
-                'Medical-grade patented materials',
-                'Professional branded design',
-                'Flexible order quantities'
+                'BeautyBite signature branding',
+                'Medical-grade patented material',
+                'Custom-molded comfort fit',
+                'Professional packaging',
+                'Available in all sport sizes'
             ],
+            useCases: ['Boxing & MMA', 'Basketball', 'Football', 'Gym & CrossFit', 'General Sports'],
             type: 'branded',
             minQuantity: 1,
             maxQuantity: 10000,
             quantityStep: 1,
             purchasingOptions: {
-                oneTime: {
-                    label: 'One-time Purchase',
-                    description: 'Single purchase, no minimum',
-                    discount: 0
-                }
+                oneTime: { label: 'One-time Order', description: 'Single order, no minimums', discount: 0 },
+                subscription: { label: 'Monthly Supply', description: 'Auto-reorder every month, save 10%', discount: 0.10 }
             }
         },
         'clear-bulk': {
             id: 'clear-bulk',
-            name: 'Clear Mouthguard',
-            description: 'Medical-grade clear mouthguards for bulk wholesale orders. Unbranded and ready for your distribution channel.',
+            name: 'Clear Classic',
+            tagline: 'Clean, professional, unbranded',
+            description: 'Crystal-clear medical-grade mouthguard. Sleek, professional look that pairs with any uniform or aesthetic. Ideal for resellers and distributors.',
             basePrice: 100,
-            image: '/src/icon.svg',
+            badge: 'Best Value',
+            badgeClass: 'badge-tier1',
             features: [
-                'Crystal-clear, unbranded design',
-                'Medical-grade patented materials',
-                'Bulk wholesale pricing',
-                'Sterilizable & reusable',
-                'Standard sizing included'
+                'Crystal-clear unbranded design',
+                'Medical-grade patented material',
+                'Sterilizable and reusable',
+                'Standard & youth sizing',
+                'Ideal for resale'
             ],
+            useCases: ['Wrestling', 'Hockey', 'Lacrosse', 'Youth Sports', 'Dental Protection'],
             type: 'bulk',
-            minQuantity: 1000,
+            minQuantity: 1,
             maxQuantity: 100000,
-            quantityStep: 100,
+            quantityStep: 1,
             purchasingOptions: {
-                oneTime: {
-                    label: 'Bulk Order',
-                    description: 'Single bulk purchase — minimum 1,000 units',
-                    discount: 0
-                }
+                oneTime: { label: 'Standard Order', description: 'Single order', discount: 0 },
+                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, save 10%', discount: 0.10 }
             }
         },
         'custom-branded': {
             id: 'custom-branded',
-            name: 'Custom Branded Mouthguard',
-            description: 'Fully custom mouthguards with your logo, colors, and design. Built with the 3D design studio.',
+            name: 'Custom Design',
+            tagline: 'Your brand, your colors, your identity',
+            description: 'Fully custom mouthguard built with our 3D design studio. Upload your logo, choose colors and materials, and create protection that is unmistakably yours.',
             basePrice: 300,
-            image: '/src/icon.svg',
+            badge: 'Premium',
+            badgeClass: 'badge-tier3',
             features: [
-                'Your logo & brand colors',
-                'Interactive 3D design editor',
-                'Material selection (matte/glossy/metallic)',
+                'Full custom logo & brand colors',
+                'Interactive 3D design studio',
+                'Matte, glossy, or metallic finish',
                 'Custom text engraving',
                 'Design saved to your account'
             ],
+            useCases: ['Team Branding', 'Gym Identity', 'Merchandise', 'Sponsorship Gear', 'Limited Editions'],
             type: 'custom',
-            minQuantity: 50,
+            minQuantity: 1,
             maxQuantity: 5000,
             quantityStep: 1,
             purchasingOptions: {
-                oneTime: {
-                    label: 'Custom Order',
-                    description: 'Single custom order — minimum 50 units',
-                    discount: 0
-                }
+                oneTime: { label: 'Custom Order', description: 'Single custom production run', discount: 0 }
             }
         }
     },

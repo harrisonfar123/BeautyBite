@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,1400 +7,559 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Shop-specific CSS variables (supplement global styles.css) */
         :root {
-            --primary-blue: #0066CC;
-            --secondary-blue: #4DA6FF;
-            --accent-teal: #14B8A6;
-            --border-light: #e2e8f0;
+            --navy: #1B2D3E;
+            --teal: #14B8A6;
+            --blue: #0066CC;
+            --bg: #F8FAFC;
+            --border: #e2e8f0;
         }
 
-        /* Shop page specific styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            margin: 0;
+        }
+
+        /* ── Hero ── */
         .shop-hero {
-            background: linear-gradient(135deg, #1B2D3E 0%, #3A5570 100%);
+            background: linear-gradient(135deg, var(--teal) 0%, var(--navy) 60%);
             color: white;
-            padding: 4rem 2rem;
+            padding: 2.5rem 2rem;
             text-align: center;
-            margin-bottom: 3rem;
         }
 
         .shop-hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
             font-family: 'Pacifico', cursive;
+            font-size: 2.4rem;
+            margin: 0 0 0.5rem;
+            letter-spacing: 0.01em;
         }
 
         .shop-hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
+            font-size: 1rem;
+            opacity: 0.88;
+            margin: 0;
+            font-weight: 400;
         }
 
-        /* Shop Controls */
-        .shop-controls {
+        /* ── Products section ── */
+        .products-section {
             max-width: 1200px;
-            margin: 0 auto 2rem;
+            margin: 3rem auto;
             padding: 0 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            justify-content: space-between;
         }
 
-        .search-box {
-            flex: 1;
-            min-width: 300px;
-            position: relative;
+        .section-heading {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            border: 2px solid var(--border-light);
-            border-radius: 8px;
+        .section-heading h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0 0 0.4rem;
+        }
+
+        .section-heading p {
+            color: #64748b;
+            margin: 0;
             font-size: 1rem;
-            transition: all 0.3s ease;
         }
 
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        .filter-controls {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-select {
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 8px;
-            background: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-        }
-
-        .sort-controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .sort-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* Products Grid */
-        .products-grid {
+        #products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            padding: 0 2rem;
-            max-width: 1200px;
-            margin: 0 auto 4rem;
         }
 
+        /* ── Product card ── */
         .product-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            padding: 1.75rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.13);
         }
 
-        .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: contain;
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            background: #f8f9fa;
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--teal);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
 
         .product-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--primary-blue);
-        }
-
-        .product-description {
-            color: #666;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .product-features {
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-        }
-
-        .feature-list li:before {
-            content: "✓";
-            color: var(--accent-teal);
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        .pricing-section {
-            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0 0 0.4rem;
         }
 
         .base-price {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary-blue);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--blue);
         }
 
-        .purchasing-options {
-            margin-bottom: 1.5rem;
+        /* ── Use cases section ── */
+        .use-cases-section {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 3.5rem 2rem;
         }
 
-        .purchasing-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        .use-cases-inner {
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        .purchasing-option:hover {
-            background-color: #f8f9fa;
-        }
-
-        .purchasing-option input {
-            margin-right: 0.5rem;
-        }
-
-        .option-label {
-            font-weight: 500;
-        }
-
-        .option-description {
-            font-size: 0.9rem;
-            color: #666;
-            margin-left: 0.5rem;
-        }
-
-        .quantity-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .quantity-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .quantity-select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .quantity-select:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-
-        .price-display {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 6px;
+        .use-cases-inner h2 {
             text-align: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0 0 0.5rem;
         }
 
-        .calculated-price {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary-blue);
+        .use-cases-inner .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            margin: 0 0 2.5rem;
         }
 
-        .discount-badge {
-            background: var(--accent-teal);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-left: 0.5rem;
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.25rem;
         }
 
-        .add-to-cart-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        .use-case-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .add-to-cart-btn:hover {
-            background: var(--secondary-blue);
+        .use-case-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 4px 16px rgba(20,184,166,0.12);
         }
 
-        .customization-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent-teal);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 1rem;
+        .use-case-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-        .customization-btn:hover {
-            background: #1a9c8c;
-        }
-
-        .bulk-pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
+        .use-case-label {
             font-size: 0.9rem;
-        }
-
-        .bulk-pricing-table th,
-        .bulk-pricing-table td {
-            padding: 0.5rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .bulk-pricing-table th {
             font-weight: 600;
-            background: #f8f9fa;
+            color: var(--navy);
         }
 
-        /* 3D Customization Modal Styles */
-        .customization-modal {
+        /* ── Modal ── */
+        .bb-modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 9000;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
-            padding: 20px;
+            padding: 1rem;
         }
 
-        .customization-modal-content {
+        .bb-modal {
             background: white;
             border-radius: 16px;
-            max-width: 1000px;
             width: 100%;
+            max-width: 840px;
             max-height: 90vh;
             overflow-y: auto;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .customization-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @media (max-width: 640px) {
+            .bb-modal { flex-direction: column; }
         }
 
-        .customization-header h3 {
-            margin: 0;
-            color: var(--primary-blue);
-            font-size: 1.5rem;
-        }
-
-        .close-customization {
+        .bb-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             background: none;
             border: none;
             font-size: 1.5rem;
+            color: #64748b;
             cursor: pointer;
-            color: var(--text-secondary);
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .close-customization:hover {
-            color: var(--text-primary);
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .customization-body {
-            display: flex;
-            flex: 1;
-            min-height: 500px;
-        }
-
-        .customization-preview {
-            flex: 1;
-            background: #f8f9fa;
+            z-index: 10;
+            line-height: 1;
+            width: 2rem;
+            height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            border-radius: 50%;
+            transition: background 0.15s;
         }
 
-        .three-d-preview-container {
-            width: 100%;
-            height: 100%;
+        .bb-modal-close:hover {
+            background: #f1f5f9;
+            color: var(--navy);
+        }
+
+        .bb-modal-visual {
+            width: 320px;
+            min-width: 280px;
+            background: #081422;
+            border-radius: 16px 0 0 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .three-d-placeholder {
-            text-align: center;
-            color: var(--text-secondary);
+        @media (max-width: 640px) {
+            .bb-modal-visual {
+                width: 100%;
+                min-width: unset;
+                height: 220px;
+                border-radius: 16px 16px 0 0;
+            }
         }
 
-        .customization-options {
-            width: 300px;
-            padding: 24px;
-            border-left: 1px solid var(--border-light);
-            overflow-y: auto;
-        }
-
-        .option-group {
-            margin-bottom: 24px;
-        }
-
-        .option-group label {
+        #modal-canvas-3d {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .color-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .color-option:hover {
-            transform: scale(1.1);
-        }
-
-        .color-option.selected {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 2px var(--primary-blue);
-        }
-
-        .customization-select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-light);
+            height: 300px;
+        }
+
+        @media (max-width: 640px) {
+            #modal-canvas-3d { height: 220px; }
+        }
+
+        .bb-modal-body {
+            flex: 1;
+            padding: 2rem 2rem 2rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bb-modal-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0 2.5rem 0.25rem 0;
+        }
+
+        .bb-modal-tagline {
+            color: var(--teal);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 0 0 1rem;
+        }
+
+        .bb-modal-desc {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            margin: 0 0 1rem;
+        }
+
+        .bb-modal-use-cases {
+            margin-bottom: 1.25rem;
+        }
+
+        .bb-modal-use-cases-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 0.4rem;
+        }
+
+        .bb-modal-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .bb-modal-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .bb-modal-price-note {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .bb-modal-qty-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .bb-modal-qty-row label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--navy);
+            white-space: nowrap;
+        }
+
+        .bb-modal-qty-input {
+            width: 90px;
+            padding: 0.55rem 0.75rem;
+            border: 2px solid var(--border);
             border-radius: 8px;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
         }
 
-        .customization-select:focus {
+        .bb-modal-qty-input:focus {
             outline: none;
-            border-color: var(--accent-teal);
+            border-color: var(--teal);
         }
 
-        .file-upload {
-            width: 100%;
-            padding: 12px;
-            border: 2px dashed var(--border-light);
-            border-radius: 8px;
-            background: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload:hover {
-            border-color: var(--accent-teal);
-            background: rgba(32, 201, 151, 0.05);
-        }
-
-        .customization-summary {
-            background: #f8f9fa;
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 24px;
-        }
-
-        .customization-summary h4 {
-            margin: 0 0 12px 0;
-            color: var(--primary-blue);
-        }
-
-        .customization-price {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .customization-footer {
-            padding: 24px;
-            border-top: 1px solid var(--border-light);
+        .bb-modal-actions {
             display: flex;
-            gap: 12px;
-            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: auto;
         }
 
-        .btn-primary {
-            background: var(--primary-blue);
+        .btn-cart {
+            flex: 1;
+            min-width: 130px;
+            padding: 0.85rem 1.25rem;
+            background: var(--blue);
             color: white;
             border: none;
-            padding: 12px 24px;
             border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.2s;
         }
 
-        .btn-primary:hover {
-            background: var(--secondary-blue);
-            transform: translateY(-2px);
-        }
+        .btn-cart:hover { background: #0052a3; }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-light);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: #f8f9fa;
-            color: var(--text-primary);
-        }
-
-        /* Enhanced Product Card Styles */
-        .product-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: var(--accent-teal);
+        .btn-checkout {
+            flex: 1;
+            min-width: 130px;
+            padding: 0.85rem 1.25rem;
+            background: var(--teal);
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
+        .btn-checkout:hover { background: #0ea898; }
 
-        .bulk-pricing-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .bulk-pricing-note {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .shop-hero {
-                padding: 3rem 1rem;
-            }
-
-            .shop-hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .products-grid {
-                grid-template-columns: 1fr;
-                padding: 0 1rem;
-                gap: 1.5rem;
-            }
-
-            .product-card {
-                padding: 1.5rem;
-            }
-
-            .shop-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                min-width: auto;
-            }
-
-            .filter-controls {
-                justify-content: center;
-            }
-
-            .sort-controls {
-                justify-content: center;
-            }
-
-            .customization-body {
-                flex-direction: column;
-            }
-
-            .customization-options {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--border-light);
-            }
-
-            .customization-footer {
-                flex-direction: column;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .shop-controls {
-                padding: 0 1rem;
-            }
-
-            .filter-controls {
-                flex-direction: column;
-            }
-
-            .customization-modal-content {
-                margin: 10px;
-                max-height: 95vh;
-            }
+        /* ── Spin animation for 3D loading ── */
+        @keyframes spin3d {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">
-            <img src="/logo2.webp" alt="Beauty Bite" style="height:44px;width:auto;border-radius:6px;">
-        </a>
-        <ul class="navbar-nav">
-            <li><a href="/" class="nav-link">Home</a></li>
-            <li><a href="/shop" class="nav-link active">Shop</a></li>
-            <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
-            <li><a href="/login" class="nav-link">Login</a></li>
-        </ul>
-        <div class="navbar-actions">
-            <a href="/cart" class="btn btn-ghost btn-sm">Cart</a>
-            <a href="/login" class="btn btn-primary btn-sm">Account</a>
+
+    <!-- Navigation -->
+    <div id="nav-root"></div>
+    <script src="/js/header-init.js"></script>
+
+    <!-- Hero -->
+    <section class="shop-hero">
+        <h1>Shop BeautyBite</h1>
+        <p>Patented Medical-Grade Mouthguards</p>
+    </section>
+
+    <!-- Products -->
+    <section class="products-section">
+        <div class="section-heading">
+            <h2>Choose Your Guard</h2>
+            <p>Click any product to see details and place an order</p>
         </div>
-    </nav>
-
-    <div class="shop-hero">
-        <h1>Shop Products</h1>
-        <p>Three tiers of patented medical-grade mouthguards — from clear bulk wholesale to fully custom 3D-branded. Minimum orders from 50 units.</p>
-    </div>
-
-    <!-- Shop Controls -->
-    <div class="shop-controls">
-        <div class="search-box">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
+        <div id="products-grid">
+            <!-- Rendered by shop-init.js -->
         </div>
+    </section>
 
-        <div class="filter-controls">
-            <select class="filter-select" id="category-filter">
-                <option value="">All Categories</option>
-                <option value="branded">BeautyBite Standard</option>
-                <option value="bulk">Clear Bulk</option>
-                <option value="custom">Custom 3D</option>
-            </select>
-
-            <select class="filter-select" id="price-filter">
-                <option value="">All Prices</option>
-                <option value="0-150">Under $150/unit</option>
-                <option value="150-250">$150 – $250/unit</option>
-                <option value="250+">$250+/unit</option>
-            </select>
-        </div>
-
-        <div class="sort-controls">
-            <span class="sort-label">Sort by:</span>
-            <select class="filter-select" id="sort-select">
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="name">Name A-Z</option>
-                <option value="newest">Newest First</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- 3D Customization Modal -->
-    <div id="customization-modal" class="customization-modal" style="display: none;">
-        <div class="customization-modal-content">
-            <div class="customization-header">
-                <h3>Customize Your 3D Mouthguard</h3>
-                <button class="close-customization" id="close-customization">&times;</button>
-            </div>
-            <div class="customization-body">
-                <div class="customization-preview">
-                    <div id="3d-preview" class="three-d-preview-container">
-                        <div class="three-d-placeholder">
-                            <p>3D Preview Loading...</p>
-                            <p>Customize your design using the options below</p>
-                        </div>
-                    </div>
+    <!-- Use Cases -->
+    <section class="use-cases-section">
+        <div class="use-cases-inner">
+            <h2>Built for Every Sport</h2>
+            <p class="subtitle">From the ring to the rink — premium protection wherever you compete</p>
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <span class="use-case-icon">🥊</span>
+                    <div class="use-case-label">Boxing &amp; MMA</div>
                 </div>
-                <div class="customization-options">
-                    <div class="option-group">
-                        <label>Color</label>
-                        <div class="color-options" id="color-options">
-                            <!-- Color options will be populated dynamically -->
-                        </div>
-                    </div>
-                    <div class="option-group">
-                        <label>Size</label>
-                        <select class="customization-select" id="size-select">
-                            <!-- Size options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="option-group">
-                        <label>Branding</label>
-                        <select class="customization-select" id="branding-select">
-                            <!-- Branding options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="option-group">
-                        <label>Upload Logo</label>
-                        <input type="file" id="logo-upload" accept="image/*" class="file-upload">
-                        <small>Recommended: PNG with transparent background, max 2MB</small>
-                    </div>
-                    <div class="customization-summary">
-                        <h4>Customization Summary</h4>
-                        <div id="customization-details"></div>
-                        <div class="customization-price">
-                            <strong>Total: <span id="customization-total">$79.99</span></strong>
-                        </div>
-                    </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🏀</span>
+                    <div class="use-case-label">Basketball</div>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🏈</span>
+                    <div class="use-case-label">Football</div>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🤼</span>
+                    <div class="use-case-label">Wrestling</div>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🦷</span>
+                    <div class="use-case-label">Dental &amp; Medical</div>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🏆</span>
+                    <div class="use-case-label">Team Sports</div>
                 </div>
             </div>
-            <div class="customization-footer">
-                <button class="btn-secondary" id="cancel-customization">Cancel</button>
-                <button class="btn-primary" id="add-customized-to-cart">Add to Cart</button>
+        </div>
+    </section>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="bb-modal-overlay" style="display:none;">
+        <div class="bb-modal">
+            <button class="bb-modal-close" onclick="closeProductModal()" aria-label="Close">&times;</button>
+
+            <!-- 3D Visual -->
+            <div class="bb-modal-visual">
+                <canvas id="modal-canvas-3d"></canvas>
+            </div>
+
+            <!-- Details -->
+            <div class="bb-modal-body">
+                <h2 class="bb-modal-name" id="modal-product-name"></h2>
+                <p class="bb-modal-tagline" id="modal-product-tagline"></p>
+                <p class="bb-modal-desc" id="modal-product-desc"></p>
+
+                <div class="bb-modal-use-cases">
+                    <div class="bb-modal-use-cases-label">Use Cases</div>
+                    <div id="modal-use-cases"></div>
+                </div>
+
+                <div class="bb-modal-price-row">
+                    <span class="bb-modal-price" id="modal-product-price"></span>
+                    <span class="bb-modal-price-note">/ unit</span>
+                </div>
+
+                <div class="bb-modal-qty-row">
+                    <label for="modal-qty">Quantity</label>
+                    <input type="number" id="modal-qty" class="bb-modal-qty-input" value="1" min="1" max="10000">
+                </div>
+
+                <div class="bb-modal-actions">
+                    <button class="btn-cart" id="modal-btn-cart">Add to Cart</button>
+                    <button class="btn-checkout" id="modal-btn-checkout">Checkout Now</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="products-grid" id="products-grid">
-        <!-- Products will be dynamically loaded here -->
-    </div>
-
-    <!-- Cart Drawer -->
-    <div id="cart-drawer" class="cart-drawer" style="
-        position: fixed;
-        top: 0;
-        right: -400px;
-        width: 400px;
-        height: 100vh;
-        background: white;
-        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        transition: right 0.3s ease;
-        display: flex;
-        flex-direction: column;
-    ">
-        <div class="cart-header" style="
-            padding: 1.5rem;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        ">
-            <h3 style="margin: 0; color: var(--primary-blue);">Your Cart</h3>
-            <button class="close-cart" id="close-cart" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #666;
-            ">&times;</button>
-        </div>
-        <div class="cart-content" id="cart-content" style="
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        ">
-            <!-- Cart items will be dynamically loaded here -->
-        </div>
-        <div class="cart-footer" style="
-            padding: 1.5rem;
-            border-top: 1px solid #f0f0f0;
-            background: #f8f9fa;
-        ">
-            <div class="cart-totals" style="margin-bottom: 1rem;">
-                <div class="total-line" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Subtotal:</span>
-                    <span id="cart-subtotal">$0.00</span>
-                </div>
-                <div class="total-line" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Tax:</span>
-                    <span id="cart-tax">$0.00</span>
-                </div>
-                <div class="total-line" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Shipping:</span>
-                    <span id="cart-shipping">$0.00</span>
-                </div>
-                <div class="total-line total"
-                    style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 2px solid #e0e0e0;">
-                    <span>Total:</span>
-                    <span id="cart-total">$0.00</span>
-                </div>
-            </div>
-            <button class="checkout-btn" id="checkout-btn" style="
-                width: 100%;
-                padding: 1rem;
-                background: var(--primary-blue);
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                margin-bottom: 0.5rem;
-                transition: background-color 0.2s;
-            ">Proceed to Checkout</button>
-            <button class="clear-cart-btn" id="clear-cart-btn" style="
-                width: 100%;
-                padding: 0.75rem;
-                background: transparent;
-                color: #666;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: all 0.2s;
-            ">Clear Cart</button>
-        </div>
-    </div>
-
-    <style>
-        .cart-drawer.open {
-            right: 0 !important;
-        }
-
-        .cart-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            align-items: flex-start;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .item-image img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            border-radius: 8px;
-            background: #f8f9fa;
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-details h4 {
-            margin: 0 0 0.5rem 0;
-            color: var(--primary-blue);
-            font-size: 1rem;
-        }
-
-        .item-details p {
-            margin: 0.25rem 0;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .item-price {
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-
-        .item-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .remove-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background-color 0.2s;
-        }
-
-        .remove-btn:hover {
-            background: #ff3742;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
-        }
-
-        .empty-cart p {
-            margin: 0.5rem 0;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .quantity-btn {
-            width: 28px;
-            height: 28px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .quantity-btn:hover:not(:disabled) {
-            background: var(--primary-blue);
-            color: white;
-            border-color: var(--primary-blue);
-        }
-
-        .quantity-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .quantity-display {
-            min-width: 30px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .customization {
-            font-style: italic;
-            color: var(--accent-teal);
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 768px) {
-            .cart-drawer {
-                width: 100% !important;
-                right: -100% !important;
-            }
-        }
-    </style>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <h2 class="site-title">BeautyBite</h2>
-                </div>
-                <div class="footer-text">
-                    <p>&copy; 2025 BeautyBite. Innovative medical devices ensuring patient safety and treatment
-                        efficiency.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <style>
-        @keyframes spin3d { to { transform: rotate(360deg); } }
-    </style>
-    <!-- Three.js for 3D product viewers -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <!-- JavaScript Files -->
+    <!-- Scripts: Three.js from jsdelivr only -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="/js/products.js"></script>
     <script src="/js/cartUtils.js"></script>
-    <script src="/js/shop.js"></script>
     <script src="/js/shop-init.js"></script>
+
     <script>
-        // Load header
-        fetch('header.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('header-container').innerHTML = html;
+        // Track active product id in modal
+        let _modalProductId = null;
 
-                // Load header initializer script so event listeners are attached correctly
-                const s = document.createElement('script');
-                s.src = 'js/header-init.js';
-                s.onload = () => {
-                    // header-init.js will initialize the header UI (modals, auth links)
-                    if (typeof initHeader === 'function') {
-                        try { initHeader(); } catch (e) { console.warn(e); }
-                    }
-                    // Setup cart icon functionality after header is initialized
-                    try { setupCartIcon(); } catch (e) { console.warn('setupCartIcon error', e); }
-                };
-                s.onerror = (err) => console.error('Failed to load header-init.js', err);
-                document.body.appendChild(s);
-            })
-            .catch(error => console.error('Error loading header:', error));
+        function openProductModal(productId) {
+            const product = window.productCatalog && window.productCatalog.getProduct(productId);
+            if (!product) return;
 
-        // Global functions for product interactions
-        function addToCart(productId) {
-            const quantitySelect = document.getElementById(`quantity-${productId}`);
-            const purchasingOption = document.querySelector(`#purchasing-options-${productId} input[type="radio"]:checked`).value;
-            const quantity = parseInt(quantitySelect.value);
+            _modalProductId = productId;
 
-            try {
-                if (window.CartManager) {
-                    window.CartManager.addToCart(productId, quantity, purchasingOption);
-                    showNotification('Product added to cart!', 'success');
-                } else {
-                    showNotification('Cart system is not available', 'error');
+            const modal = document.getElementById('product-modal');
+            document.getElementById('modal-product-name').textContent = product.name;
+            document.getElementById('modal-product-tagline').textContent = product.tagline || '';
+            document.getElementById('modal-product-desc').textContent = product.description;
+            document.getElementById('modal-product-price').textContent = '$' + product.basePrice;
+
+            const chips = document.getElementById('modal-use-cases');
+            if (chips) {
+                chips.innerHTML = (product.useCases || []).map(u =>
+                    `<span style="background:#EEF6FA;color:#1B2D3E;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.8rem;font-weight:500;margin:0.2rem;display:inline-block;">${u}</span>`
+                ).join('');
+            }
+
+            // Reset quantity input bounds
+            const qtyInput = document.getElementById('modal-qty');
+            if (qtyInput) {
+                qtyInput.value = product.minQuantity || 1;
+                qtyInput.min = product.minQuantity || 1;
+                qtyInput.max = product.maxQuantity || 10000;
+            }
+
+            // Wire cart/checkout buttons
+            document.getElementById('modal-btn-cart').onclick = function() {
+                if (typeof addToCart === 'function') {
+                    const qty = parseInt(document.getElementById('modal-qty').value) || 1;
+                    addToCart(_modalProductId, qty);
                 }
-            } catch (error) {
-                showNotification(error.message, 'error');
+            };
+            document.getElementById('modal-btn-checkout').onclick = function() {
+                const qty = parseInt(document.getElementById('modal-qty').value) || 1;
+                window.location.href = '/checkout.html?product=' + _modalProductId + '&qty=' + qty;
+            };
+
+            modal.style.display = 'flex';
+
+            // Init 3D in modal canvas
+            if (typeof initModalCanvas === 'function') {
+                initModalCanvas(productId);
             }
         }
 
-        function startCustomization(productId) {
-            // Show 3D customization modal
-            const modal = document.getElementById('customization-modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                initializeCustomization(productId);
-            }
+        function closeProductModal() {
+            document.getElementById('product-modal').style.display = 'none';
+            _modalProductId = null;
         }
 
-        function initializeCustomization(productId) {
-            // Initialize color options
-            const colorOptions = document.getElementById('color-options');
-            if (colorOptions) {
-                const colors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#34495e'];
-                const colorNames = ['Blue', 'Green', 'Red', 'Orange', 'Purple', 'Dark Gray'];
-
-                colorOptions.innerHTML = colors.map((color, index) => `
-                    <div class="color-option" style="background-color: ${color};"
-                         data-color="${colorNames[index]}"
-                         onclick="selectColor(this, '${colorNames[index]}')"></div>
-                `).join('');
-
-                // Select first color by default
-                if (colorOptions.firstChild) {
-                    selectColor(colorOptions.firstChild, colorNames[0]);
-                }
-            }
-
-            // Initialize size options
-            const sizeSelect = document.getElementById('size-select');
-            if (sizeSelect) {
-                const sizes = ['Adult Small', 'Adult Medium', 'Adult Large', 'Youth Small', 'Youth Medium'];
-                sizeSelect.innerHTML = sizes.map(size => `<option value="${size}">${size}</option>`).join('');
-                updateCustomizationSummary();
-            }
-
-            // Initialize branding options
-            const brandingSelect = document.getElementById('branding-select');
-            if (brandingSelect) {
-                const brandingOptions = ['No Branding', 'Logo Placement', 'Text Only', 'Logo + Text'];
-                brandingSelect.innerHTML = brandingOptions.map(option => `<option value="${option}">${option}</option>`).join('');
-                updateCustomizationSummary();
-            }
-
-            // Setup file upload
-            const logoUpload = document.getElementById('logo-upload');
-            if (logoUpload) {
-                logoUpload.addEventListener('change', function (e) {
-                    if (e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        if (file.size > 2 * 1024 * 1024) {
-                            showNotification('File size must be less than 2MB', 'error');
-                            e.target.value = '';
-                        } else {
-                            updateCustomizationSummary();
-                        }
-                    }
-                });
-            }
-
-            // Setup modal controls
-            setupCustomizationModal();
-        }
-
-        function selectColor(element, colorName) {
-            // Remove selected class from all color options
-            document.querySelectorAll('.color-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-
-            // Add selected class to clicked option
-            element.classList.add('selected');
-            updateCustomizationSummary();
-        }
-
-        function updateCustomizationSummary() {
-            const colorElement = document.querySelector('.color-option.selected');
-            const sizeSelect = document.getElementById('size-select');
-            const brandingSelect = document.getElementById('branding-select');
-            const logoUpload = document.getElementById('logo-upload');
-
-            const color = colorElement ? colorElement.getAttribute('data-color') : 'Blue';
-            const size = sizeSelect ? sizeSelect.value : 'Adult Medium';
-            const branding = brandingSelect ? brandingSelect.value : 'No Branding';
-            const hasLogo = logoUpload ? logoUpload.files.length > 0 : false;
-
-            const detailsElement = document.getElementById('customization-details');
-            if (detailsElement) {
-                detailsElement.innerHTML = `
-                    <p><strong>Color:</strong> ${color}</p>
-                    <p><strong>Size:</strong> ${size}</p>
-                    <p><strong>Branding:</strong> ${branding}</p>
-                    ${hasLogo ? '<p><strong>Logo:</strong> Uploaded</p>' : ''}
-                `;
-            }
-
-            // Update price (base price + customization fees)
-            let price = 79.99; // Base price for custom 3D
-            if (branding !== 'No Branding') price += 10;
-            if (hasLogo) price += 15;
-
-            const totalElement = document.getElementById('customization-total');
-            if (totalElement) {
-                totalElement.textContent = `$${price.toFixed(2)}`;
-            }
-        }
-
-        function setupCustomizationModal() {
-            // Close button
-            const closeBtn = document.getElementById('close-customization');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function () {
-                    const modal = document.getElementById('customization-modal');
-                    modal.style.display = 'none';
-                });
-            }
-
-            // Cancel button
-            const cancelBtn = document.getElementById('cancel-customization');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function () {
-                    const modal = document.getElementById('customization-modal');
-                    modal.style.display = 'none';
-                });
-            }
-
-            // Add to cart button
-            const addBtn = document.getElementById('add-customized-to-cart');
-            if (addBtn) {
-                addBtn.addEventListener('click', function () {
-                    const colorElement = document.querySelector('.color-option.selected');
-                    const sizeSelect = document.getElementById('size-select');
-                    const brandingSelect = document.getElementById('branding-select');
-                    const logoUpload = document.getElementById('logo-upload');
-
-                    const customization = {
-                        color: colorElement ? colorElement.getAttribute('data-color') : 'Blue',
-                        size: sizeSelect ? sizeSelect.value : 'Adult Medium',
-                        branding: brandingSelect ? brandingSelect.value : 'No Branding',
-                        hasLogo: logoUpload ? logoUpload.files.length > 0 : false
-                    };
-
-                    try {
-                        if (window.CartManager) {
-                            window.CartManager.addToCart('custom-3d', 1, 'oneTime', customization);
-                            showNotification('Custom product added to cart!', 'success');
-
-                            // Close modal
-                            const modal = document.getElementById('customization-modal');
-                            modal.style.display = 'none';
-                        } else {
-                            showNotification('Cart system is not available', 'error');
-                        }
-                    } catch (error) {
-                        showNotification(error.message, 'error');
-                    }
-                });
-            }
-
-            // Update summary when options change
-            const sizeSelect = document.getElementById('size-select');
-            const brandingSelect = document.getElementById('branding-select');
-
-            if (sizeSelect) {
-                sizeSelect.addEventListener('change', updateCustomizationSummary);
-            }
-            if (brandingSelect) {
-                brandingSelect.addEventListener('change', updateCustomizationSummary);
-            }
-        }
-
-        function setupCartIcon() {
-            const cartIcon = document.getElementById('cart-icon');
-            if (cartIcon) {
-                cartIcon.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (window.CartManager) {
-                        window.CartManager.toggleCartDrawer();
-                    }
-                });
-            }
-        }
-
-        function setupCartFunctionality() {
-            const closeCart = document.getElementById('close-cart');
-            const checkoutBtn = document.getElementById('checkout-btn');
-            const clearCartBtn = document.getElementById('clear-cart-btn');
-
-            if (closeCart) {
-                closeCart.addEventListener('click', function () {
-                    if (window.CartManager) {
-                        window.CartManager.closeCartDrawer();
-                    }
-                });
-            }
-
-            if (checkoutBtn) {
-                checkoutBtn.addEventListener('click', function () {
-                    if (window.CartManager) {
-                        window.CartManager.proceedToCheckout();
-                    }
-                });
-            }
-
-            if (clearCartBtn) {
-                clearCartBtn.addEventListener('click', function () {
-                    if (confirm('Are you sure you want to clear your entire cart?')) {
-                        if (window.CartManager) {
-                            window.CartManager.clearCart();
-                        }
-                    }
-                });
-            }
-
-            // Listen for cart updates to refresh drawer
-            document.addEventListener('cartUpdated', function () {
-                if (window.CartManager) {
-                    window.CartManager.updateCartCount();
-                    updateCartTotals();
-                    showCartItems();
-                }
-            });
-        }
-
-        function updateCartTotals() {
-            // This function is called when cart is updated
-            if (window.CartManager) {
-                const summary = window.CartManager.getCartSummary();
-                const subtotalElement = document.getElementById('cart-subtotal');
-                const taxElement = document.getElementById('cart-tax');
-                const shippingElement = document.getElementById('cart-shipping');
-                const totalElement = document.getElementById('cart-total');
-
-                if (subtotalElement) subtotalElement.textContent = `$${summary.subtotal.toFixed(2)}`;
-                if (taxElement) taxElement.textContent = `$${summary.tax.toFixed(2)}`;
-                if (shippingElement) shippingElement.textContent = summary.shipping === 0 ? 'FREE' : `$${summary.shipping.toFixed(2)}`;
-                if (totalElement) totalElement.textContent = `$${summary.total.toFixed(2)}`;
-            }
-        }
-
-        function showCartItems() {
-            const cartContent = document.getElementById('cart-content');
-            if (!cartContent || !window.CartManager) return;
-
-            const summary = window.CartManager.getCartSummary();
-
-            if (summary.items.length === 0) {
-                cartContent.innerHTML = `
-                    <div class="empty-cart">
-                        <p>Your cart is empty</p>
-                        <p>Add some products to get started!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            cartContent.innerHTML = summary.items.map((item, index) => `
-                <div class="cart-item">
-                    <div class="item-image">
-                        <img src="${window.cartUtils.getProductImage(item.productId)}" alt="${item.productName}">
-                    </div>
-                    <div class="item-details">
-                        <h4>${item.productName}</h4>
-                        <p class="item-price">$${item.priceInfo.subtotal.toFixed(2)}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        ${item.customization && Object.keys(item.customization).length > 0 ?
-                    `<p class="customization">Custom: ${Object.values(item.customization).join(', ')}</p>` : ''}
-                        <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="updateCartQuantity(${index}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
-                            <span class="quantity-display">${item.quantity}</span>
-                            <button class="quantity-btn" onclick="updateCartQuantity(${index}, ${item.quantity + 1})">+</button>
-                        </div>
-                    </div>
-                    <div class="item-actions">
-                        <button class="remove-btn" onclick="removeCartItem(${index})">Remove</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateCartQuantity(index, newQuantity) {
-            if (newQuantity < 1) {
-                removeCartItem(index);
-                return;
-            }
-
-            try {
-                if (window.CartManager) {
-                    window.CartManager.updateQuantity(index, newQuantity);
-                }
-            } catch (error) {
-                showNotification(error.message, 'error');
-            }
-        }
-
-        function removeCartItem(index) {
-            try {
-                if (window.CartManager) {
-                    window.CartManager.removeFromCart(index);
-                    showNotification('Item removed from cart', 'success');
-                }
-            } catch (error) {
-                showNotification(error.message, 'error');
-            }
-        }
-
-        function updateCartItemCount() {
-            if (window.CartManager) {
-                window.CartManager.updateCartCount();
-            }
-        }
-
-        function updateCartSubtotal() {
-            updateCartTotals();
-        }
-
-        function showNotification(message, type) {
-            // Create and show a simple notification
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 1rem 2rem;
-                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-                color: white;
-                border-radius: 6px;
-                z-index: 1000;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            `;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            // Setup cart functionality
-            setupCartFunctionality();
-
-            // Ensure cart is initialized
-            if (window.CartManager) {
-                window.CartManager.updateCartCount();
-                updateCartTotals();
-                showCartItems();
-            }
+        document.getElementById('product-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeProductModal();
         });
     </script>
-</body>
 
+</body>
 </html>
