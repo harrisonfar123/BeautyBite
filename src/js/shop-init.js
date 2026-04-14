@@ -101,14 +101,15 @@
     const TIER_CONFIGS = {
         'clear-bulk': {
             bgColor: 0x0a1929,
-            makeMat: () => new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color(0xb8e4ff),
-                roughness: 0.05, metalness: 0.0,
-                clearcoat: 0.8, clearcoatRoughness: 0.1,
-                transparent: true, opacity: 0.85,
+            makeMat: () => new THREE.MeshStandardMaterial({
+                color: new THREE.Color(0x88ccff),
+                roughness: 0.15,
+                metalness: 0.0,
+                transparent: true,
+                opacity: 0.88,
                 side: THREE.DoubleSide,
-                emissive: new THREE.Color(0x1a4060),
-                emissiveIntensity: 0.4
+                emissive: new THREE.Color(0x1a4a70),
+                emissiveIntensity: 0.5
             }),
             lights: [
                 ['ambient',0xd0e8ff,3.3],
@@ -329,8 +330,8 @@
                 failIfMajorPerformanceCaveat: false
             });
             window._modalRenderer.outputEncoding = THREE.sRGBEncoding;
-            window._modalRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-            window._modalRenderer.toneMappingExposure = 1.2;
+            window._modalRenderer.toneMapping = THREE.NoToneMapping;
+            window._modalRenderer.toneMappingExposure = 1.8;
 
             const scene = buildScene(cfg);
             const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);

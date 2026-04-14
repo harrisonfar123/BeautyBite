@@ -574,8 +574,8 @@
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1;
+        renderer.toneMapping = THREE.NoToneMapping;
+        renderer.toneMappingExposure = 1.8;
 
         // Lights
         const ambient = new THREE.AmbientLight(0xffffff, 2.0);
@@ -662,8 +662,8 @@
                     mat = new THREE.MeshPhysicalMaterial({
                         color, roughness: 0.05, metalness: 0.0,
                         clearcoat: 0.8, clearcoatRoughness: 0.1,
-                        emissive: color.clone().multiplyScalar(0.15),
-                        emissiveIntensity: 1.0
+                        emissive: new THREE.Color(state.color),
+                        emissiveIntensity: 0.3
                     });
                     break;
                 case 'metallic':

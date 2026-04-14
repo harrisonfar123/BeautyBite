@@ -10,14 +10,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8FAFC;
+        }
+
         .auth-container {
-            max-width: 450px;
+            max-width: 420px;
             margin: 2rem auto;
-            padding: 2rem;
-            background: var(--gradient-2);
-            border-radius: 20px;
-            box-shadow: var(--shadow-3);
-            border: 1px solid var(--accent-teal);
+            padding: 2.5rem;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(27,45,62,0.10);
         }
 
         .auth-header {
@@ -27,13 +31,13 @@
 
         .auth-logo {
             font-family: 'Pacifico', cursive;
-            font-size: 2.5rem;
-            color: var(--primary-blue);
+            font-size: 1.6rem;
+            color: #14B8A6;
             margin-bottom: 0.5rem;
         }
 
         .auth-subtitle {
-            color: var(--text-secondary);
+            color: #1B2D3E;
             font-size: 1.1rem;
         }
 
@@ -106,20 +110,21 @@
 
         .btn-primary {
             width: 100%;
-            padding: 0.875rem 2rem;
-            background: var(--gradient-1);
+            padding: 0.85rem 1.5rem;
+            background: #14B8A6;
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.2s, transform 0.15s;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-2);
+            background: #0ea898;
+            transform: translateY(-1px);
         }
 
         .btn-primary:disabled {

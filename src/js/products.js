@@ -2,47 +2,22 @@
 window.productCatalog = {
     // Product data for all three product types
     products: {
-        'beautybite-branded': {
-            id: 'beautybite-branded',
-            name: 'BeautyBite Branded',
-            tagline: 'Professional protection with our signature look',
-            description: 'Medical-grade mouthguard featuring the BeautyBite brand identity. Perfect for athletes, coaches, and health-conscious individuals who want premium protection without compromise.',
-            basePrice: 200,
-            badge: 'Most Popular',
-            badgeClass: 'badge-tier2',
-            features: [
-                'BeautyBite signature branding',
-                'Medical-grade patented material',
-                'Custom-molded comfort fit',
-                'Professional packaging',
-                'Available in all sport sizes'
-            ],
-            useCases: ['Boxing & MMA', 'Basketball', 'Football', 'Gym & CrossFit', 'General Sports'],
-            type: 'branded',
-            minQuantity: 1,
-            maxQuantity: 10000,
-            quantityStep: 1,
-            purchasingOptions: {
-                oneTime: { label: 'One-time Order', description: 'Single order, no minimums', discount: 0 },
-                subscription: { label: 'Monthly Supply', description: 'Auto-reorder every month, save 10%', discount: 0.10 }
-            }
-        },
         'clear-bulk': {
             id: 'clear-bulk',
-            name: 'Clear Classic',
-            tagline: 'Clean, professional, unbranded',
-            description: 'Crystal-clear medical-grade mouthguard. Sleek, professional look that pairs with any uniform or aesthetic. Ideal for resellers and distributors.',
-            basePrice: 100,
-            badge: 'Best Value',
+            name: 'BeautyBite Standard',
+            tagline: 'Essential protection for electrical facial therapy',
+            description: 'Our standard-grade isolating guard, made from medical-grade EVA. Provides reliable electrical isolation for patients with metal dental work during microcurrent, TENS, and PEMF facial treatments. Clear design, comfortable universal fit.',
+            basePrice: 89,
+            badge: 'Essential',
             badgeClass: 'badge-tier1',
             features: [
-                'Crystal-clear unbranded design',
-                'Medical-grade patented material',
+                'Medical-grade EVA material',
+                'Electrically insulating — safe with implants & fillings',
+                'Universal fit for most adults',
                 'Sterilizable and reusable',
-                'Standard & youth sizing',
-                'Ideal for resale'
+                'Clear, unobtrusive design'
             ],
-            useCases: ['Wrestling', 'Hockey', 'Lacrosse', 'Youth Sports', 'Dental Protection'],
+            useCases: ['Microcurrent Facials', 'TENS Therapy', 'PEMF Treatment', 'Dental Implant Patients', 'Facial Esthetics'],
             type: 'bulk',
             minQuantity: 1,
             maxQuantity: 100000,
@@ -52,22 +27,47 @@ window.productCatalog = {
                 subscription: { label: 'Monthly Supply', description: 'Auto-reorder, save 10%', discount: 0.10 }
             }
         },
+        'beautybite-branded': {
+            id: 'beautybite-branded',
+            name: 'BeautyBite Signature',
+            tagline: 'Premium isolation guard with our signature branding',
+            description: 'Premium medical-grade silicone isolating guard featuring the BeautyBite brand. Designed for med spas and clinics who want to offer a polished, professional patient experience. Superior electrical isolation with enhanced comfort.',
+            basePrice: 149,
+            badge: 'Most Popular',
+            badgeClass: 'badge-tier2',
+            features: [
+                'Premium medical-grade silicone',
+                'Superior electrical isolation rating',
+                'BeautyBite signature branding',
+                'Enhanced comfort — thinner rear wall',
+                'Compatible with all major therapy devices'
+            ],
+            useCases: ['Med Spa Treatments', 'Microcurrent Facials', 'PEMF Therapy', 'Interferential Therapy', 'Wellness Clinics'],
+            type: 'branded',
+            minQuantity: 1,
+            maxQuantity: 10000,
+            quantityStep: 1,
+            purchasingOptions: {
+                oneTime: { label: 'One-time Order', description: 'Single order, no minimums', discount: 0 },
+                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, save 10%', discount: 0.10 }
+            }
+        },
         'custom-branded': {
             id: 'custom-branded',
-            name: 'Custom Design',
-            tagline: 'Your brand, your colors, your identity',
-            description: 'Fully custom mouthguard built with our 3D design studio. Upload your logo, choose colors and materials, and create protection that is unmistakably yours.',
-            basePrice: 300,
+            name: 'BeautyBite Custom',
+            tagline: 'Your brand on a patented therapy device',
+            description: 'Fully custom-branded isolating guard built with our 3D design studio. Upload your clinic logo, choose your brand colors, and create a premium patient experience that is unmistakably yours. Ideal for med spas and therapy clinics.',
+            basePrice: 249,
             badge: 'Premium',
             badgeClass: 'badge-tier3',
             features: [
                 'Full custom logo & brand colors',
                 'Interactive 3D design studio',
-                'Matte, glossy, or metallic finish',
-                'Custom text engraving',
+                'Matching your clinic identity',
+                'Medical-grade silicone or EVA',
                 'Design saved to your account'
             ],
-            useCases: ['Team Branding', 'Gym Identity', 'Merchandise', 'Sponsorship Gear', 'Limited Editions'],
+            useCases: ['Clinic Branding', 'Med Spa Identity', 'Patient Gifting', 'Treatment Packages', 'Referral Programs'],
             type: 'custom',
             minQuantity: 1,
             maxQuantity: 5000,
