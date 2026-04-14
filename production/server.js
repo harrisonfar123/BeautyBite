@@ -38,7 +38,7 @@ async function logOrder(orderData) {
         ]);
 
         const orderLog = result.rows[0];
-        console.log(`✅ Order logged: ${orderType} - ${productType} - $${amount} (Log ID: ${orderLog.id})`);
+        console.log(`Order logged: ${orderType} - ${productType} - $${amount} (Log ID: ${orderLog.id})`);
 
         // Send confirmation email (skip if email not configured)
         try {
@@ -49,15 +49,15 @@ async function logOrder(orderData) {
                     [orderLog.id]
                 );
             } else {
-                console.log('⚠️  Email not configured, skipping email');
+                console.log('Email not configured, skipping email');
             }
         } catch (emailError) {
-            console.error('⚠️  Email sending failed (order still logged):', emailError.message);
+            console.error('Email sending failed (order still logged):', emailError.message);
         }
 
         return orderLog;
     } catch (error) {
-        console.error('❌ Failed to log order:', error);
+        console.error('Failed to log order:', error);
         throw error;
     }
 }
@@ -96,7 +96,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    console.log('✅ Webhook received:', event.type);
+    console.log('Webhook received:', event.type);
 
     // Handle the event
     if (event.type === 'checkout.session.completed') {
@@ -124,7 +124,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
                     session.amount_total / 100,
                     'completed'
                 ]);
-                console.log('✅ Order saved to database');
+                console.log('Order saved to database');
 
             } else if (productType === 'subscription') {
                 // Insert subscription
@@ -143,7 +143,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
                     subscriptionMonths,
                     endDate
                 ]);
-                console.log('✅ Subscription saved to database');
+                console.log('Subscription saved to database');
             }
             // Schedule subscription cancellation after duration from metadata
             if (session.mode === 'subscription' && session.subscription && session.metadata?.subscription_months) {
@@ -155,13 +155,13 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
                         cancel_at: cancelAt
                     });
 
-                    console.log(`✅ Subscription ${session.subscription} scheduled to cancel after ${durationMonths} months`);
+                    console.log(`Subscription ${session.subscription} scheduled to cancel after ${durationMonths} months`);
                 } catch (subError) {
-                    console.error('❌ Failed to schedule subscription cancellation:', subError);
+                    console.error('Failed to schedule subscription cancellation:', subError);
                 }
             }
         } catch (dbError) {
-            console.error('❌ Database error:', dbError);
+            console.error('Database error:', dbError);
         }
     }
 
@@ -493,7 +493,7 @@ app.post('/api/stripe/confirm-payment', authenticateToken, async (req, res) => {
             notes: `One-time purchase of ${quantity} BeautyBite mouthguards`
         });
 
-        console.log('✅ One-time order saved and logged');
+        console.log('One-time order saved and logged');
         res.json({ order: order });
 
     } catch (error) {
@@ -784,8 +784,8 @@ app.post('/api/stripe/confirm-subscription', authenticateToken, async (req, res)
             }
         });
 
-        console.log('✅ Subscription created and logged');
-        console.log('✅ Subscription created:', subscription.rows[0].id);
+        console.log('Subscription created and logged');
+        console.log('Subscription created:', subscription.rows[0].id);
         res.json({ subscription: subscription.rows[0] });
 
     } catch (error) {
@@ -808,7 +808,7 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
             try {
                 // Check if subscription is already complete BEFORE charging
                 if (sub.periods_completed >= sub.total_periods) {
-                    console.log(`✅ Subscription ${sub.id} already complete (${sub.periods_completed}/${sub.total_periods}) - marking as completed`);
+                    console.log(`Subscription ${sub.id} already complete (${sub.periods_completed}/${sub.total_periods}) - marking as completed`);
                     await pool.query(
                         'UPDATE subscriptions SET status = $1, updated_at = NOW() WHERE id = $2',
                         ['completed', sub.id]
@@ -874,14 +874,14 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
                         newPeriodsCompleted
                     ]);
 
-                    console.log(`✅ Charged subscription ${sub.id}: Period ${newPeriodsCompleted}/${sub.total_periods}`);
+                    console.log(`Charged subscription ${sub.id}: Period ${newPeriodsCompleted}/${sub.total_periods}`);
 
                 } else {
-                    console.error(`❌ Payment failed for subscription ${sub.id}`);
+                    console.error(`Payment failed for subscription ${sub.id}`);
                 }
 
             } catch (error) {
-                console.error(`❌ Error processing subscription ${sub.id}:`, error.message);
+                console.error(`Error processing subscription ${sub.id}:`, error.message);
 
                 if (error.code === 'card_declined') {
                     await pool.query(
@@ -892,7 +892,7 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
             }
         }
 
-        console.log('✅ Finished processing subscriptions');
+        console.log('Finished processing subscriptions');
         res.json({ processed: dueSubscriptions.rows.length });
 
     } catch (error) {
@@ -903,7 +903,7 @@ app.post('/api/cron/process-subscriptions', async (req, res) => {
 
 app.post('/api/cron/send-supplier-log', async (req, res) => {
     try {
-        console.log('📧 Sending supplier log...');
+        console.log('Sending supplier log...');
         
         // Query only UNSENT orders (no time limit - sends all pending)
         const ordersResult = await pool.query(
@@ -941,14 +941,14 @@ app.post('/api/cron/send-supplier-log', async (req, res) => {
                 [orderIds]
             );
             
-            console.log(`✅ Marked ${orderIds.length} orders as sent`);
+            console.log(`Marked ${orderIds.length} orders as sent`);
             res.json({
                 success: true,
                 ordersCount: orders.length,
                 orderIds: orderIds
             });
         } else {
-            console.log('ℹ️  No new orders to send in supplier log');
+            console.log('ℹNo new orders to send in supplier log');
             res.json({
                 success: true,
                 ordersCount: 0,
@@ -956,7 +956,7 @@ app.post('/api/cron/send-supplier-log', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('❌ Cron send-supplier-log failed:', error.message);
+        console.error('Cron send-supplier-log failed:', error.message);
         res.status(500).json({
             success: false,
             error: error.message
@@ -1082,7 +1082,7 @@ app.post('/api/orders/custom', async (req, res) => {
             unitPrice
         ]);
 
-        console.log(`✅ Custom order design saved: ID ${designResult.rows[0].id} — qty ${quantity} — ${safeBrandColor}`);
+        console.log(`Custom order design saved: ID ${designResult.rows[0].id} — qty ${quantity} — ${safeBrandColor}`);
 
         res.json({
             success:     true,
@@ -1092,7 +1092,7 @@ app.post('/api/orders/custom', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Custom order recording failed:', error);
+        console.error('Custom order recording failed:', error);
         // Still return 200 so the frontend shows success — payment already completed
         // The order will show up in Stripe dashboard even if our DB write fails
         res.status(500).json({ error: 'Order recorded in Stripe but failed to save design details. Contact support.' });
@@ -1175,5 +1175,5 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`\n🦷  BeautyBite running at http://localhost:${PORT}\n`);
+    console.log(`\nBeautyBite running at http://localhost:${PORT}\n`);
 });

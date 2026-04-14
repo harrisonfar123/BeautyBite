@@ -11,7 +11,7 @@ if (process.env.DATABASE_URL) {
         connectionString: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
     });
-    console.log('✅ PostgreSQL pool initialised (Heroku)');
+    console.log('PostgreSQL pool initialised (Heroku)');
 } else {
     // Local dev: Turso/libSQL wrapper with pg-compatible interface
     const { createClient } = require('@libsql/client');
@@ -19,7 +19,7 @@ if (process.env.DATABASE_URL) {
         url:       process.env.TURSO_DATABASE_URL || 'file:local.db',
         authToken: process.env.TURSO_AUTH_TOKEN,
     });
-    console.log('✅ Turso libSQL client initialised:', process.env.TURSO_DATABASE_URL || 'file:local.db');
+    console.log('Turso libSQL client initialised:', process.env.TURSO_DATABASE_URL || 'file:local.db');
 
     function convertPlaceholders(sql) {
         return sql.replace(/\$(\d+)/g, '?');
@@ -34,7 +34,7 @@ if (process.env.DATABASE_URL) {
                 rowCount: Number(result.rowsAffected ?? result.rows.length),
             };
         } catch (err) {
-            console.error('❌ DB query error:', err.message, '\nSQL:', converted);
+            console.error('DB query error:', err.message, '\nSQL:', converted);
             throw err;
         }
     }
