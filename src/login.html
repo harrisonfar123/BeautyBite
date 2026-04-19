@@ -217,7 +217,7 @@
 
     function showAlert (type, msg) {
         alertBox.className = 'auth-alert show ' + type;
-        alertBox.textContent = msg;
+        alertBox.innerHTML = msg;
     }
     function clearAlert () {
         alertBox.className = 'auth-alert';
@@ -241,6 +241,14 @@
         return;
     }
 
+    // Prefill email if we came from register with ?email=
+    const qEmail = new URLSearchParams(location.search).get('email');
+    if (qEmail) {
+        form.email.value = qEmail;
+        form.password.focus();
+        showAlert('success', `Welcome back — sign in with ${qEmail} below.`);
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         clearAlert();
@@ -249,7 +257,7 @@
         const password = form.password.value;
 
         if (!email || !password) {
-            showAlert('error', 'Please enter both email and password.');
+            showAlert('error', 'Fill in both fields to continue.');
             return;
         }
 
@@ -262,7 +270,11 @@
             });
             const data = await res.json().catch(() => ({}));
 
-            if (!res.ok) throw new Error(data.error || 'Login failed. Please try again.');
+            if (!res.ok) {
+                if (res.status === 401) throw new Error('That combination didn\'t work — check your password, or hit <a href="#" id="forgotInline">Forgot password?</a> below.');
+                if (res.status === 429) throw new Error('Too many sign-in tries. Give it a minute and try again.');
+                throw new Error(data.error || "Couldn't sign you in right now. Try again in a sec.");
+            }
 
             // Store tokens under every key used elsewhere in the app
             if (data.token) {
@@ -278,23 +290,35 @@
             const exp = new Date(Date.now() + 15 * 60 * 1000).toISOString();
             localStorage.setItem('beautybite_token_expiry', exp);
 
-            showAlert('success', 'Signed in — redirecting…');
+            showAlert('success', "You're in — taking you to your dashboard.");
             const next = new URLSearchParams(location.search).get('next') || '/dashboard';
             setTimeout(() => window.location.replace(next), 400);
         } catch (err) {
-            showAlert('error', err.message || 'Login failed.');
+            showAlert('error', err.message || "Couldn't sign you in.");
             setLoading(false);
         }
     });
 
-    forgot.addEventListener('click', (e) => {
-        e.preventDefault();
+    function triggerForgot () {
         const email = form.email.value.trim();
         if (!email) {
-            showAlert('error', 'Enter your email above, then click Forgot password.');
+            showAlert('error', 'Type your email first, then tap Forgot password.');
             return;
         }
-        showAlert('success', `If an account exists for ${email}, a password reset link will be sent shortly.`);
+        showAlert('success', `If ${email} is on file, we'll send a reset link shortly.`);
+    }
+
+    forgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        triggerForgot();
+    });
+
+    // Delegate clicks on the inline "Forgot password?" link that appears inside the 401 alert
+    alertBox.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'forgotInline') {
+            e.preventDefault();
+            triggerForgot();
+        }
     });
 })();
 </script>

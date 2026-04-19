@@ -235,7 +235,10 @@
 
     function showAlert (type, msg) {
         alertBox.className = 'auth-alert show ' + type;
-        alertBox.textContent = msg;
+        alertBox.innerHTML = msg;
+    }
+    function escapeHtml (s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
     }
     function clearAlert () {
         alertBox.className = 'auth-alert';
@@ -295,35 +298,35 @@
         const terms    = form.terms.checked;
 
         if (!name || name.length < 2) {
-            showAlert('error', 'Please enter your full name.');
+            showAlert('error', 'Tell us your name so we know what to call you.');
             return;
         }
         if (!email) {
-            showAlert('error', 'Please enter your email.');
+            showAlert('error', "We'll need your email too.");
             return;
         }
         if (password.length < 12) {
-            showAlert('error', 'Password must be at least 12 characters.');
+            showAlert('error', 'Your password needs at least 12 characters.');
             return;
         }
         if (!/[A-Z]/.test(password)) {
-            showAlert('error', 'Password must contain an uppercase letter.');
+            showAlert('error', 'Add an uppercase letter to your password.');
             return;
         }
         if (!/[a-z]/.test(password)) {
-            showAlert('error', 'Password must contain a lowercase letter.');
+            showAlert('error', 'Add a lowercase letter in there as well.');
             return;
         }
         if (!/[0-9]/.test(password)) {
-            showAlert('error', 'Password must contain a number.');
+            showAlert('error', 'Mix a number into your password.');
             return;
         }
         if (password !== confirm) {
-            showAlert('error', 'Passwords do not match.');
+            showAlert('error', "Those passwords don't match — give it another go.");
             return;
         }
         if (!terms) {
-            showAlert('error', 'Please agree to the Terms of Service to continue.');
+            showAlert('error', 'Tick the Terms box to continue.');
             return;
         }
 
@@ -337,8 +340,14 @@
             const data = await res.json().catch(() => ({}));
 
             if (!res.ok) {
-                if (res.status === 409) throw new Error('An account with that email already exists.');
-                throw new Error(data.error || 'Registration failed. Please try again.');
+                if (res.status === 409) {
+                    const q = escapeHtml(email);
+                    showAlert('error', `Looks like you've been here before — <a href="/login?email=${q}">sign in instead &rarr;</a>`);
+                    setLoading(false);
+                    return;
+                }
+                if (res.status === 429) throw new Error('Too many tries in a row. Give it a minute, then try again.');
+                throw new Error(data.error || "Something went sideways on our end. Try again in a sec.");
             }
 
             if (data.token) {
@@ -354,10 +363,10 @@
             const exp = new Date(Date.now() + 15 * 60 * 1000).toISOString();
             localStorage.setItem('beautybite_token_expiry', exp);
 
-            showAlert('success', 'Account created — redirecting…');
+            showAlert('success', "You're all set — heading to your dashboard.");
             setTimeout(() => window.location.replace('/dashboard'), 500);
         } catch (err) {
-            showAlert('error', err.message || 'Registration failed.');
+            showAlert('error', err.message || "Couldn't finish signing you up. Try again in a sec.");
             setLoading(false);
         }
     });
