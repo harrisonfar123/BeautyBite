@@ -3,905 +3,1137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Studio — BeautyBite Custom Branded</title>
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <title>Design Studio — Beauty Bite</title>
+    <meta name="description" content="Design a clinic-branded Beauty Bite isolation guard in 3D. Pick colours, materials and add your logo — no account needed to start.">
+    <link rel="icon" href="/logo2.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@900&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
     <style>
-        :root {
-            --primary-blue: #0066CC;
-            --secondary-blue: #4DA6FF;
-            --teal: #14B8A6;
-            --teal-dark: #0e9c96;
-            --text-primary: #1a2332;
-            --text-secondary: #64748b;
-            --border-light: #e2e8f0;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
-            --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
+        /* ── Layout frame ─────────────────────────────────────── */
+        body { background: var(--off-white); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        /* Site header is 68px — studio shell fills the rest */
+        nav.navbar { flex-shrink: 0; }
+
+        .studio-shell {
+            flex: 1; display: grid;
+            grid-template-columns: 340px 1fr;
+            min-height: 0;
+            background: var(--off-white);
         }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: #0f1a2e;
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Top bar */
-        .topbar {
-            background: rgba(255,255,255,0.97);
-            border-bottom: 1px solid var(--border-light);
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            flex-shrink: 0;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            z-index: 10;
-        }
-
-        .topbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            text-decoration: none;
-        }
-
-        .topbar-brand img { width: 28px; height: 28px; }
-
-        .topbar-brand-name {
-            font-family: 'Pacifico', cursive;
-            font-size: 1.2rem;
-            color: var(--primary-blue);
-        }
-
-        .topbar-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-
-        .topbar-badge {
-            background: #ccfbf1;
-            color: #0d7a73;
-            padding: 0.2rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        /* Main layout */
-        .studio-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Controls panel */
-        .controls-panel {
-            width: 300px;
-            flex-shrink: 0;
+        /* ── Left: controls panel ─────────────────────────────── */
+        .studio-panel {
             background: white;
-            border-right: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
+            border-right: 1px solid var(--border);
             overflow-y: auto;
+            display: flex; flex-direction: column;
         }
 
-        .panel-section {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-light);
+        .studio-panel-header {
+            padding: 1.75rem 1.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--brand-bg) 0%, #fff 100%);
         }
-
-        .panel-section:last-child { border-bottom: none; }
-
-        .panel-section-title {
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 0.875rem;
+        .studio-kicker {
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--brand-dark); margin-bottom: 0.5rem;
         }
+        .studio-panel-header h1 {
+            font-size: 1.35rem; letter-spacing: -0.01em;
+            color: var(--text-primary); margin-bottom: 0.4rem;
+        }
+        .studio-panel-header p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
 
-        /* Color swatches */
-        .color-swatches {
+        .studio-section {
+            padding: 1.4rem 1.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .studio-section:last-child { border-bottom: none; }
+        .studio-section h3 {
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-secondary); margin-bottom: 0.9rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .studio-section h3 .optional { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--gray-400); font-size: 0.72rem; }
+
+        /* ── Color swatches ──────────────────────────────────── */
+        .swatch-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 0.5rem;
+            gap: 0.45rem;
             margin-bottom: 0.75rem;
         }
-
         .swatch {
-            width: 100%;
             aspect-ratio: 1;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 2px solid transparent;
             cursor: pointer;
-            transition: all 0.15s;
+            position: relative;
+            transition: transform 0.12s, border-color 0.12s;
+            box-shadow: inset 0 0 0 1px rgba(27,45,62,0.07);
         }
-
-        .swatch:hover { transform: scale(1.15); }
-        .swatch.active { border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(0,102,204,0.3); }
-
-        .color-custom-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .swatch:hover { transform: scale(1.08); }
+        .swatch.active {
+            border-color: var(--brand-dark);
+            box-shadow: 0 0 0 2px var(--brand-bg), inset 0 0 0 1px rgba(27,45,62,0.15);
         }
-
-        .color-custom-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            flex: 1;
+        .swatch.active::after {
+            content: ''; position: absolute; top: 4px; right: 4px;
+            width: 6px; height: 6px; border-radius: 50%; background: white;
+            box-shadow: 0 0 0 1.5px var(--brand-dark);
         }
-
-        input[type="color"] {
-            width: 36px;
-            height: 28px;
-            border: 1.5px solid var(--border-light);
-            border-radius: 5px;
-            cursor: pointer;
-            padding: 2px;
-            background: white;
-        }
-
-        /* Material buttons */
-        .material-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-        }
-
-        .material-btn {
-            padding: 0.6rem 0.4rem;
-            border: 1.5px solid var(--border-light);
-            border-radius: var(--radius-md);
-            background: white;
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-
-        .material-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
-        .material-btn.active { border-color: var(--primary-blue); background: #dbeafe; color: var(--primary-blue); font-weight: 600; }
-
-        .material-icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
-
-        /* Text input */
-        .studio-input {
-            width: 100%;
-            padding: 0.65rem 0.875rem;
-            border: 1.5px solid var(--border-light);
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            font-family: inherit;
-            color: var(--text-primary);
-            background: white;
-            transition: border-color 0.2s;
-        }
-
-        .studio-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
-        .studio-input::placeholder { color: #aab; }
-
-        /* Logo upload */
-        .upload-zone {
-            border: 2px dashed var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--gray-50);
-        }
-
-        .upload-zone:hover {
-            border-color: var(--teal);
-            background: #f0fdfb;
-        }
-
-        .upload-zone.has-logo {
-            border-color: var(--teal);
-            background: #f0fdfb;
-        }
-
-        .upload-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.4rem;
-        }
-
-        .upload-text {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-        }
-
-        .upload-text strong { color: var(--teal); }
-
-        #logo-preview {
-            max-width: 80px;
-            max-height: 60px;
-            margin: 0 auto 0.4rem;
-            border-radius: 4px;
-            object-fit: contain;
-        }
-
-        /* Quantity & pricing */
-        .qty-row {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .qty-input {
-            width: 90px;
-            padding: 0.65rem 0.875rem;
-            border: 1.5px solid var(--border-light);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
+        .swatch-brand-label {
+            display: block;
+            font-size: 0.72rem; color: var(--brand-dark);
             font-weight: 600;
-            font-family: inherit;
-            text-align: center;
-            color: var(--text-primary);
+            margin-top: 0.1rem;
         }
 
-        .qty-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
-        .qty-min-hint {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-        }
-
-        .price-summary {
-            background: var(--gray-50);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-top: 0.75rem;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.3rem;
-        }
-
-        .price-total-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            border-top: 1px solid var(--border-light);
+        .color-picker-row {
+            display: flex; align-items: center; gap: 0.6rem;
             padding-top: 0.5rem;
+            border-top: 1px dashed var(--border);
             margin-top: 0.4rem;
         }
-
-        /* Purchase button */
-        .purchase-btn {
-            width: 100%;
-            padding: 0.875rem;
-            background: var(--teal);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 700;
+        .color-picker-row label { flex: 1; font-size: 0.82rem; color: var(--text-secondary); }
+        input[type="color"] {
+            width: 44px; height: 30px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            padding: 2px; background: white;
+        }
+
+        /* ── Finish (material) tabs ──────────────────────────── */
+        .finish-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .finish-btn {
+            padding: 0.7rem 0.5rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: white;
             font-family: inherit;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            font-size: 0.82rem; font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .finish-btn:hover { border-color: var(--brand); color: var(--text-primary); }
+        .finish-btn.active {
+            border-color: var(--brand-dark);
+            background: var(--brand-bg);
+            color: var(--brand-dark);
+            font-weight: 600;
+        }
+        .finish-btn small {
+            display: block; font-size: 0.68rem;
+            color: var(--gray-400); font-weight: 400;
+            margin-top: 0.15rem;
+        }
+        .finish-btn.active small { color: var(--brand-dark); }
+
+        /* ── Text input ──────────────────────────────────────── */
+        .studio-input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.92rem; font-family: inherit;
+            color: var(--text-primary);
+            background: white;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .studio-input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(139,184,204,0.2);
         }
 
-        .purchase-btn:hover:not(:disabled) {
-            background: var(--teal-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(20,184,166,0.35);
+        /* ── Upload ──────────────────────────────────────────── */
+        .upload-zone {
+            border: 1.5px dashed var(--border);
+            border-radius: 10px;
+            padding: 1.1rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: var(--gray-50);
+            transition: all 0.2s;
+        }
+        .upload-zone:hover { border-color: var(--brand); background: var(--brand-bg); }
+        .upload-zone.has-logo { border-color: var(--brand-dark); background: var(--brand-bg); border-style: solid; }
+        .upload-zone svg { display: block; margin: 0 auto 0.4rem; }
+        .upload-zone .upload-hint { font-size: 0.82rem; color: var(--text-secondary); }
+        .upload-zone .upload-hint strong { color: var(--brand-dark); font-weight: 600; }
+        #logo-preview { max-width: 110px; max-height: 54px; margin: 0 auto 0.4rem; object-fit: contain; }
+
+        /* ── Quantity & price ────────────────────────────────── */
+        .qty-row { display: flex; align-items: center; gap: 0.75rem; }
+        .qty-input {
+            width: 110px;
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem; font-weight: 600; font-family: inherit;
+            text-align: center; color: var(--text-primary);
+        }
+        .qty-input:focus {
+            outline: none; border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(139,184,204,0.2);
+        }
+        .qty-hint { font-size: 0.78rem; color: var(--text-secondary); }
+
+        .price-card {
+            margin-top: 0.9rem;
+            background: var(--gray-50);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .price-row {
+            display: flex; justify-content: space-between;
+            font-size: 0.86rem; color: var(--text-secondary);
+            padding: 0.2rem 0;
+        }
+        .price-total {
+            display: flex; justify-content: space-between;
+            font-size: 1rem; font-weight: 700;
+            color: var(--brand-dark);
+            border-top: 1px solid var(--border);
+            margin-top: 0.4rem; padding-top: 0.5rem;
         }
 
-        .purchase-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        /* ── Action buttons ──────────────────────────────────── */
+        .studio-actions {
+            padding: 1.4rem 1.75rem 1.75rem;
+            border-top: 1px solid var(--border);
+            background: #fff;
+            position: sticky; bottom: 0;
+            display: flex; flex-direction: column; gap: 0.6rem;
         }
-
-        .qty-error {
-            font-size: 0.78rem;
-            color: #dc2626;
-            margin-top: 0.35rem;
-            display: none;
+        .studio-btn {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-family: inherit; font-size: 0.95rem; font-weight: 600;
+            cursor: pointer; border: 2px solid transparent;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            transition: var(--transition);
         }
+        .studio-btn-primary { background: var(--brand-dark); color: white; border-color: var(--brand-dark); }
+        .studio-btn-primary:hover:not(:disabled) { background: var(--navy); border-color: var(--navy); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(92,142,166,0.3); }
+        .studio-btn-outline { background: white; color: var(--brand-dark); border-color: var(--brand-dark); }
+        .studio-btn-outline:hover:not(:disabled) { background: var(--brand-bg); }
+        .studio-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .qty-error.visible { display: block; }
+        .studio-status {
+            font-size: 0.78rem; color: var(--text-secondary);
+            text-align: center; line-height: 1.45;
+        }
+        .studio-status.ok  { color: #176c43; }
+        .studio-status.err { color: #b42318; }
 
-        /* 3D Viewport */
-        .viewport {
-            flex: 1;
+        /* studio-topbar removed — using site nav header instead */
+
+        /* ── Right: viewport ─────────────────────────────────── */
+        .studio-viewport {
             position: relative;
+            background: radial-gradient(circle at 50% 35%, #2a435e 0%, #1B2D3E 60%, #0f1a2e 100%);
             overflow: hidden;
         }
-
-        #canvas {
+        #viewer-canvas {
             display: block;
-            width: 100% !important;
-            height: 100% !important;
+            width: 100% !important; height: 100% !important;
+            cursor: grab;
         }
+        #viewer-canvas:active { cursor: grabbing; }
 
-        .viewport-hint {
-            position: absolute;
-            bottom: 1.25rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.55);
+        .viewport-loading {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.75rem;
             color: rgba(255,255,255,0.85);
-            padding: 0.5rem 1.25rem;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(15,26,46,0.85);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.85);
-            gap: 1rem;
+            background: radial-gradient(circle at 50% 40%, #2a435e 0%, #1B2D3E 80%);
+            transition: opacity 0.4s;
             z-index: 5;
         }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: var(--teal);
+        .viewport-loading .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: var(--brand-light);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.9s linear infinite;
+        }
+        .viewport-loading small { font-size: 0.82rem; color: rgba(255,255,255,0.6); }
+        .viewport-loading.hidden { opacity: 0; pointer-events: none; }
+
+        .viewport-hint {
+            position: absolute; left: 50%; bottom: 1.25rem;
+            transform: translateX(-50%);
+            background: rgba(27,45,62,0.6);
+            backdrop-filter: blur(6px);
+            color: rgba(255,255,255,0.85);
+            font-size: 0.78rem;
+            padding: 0.45rem 1.1rem; border-radius: 999px;
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .viewport-chip {
+            position: absolute; top: 1.25rem;
+            background: rgba(27,45,62,0.55);
+            backdrop-filter: blur(6px);
+            color: rgba(255,255,255,0.88);
+            font-size: 0.72rem;
+            padding: 0.4rem 0.9rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.14);
+            letter-spacing: 0.07em; text-transform: uppercase;
+            font-weight: 600;
+        }
+        .viewport-chip-left  { left: 1.25rem; }
+        .viewport-chip-right { right: 1.25rem; display: flex; align-items: center; gap: 0.45rem; }
+        .viewport-chip-right .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-light); animation: pulse 2s infinite; }
 
-        .loading-text { font-size: 0.9rem; }
+        .viewport-label-overlay {
+            position: absolute; inset: 0;
+            pointer-events: none;
+        }
 
-        @media (max-width: 768px) {
-            .studio-layout { flex-direction: column; }
-            .controls-panel { width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid var(--border-light); }
-            .viewport { height: 50vh; }
+        .engraving-preview {
+            position: absolute;
+            left: 50%;
+            bottom: 22%;
+            transform: translateX(-50%);
+            font-family: 'Pacifico', cursive;
+            font-size: clamp(1.1rem, 2.4vw, 1.8rem);
+            color: rgba(255,255,255,0.95);
+            text-shadow: 0 2px 14px rgba(0,0,0,0.55), 0 0 2px rgba(0,0,0,0.5);
+            pointer-events: none;
+            white-space: nowrap;
+            max-width: 70%;
+            overflow: hidden; text-overflow: ellipsis;
+            letter-spacing: 0.02em;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .engraving-preview.visible { opacity: 1; }
+
+        .logo-overlay {
+            position: absolute;
+            left: 50%; bottom: 32%;
+            transform: translateX(-50%);
+            max-width: 90px; max-height: 50px;
+            opacity: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.45));
+            transition: opacity 0.2s;
+        }
+        .logo-overlay.visible { opacity: 0.88; }
+
+        @keyframes spin  { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+        /* ── Save modal ──────────────────────────────────────── */
+        .bb-modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(15,26,46,0.68);
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 400; padding: 1rem;
+            backdrop-filter: blur(3px);
+        }
+        .bb-modal-backdrop.visible { display: flex; }
+        .bb-modal {
+            background: white; border-radius: 20px;
+            max-width: 440px; width: 100%;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .bb-modal-header {
+            padding: 1.5rem 1.75rem 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .bb-modal-header h3 { font-size: 1.15rem; }
+        .bb-modal-header p { font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.35rem; line-height: 1.55; }
+        .bb-modal-body { padding: 1.25rem 1.75rem; }
+        .bb-modal-footer {
+            padding: 1rem 1.75rem 1.5rem;
+            display: flex; gap: 0.6rem; justify-content: flex-end;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        /* ── Font picker ──────────────────────────────────────── */
+        .font-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+        .font-btn {
+            padding: 0.38rem 0.8rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.88rem; font-weight: 500;
+            cursor: pointer; transition: all 0.12s;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .font-btn:hover { border-color: var(--brand); }
+        .font-btn.active { border-color: var(--brand-dark); background: var(--brand-bg); color: var(--brand-dark); }
+
+        /* ── Text options row (color + size) ─────────────────── */
+        .text-opts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.65rem; }
+        .text-opt-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.3rem; display: block; }
+
+        /* ── Range sliders ───────────────────────────────────── */
+        .range-row { display: flex; align-items: center; gap: 0.5rem; }
+        .range-row input[type=range] {
+            flex: 1; -webkit-appearance: none; height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(to right, var(--brand-dark) 0%, var(--brand-dark) var(--pct, 50%), var(--border) var(--pct, 50%), var(--border) 100%);
+            cursor: pointer;
+        }
+        .range-row input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: var(--brand-dark); border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
+        }
+        .range-val { font-size: 0.75rem; font-weight: 600; color: var(--brand-dark); min-width: 30px; text-align: right; }
+
+        /* ── Logo controls ───────────────────────────────────── */
+        .logo-controls { margin-top: 0.75rem; display: none; }
+        .logo-controls.visible { display: block; }
+        .logo-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; }
+
+        @media (max-width: 920px) {
             body { overflow: auto; height: auto; }
+            .studio-shell {
+                grid-template-columns: 1fr;
+                grid-template-rows: 45vh auto;
+            }
+            .studio-panel { order: 2; }
+            .studio-viewport { order: 1; height: 45vh; }
+            .studio-actions { position: static; }
         }
     </style>
 </head>
 <body>
 
-<!-- Top bar -->
-<div class="topbar">
-    <a href="/shop" style="font-size:0.8rem;color:var(--text-secondary);text-decoration:none;">← Shop</a>
-    <a href="/" class="topbar-brand">
-        <img src="/logo2.webp" alt="Beauty Bite" style="height:36px;width:auto;border-radius:8px;">
-    </a>
-    <span class="topbar-badge">Custom Design Studio</span>
-</div>
+<!-- Site header — built by header-init.js -->
+<nav class="navbar"></nav>
 
-<!-- Main layout -->
-<div class="studio-layout">
+<!-- Shell -->
+<div class="studio-shell">
 
-    <!-- Controls panel -->
-    <div class="controls-panel">
+    <!-- Controls -->
+    <aside class="studio-panel">
 
-        <!-- Brand color -->
-        <div class="panel-section">
-            <div class="panel-section-title">Brand Color</div>
-            <div class="color-swatches" id="swatches">
-                <div class="swatch" style="background:#ffffff;" data-color="#ffffff" title="White"></div>
-                <div class="swatch" style="background:#000000;" data-color="#000000" title="Black"></div>
-                <div class="swatch active" style="background:#0066CC;" data-color="#0066CC" title="Royal Blue"></div>
-                <div class="swatch" style="background:#14B8A6;" data-color="#14B8A6" title="Teal"></div>
-                <div class="swatch" style="background:#e11d48;" data-color="#e11d48" title="Red"></div>
-                <div class="swatch" style="background:#f59e0b;" data-color="#f59e0b" title="Amber"></div>
-                <div class="swatch" style="background:#16a34a;" data-color="#16a34a" title="Green"></div>
-                <div class="swatch" style="background:#7c3aed;" data-color="#7c3aed" title="Purple"></div>
-                <div class="swatch" style="background:#1e293b;" data-color="#1e293b" title="Dark Navy"></div>
-                <div class="swatch" style="background:#f1f5f9;" data-color="#f1f5f9" title="Light Gray"></div>
-                <div class="swatch" style="background:#fce7f3;" data-color="#fce7f3" title="Pink"></div>
-                <div class="swatch" style="background:#fef08a;" data-color="#fef08a" title="Yellow"></div>
-            </div>
-            <div class="color-custom-row">
-                <span class="color-custom-label">Custom color:</span>
-                <input type="color" id="colorPicker" value="#0066CC" title="Pick custom color">
-            </div>
+        <div class="studio-panel-header">
+            <div class="studio-kicker">Tier 3 · Custom Branded</div>
+            <h1>Design your guard</h1>
+            <p>Pick a colour, finish and engraving. Drop your logo in to preview how a branded production run will look. No account needed to explore — log in only when you're ready to save.</p>
         </div>
 
-        <!-- Material -->
-        <div class="panel-section">
-            <div class="panel-section-title">Material Finish</div>
-            <div class="material-grid">
-                <button class="material-btn" data-material="standard" onclick="setMaterial('standard', this)">
-                    <span class="material-icon">○</span>Matte
-                </button>
-                <button class="material-btn" data-material="glossy" onclick="setMaterial('glossy', this)">
-                    <span class="material-icon">◉</span>Glossy
-                </button>
-                <button class="material-btn active" data-material="metallic" onclick="setMaterial('metallic', this)">
-                    <span class="material-icon">◈</span>Metallic
-                </button>
+        <!-- Colour -->
+        <div class="studio-section">
+            <h3>Guard Colour</h3>
+            <div class="swatch-grid" id="swatch-grid">
+                <!-- Beauty Bite signature colours first -->
+                <div class="swatch" style="background:#8BB8CC" data-color="#8BB8CC" title="Beauty Bite Blue"></div>
+                <div class="swatch" style="background:#1B2D3E" data-color="#1B2D3E" title="Navy"></div>
+                <div class="swatch" style="background:#B8D5E3" data-color="#B8D5E3" title="Soft Sky"></div>
+                <div class="swatch" style="background:#5C8EA6" data-color="#5C8EA6" title="Steel Blue"></div>
+                <div class="swatch" style="background:#ffffff" data-color="#ffffff" title="Pure White"></div>
+                <div class="swatch" style="background:#F1F5F9" data-color="#F1F5F9" title="Porcelain"></div>
+                <!-- Accents -->
+                <div class="swatch" style="background:#0066CC" data-color="#0066CC" title="Royal Blue"></div>
+                <div class="swatch" style="background:#10B981" data-color="#10B981" title="Emerald"></div>
+                <div class="swatch" style="background:#7C3AED" data-color="#7C3AED" title="Violet"></div>
+                <div class="swatch" style="background:#EC4899" data-color="#EC4899" title="Rose"></div>
+                <div class="swatch" style="background:#F59E0B" data-color="#F59E0B" title="Amber"></div>
+                <div class="swatch" style="background:#111827" data-color="#111827" title="Onyx"></div>
+            </div>
+            <small class="swatch-brand-label">Starts in Beauty Bite Blue — the hue from our logo.</small>
+            <div class="color-picker-row">
+                <label for="color-picker">Custom hex</label>
+                <input type="color" id="color-picker" value="#8BB8CC">
             </div>
         </div>
 
-        <!-- Brand text -->
-        <div class="panel-section">
-            <div class="panel-section-title">Brand Text (Engraving)</div>
-            <input type="text" class="studio-input" id="brandText" placeholder="Your company name" maxlength="40">
+        <!-- Finish -->
+        <div class="studio-section">
+            <h3>Finish</h3>
+            <div class="finish-grid">
+                <button class="finish-btn active" data-finish="silicone" type="button">
+                    Silicone
+                    <small>Medical grade</small>
+                </button>
+                <button class="finish-btn" data-finish="glossy" type="button">
+                    Glossy
+                    <small>High shine</small>
+                </button>
+                <button class="finish-btn" data-finish="matte" type="button">
+                    Matte
+                    <small>Soft feel</small>
+                </button>
+            </div>
         </div>
 
-        <!-- Logo upload -->
-        <div class="panel-section">
-            <div class="panel-section-title">Logo Upload</div>
-            <input type="file" id="logoFile" accept="image/*" style="display:none;">
-            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('logoFile').click()">
+        <!-- Engraving -->
+        <div class="studio-section">
+            <h3>Clinic Engraving <span class="optional">Optional</span></h3>
+            <input type="text" class="studio-input" id="brand-text" placeholder="e.g. Glow Med Spa" maxlength="32" autocomplete="off">
+
+            <!-- Font picker -->
+            <div style="margin-top:0.75rem;">
+                <span class="text-opt-label">Font</span>
+                <div class="font-grid" id="font-grid"></div>
+            </div>
+
+            <!-- Text color + size -->
+            <div class="text-opts-row">
+                <div>
+                    <span class="text-opt-label">Text Colour</span>
+                    <div style="display:flex;align-items:center;gap:0.4rem;">
+                        <input type="color" id="text-color-picker" value="#1B2D3E" style="width:38px;height:30px;padding:2px;">
+                        <span id="text-color-val" style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;">#1B2D3E</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-opt-label">Size</span>
+                    <div class="range-row">
+                        <input type="range" id="text-size-slider" min="40" max="200" value="100" step="5">
+                        <span class="range-val" id="text-size-val">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="studio-section">
+            <h3>Logo <span class="optional">Optional · PNG / SVG</span></h3>
+            <input type="file" id="logo-file" accept="image/png,image/svg+xml,image/jpeg" hidden>
+            <div class="upload-zone" id="upload-zone">
                 <div id="upload-default">
-                    <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#14B8A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-                    <div class="upload-text"><strong>Click to upload</strong> your logo<br>PNG, SVG, JPG accepted</div>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5C8EA6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div class="upload-hint"><strong>Upload logo</strong> · 2 MB max</div>
                 </div>
                 <div id="upload-preview" style="display:none;">
-                    <img id="logo-preview" src="" alt="Logo preview">
-                    <div class="upload-text" style="color:var(--teal);"><strong>Logo uploaded</strong> — click to change</div>
+                    <img id="logo-preview" alt="Logo preview">
+                    <div class="upload-hint"><strong>Logo added</strong> — click to change</div>
                 </div>
+            </div>
+            <!-- Logo size + drag hint (appear after upload) -->
+            <div class="logo-controls" id="logo-controls">
+                <div style="margin-top:0.1rem;">
+                    <span class="text-opt-label">Logo Size</span>
+                    <div class="range-row">
+                        <input type="range" id="logo-size-slider" min="30" max="250" value="100" step="5">
+                        <span class="range-val" id="logo-size-val">100%</span>
+                    </div>
+                </div>
+                <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.5rem;line-height:1.45;">
+                    Drag the logo on the canvas to reposition it.
+                </p>
             </div>
         </div>
 
-        <!-- Quantity & pricing -->
-        <div class="panel-section">
-            <div class="panel-section-title">Order Quantity</div>
+        <!-- Quantity -->
+        <div class="studio-section">
+            <h3>Order Quantity</h3>
             <div class="qty-row">
-                <input type="number" class="qty-input" id="quantity" min="1" value="1" step="1">
-                <span class="qty-min-hint">Min. 1 unit</span>
-            </div>
-            <div class="qty-error" id="qty-error">Please enter a valid quantity</div>
-
-            <div class="price-summary" id="priceSummary">
-                <div class="price-row">
-                    <span>Unit price</span>
-                    <span>$300.00</span>
-                </div>
-                <div class="price-row">
-                    <span>Quantity</span>
-                    <span id="price-qty">50</span>
-                </div>
-                <div class="price-total-row">
-                    <span>Total</span>
-                    <span id="price-total">$15,000.00</span>
+                <input type="number" class="qty-input" id="quantity" min="50" value="50" step="1">
+                <div>
+                    <div class="qty-hint"><strong style="color:var(--text-primary)">Min. 50 units</strong></div>
+                    <div class="qty-hint">$300.00 per guard</div>
                 </div>
             </div>
+            <div class="price-card">
+                <div class="price-row"><span>Unit price</span><span>$300.00</span></div>
+                <div class="price-row"><span>Quantity</span><span id="price-qty">50</span></div>
+                <div class="price-total"><span>Total</span><span id="price-total">$15,000.00</span></div>
+            </div>
+        </div>
 
-            <button class="purchase-btn" id="purchaseBtn" onclick="goToPurchase()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                Proceed to Purchase
+        <!-- Actions -->
+        <div class="studio-actions">
+            <button class="studio-btn studio-btn-outline" id="save-btn" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save design
             </button>
+            <button class="studio-btn studio-btn-primary" id="purchase-btn" type="button">
+                Checkout · <span id="btn-total">$15,000</span>
+            </button>
+            <div class="studio-status" id="studio-status">Designs saved locally auto-update as you tweak. Log in to sync them to your dashboard.</div>
         </div>
 
-    </div>
+    </aside>
 
-    <!-- 3D Viewport -->
-    <div class="viewport" id="viewport">
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner"></div>
-            <span class="loading-text">Loading 3D model…</span>
+    <!-- Viewport -->
+    <section class="studio-viewport" id="viewport">
+        <span class="viewport-chip viewport-chip-left" id="render-mode-chip">3D Preview</span>
+        <span class="viewport-chip viewport-chip-right"><span class="dot"></span> Live</span>
+
+        <div class="viewport-loading" id="viewport-loading">
+            <div class="spinner"></div>
+            <div>Loading 3D model…</div>
+            <small>Works in every modern browser — no setup needed.</small>
         </div>
-        <canvas id="canvas"></canvas>
-        <canvas id="text-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;cursor:move;pointer-events:auto;"></canvas>
-        <div class="viewport-hint">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Right-drag to pan</div>
-    </div>
+
+        <canvas id="viewer-canvas"></canvas>
+
+        <div class="viewport-label-overlay">
+            <img class="logo-overlay" id="logo-overlay" alt="">
+            <div class="engraving-preview" id="engraving-preview"></div>
+        </div>
+
+        <div class="viewport-hint">Drag guard to orbit · Drag text/logo to reposition · Scroll to zoom</div>
+    </section>
 
 </div>
 
+<!-- Save / login prompt modal -->
+<div class="bb-modal-backdrop" id="save-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+    <div class="bb-modal">
+        <div class="bb-modal-header">
+            <h3 id="save-modal-title">Save this design</h3>
+            <p id="save-modal-msg">You need a free Beauty Bite account to sync designs to the cloud. Your design is still safe on this device while you sign in.</p>
+        </div>
+        <div class="bb-modal-body">
+            <label for="design-name" style="font-size:0.82rem;font-weight:600;color:var(--text-primary);display:block;margin-bottom:0.35rem;">Design name</label>
+            <input type="text" class="studio-input" id="design-name" placeholder="e.g. Glow Med Spa — navy w/ logo" maxlength="60">
+            <div class="studio-status" id="save-modal-status" style="margin-top:0.6rem;text-align:left;"></div>
+        </div>
+        <div class="bb-modal-footer">
+            <button class="studio-btn studio-btn-outline" id="save-cancel" type="button" style="width:auto;">Cancel</button>
+            <button class="studio-btn studio-btn-primary" id="save-confirm" type="button" style="width:auto;">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="/js/header-init.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="/js/bb3d.js"></script>
 <script>
-    // ─── State ───────────────────────────────────────────────────────────────
-    const state = {
-        color: '#0066CC',
-        material: 'metallic',
-        brandText: '',
-        logoFile: null,
-        logoDataUrl: null,
-        quantity: 1
+/* ========================================================================
+   Design Studio — state + wiring
+   ====================================================================== */
+
+const UNIT_PRICE = 300;
+const MIN_QTY    = 50;
+const STORAGE_KEY = 'bb_studio_design_v1';
+
+const state = {
+    color:       '#8BB8CC',
+    finish:      'silicone',
+    brandText:   '',
+    textColor:   '#1B2D3E',
+    textFont:    'Pacifico',
+    textSize:    100,          // percent, 40–200
+    logoDataUrl: null,
+    logoFilename: null,
+    logoScale:   100,          // percent, 30–250
+    quantity:    50
+};
+
+const $  = (id) => document.getElementById(id);
+const el = {
+    swatchGrid:   $('swatch-grid'),
+    colorPicker:  $('color-picker'),
+    finishButtons: document.querySelectorAll('.finish-btn'),
+    brandText:    $('brand-text'),
+    logoFile:     $('logo-file'),
+    uploadZone:   $('upload-zone'),
+    uploadDefault:$('upload-default'),
+    uploadPreview:$('upload-preview'),
+    logoPreview:  $('logo-preview'),
+    quantity:       $('quantity'),
+    priceQty:       $('price-qty'),
+    priceTotal:     $('price-total'),
+    btnTotal:       $('btn-total'),
+    purchaseBtn:    $('purchase-btn'),
+    saveBtn:        $('save-btn'),
+    studioStatus:   $('studio-status'),
+    viewerCanvas:   $('viewer-canvas'),
+    viewportLoad:   $('viewport-loading'),
+    viewport:       $('viewport'),
+    engraving:      $('engraving-preview'),
+    logoOverlay:    $('logo-overlay'),
+    modeChip:       $('render-mode-chip'),
+    saveModal:      $('save-modal'),
+    saveCancel:     $('save-cancel'),
+    saveConfirm:    $('save-confirm'),
+    saveMsg:        $('save-modal-msg'),
+    saveStatus:     $('save-modal-status'),
+    designName:     $('design-name'),
+    fontGrid:       $('font-grid'),
+    textColorPicker:$('text-color-picker'),
+    textColorVal:   $('text-color-val'),
+    textSizeSlider: $('text-size-slider'),
+    textSizeVal:    $('text-size-val'),
+    logoControls:   $('logo-controls'),
+    logoSizeSlider: $('logo-size-slider'),
+    logoSizeVal:    $('logo-size-val'),
+};
+
+/* ── 0. Font picker bootstrap ──────────────────────────────────────── */
+function buildFontPicker () {
+    const fonts = Object.keys(BB3D.LABEL_FONTS);
+    const LABELS = {
+        'Pacifico':         'Pacifico',
+        'Dancing Script':   'Dancing',
+        'Playfair Display': 'Playfair',
+        'Montserrat':       'Montserrat',
+        'Inter':            'Inter',
+        'Bebas Neue':       'Bebas',
+    };
+    fonts.forEach(f => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'font-btn' + (f === state.textFont ? ' active' : '');
+        btn.textContent = LABELS[f] || f;
+        btn.style.fontFamily = f + ', cursive';
+        btn.dataset.font = f;
+        btn.addEventListener('click', () => {
+            state.textFont = f;
+            document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', b.dataset.font === f));
+            refreshLabel();
+            persistLocal();
+        });
+        el.fontGrid.appendChild(btn);
+    });
+}
+
+/* ── Range slider track-fill helper ────────────────────────────────── */
+function updateSliderFill (input) {
+    const min = +input.min, max = +input.max, val = +input.value;
+    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+    input.style.setProperty('--pct', pct);
+}
+
+/* ── 1. Session detection ───────────────────────────────────────────── */
+function getAuthToken () {
+    return localStorage.getItem('bb_token') ||
+           localStorage.getItem('authToken') ||
+           localStorage.getItem('token') || null;
+}
+function getAuthUser () {
+    const raw = localStorage.getItem('bb_user') ||
+                localStorage.getItem('user')    ||
+                localStorage.getItem('authUser');
+    try { return raw ? JSON.parse(raw) : null; } catch (_) { return null; }
+}
+/* auth chip removed — site header handles auth state */
+
+/* ── 2. Local persistence (compact text — ~220 bytes without logo) ──── */
+function serializeDesign () {
+    return {
+        v: 1,
+        color:     state.color,
+        finish:    state.finish,
+        brandText: state.brandText.slice(0, 32),
+        logoFilename: state.logoFilename,
+        logoDataUrl:  state.logoDataUrl,  // stays in-session; the POST payload strips this if >64 KB
+        quantity:  state.quantity
+    };
+}
+function persistLocal () {
+    try {
+        const d = serializeDesign();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    } catch (_) { /* storage quota — ignore */ }
+}
+function restoreLocal () {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.color)     state.color     = d.color;
+        if (d.finish)    state.finish    = d.finish;
+        if (d.brandText) state.brandText = d.brandText;
+        if (d.logoDataUrl) {
+            state.logoDataUrl  = d.logoDataUrl;
+            state.logoFilename = d.logoFilename;
+        }
+        if (d.quantity)  state.quantity  = Math.max(MIN_QTY, parseInt(d.quantity) || MIN_QTY);
+    } catch (_) { /* ignore malformed */ }
+}
+
+/* ── 3. Apply state → UI (swatches, inputs, viewer) ─────────────────── */
+let viewer = null;
+function syncSwatches () {
+    document.querySelectorAll('.swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.color && s.dataset.color.toLowerCase() === state.color.toLowerCase());
+    });
+    el.colorPicker.value = state.color;
+}
+function syncFinishButtons () {
+    el.finishButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.finish === state.finish);
+    });
+}
+function syncPricing () {
+    const q = Math.max(MIN_QTY, parseInt(state.quantity) || 0);
+    const total = q * UNIT_PRICE;
+    el.priceQty.textContent   = q.toLocaleString();
+    el.priceTotal.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    el.btnTotal.textContent   = '$' + total.toLocaleString('en-US');
+    el.purchaseBtn.disabled   = q < MIN_QTY;
+}
+function syncOverlays () {
+    // If the 3D viewer is live we render text + logo AS a decal on the mesh
+    // (they rotate with the guard). Keep the HTML overlay only as a fallback
+    // when 3D is unavailable — otherwise hide it so it never floats in front
+    // of the canvas.
+    const has3D = !!viewer;
+    if (state.brandText && !has3D) {
+        el.engraving.textContent = state.brandText;
+        el.engraving.classList.add('visible');
+    } else {
+        el.engraving.classList.remove('visible');
+    }
+    if (state.logoDataUrl && !has3D) {
+        el.logoOverlay.src = state.logoDataUrl;
+        el.logoOverlay.classList.add('visible');
+    } else {
+        el.logoOverlay.classList.remove('visible');
+        el.logoOverlay.removeAttribute('src');
+    }
+    // Show logo preview in panel
+    if (state.logoDataUrl) {
+        el.logoPreview.src = state.logoDataUrl;
+        el.uploadDefault.style.display = 'none';
+        el.uploadPreview.style.display = 'block';
+        el.uploadZone.classList.add('has-logo');
+    } else {
+        el.uploadDefault.style.display = 'block';
+        el.uploadPreview.style.display = 'none';
+        el.uploadZone.classList.remove('has-logo');
+    }
+}
+function syncBrandText () {
+    el.brandText.value = state.brandText;
+}
+function syncQuantity () {
+    el.quantity.value = state.quantity;
+}
+function syncTextControls () {
+    el.textColorPicker.value = state.textColor;
+    el.textColorVal.textContent = state.textColor.toUpperCase();
+    el.textSizeSlider.value = state.textSize;
+    el.textSizeVal.textContent = state.textSize + '%';
+    updateSliderFill(el.textSizeSlider);
+}
+function syncLogoControls () {
+    if (state.logoDataUrl) el.logoControls.classList.add('visible');
+    else                   el.logoControls.classList.remove('visible');
+    el.logoSizeSlider.value = state.logoScale;
+    el.logoSizeVal.textContent = state.logoScale + '%';
+    updateSliderFill(el.logoSizeSlider);
+}
+function syncAll () {
+    syncSwatches();
+    syncFinishButtons();
+    syncBrandText();
+    syncQuantity();
+    syncPricing();
+    syncOverlays();
+    syncTextControls();
+    syncLogoControls();
+}
+
+/* ── 4. 3D viewer — uses BB3D universal loader ──────────────────────── */
+function initViewer () {
+    const webgl = BB3D.probeWebGL();
+    if (!webgl || typeof THREE === 'undefined') {
+        // Immediate 2D fallback — still pretty, still branded
+        BB3D.draw2DGuard(el.viewerCanvas, {
+            bg: '#1B2D3E',
+            color: state.color,
+            label: state.brandText || null
+        });
+        el.viewportLoad.classList.add('hidden');
+        el.modeChip.textContent = '2D Preview';
+        return;
+    }
+
+    viewer = BB3D.registerViewer({
+        canvas: el.viewerCanvas,
+        bg: '#1B2D3E',
+        color: state.color,
+        finish: state.finish,
+        label: state.brandText || null,
+        labelColor: '#1B2D3E',
+        logo:  state.logoDataUrl || null,
+        camY: 0.4, camZ: 3.9,
+        scale: 2.2, yOffset: 0.05,
+        rotSpeed: 0.004,
+        interactive: true,
+        onReady: (v) => {
+            el.viewportLoad.classList.add('hidden');
+            el.modeChip.textContent = '3D Preview';
+            window.__bb_viewer = v;
+            if (state.brandText)   BB3D.setViewerLabel(v, state.brandText, { color: state.textColor, fontFamily: state.textFont, textScale: state.textSize / 100 });
+            if (state.logoDataUrl) BB3D.setViewerLogo(v,  state.logoDataUrl, { scale: state.logoScale / 100 });
+        },
+        onFallback: () => {
+            BB3D.draw2DGuard(el.viewerCanvas, {
+                bg: '#1B2D3E',
+                color: state.color,
+                label: state.brandText || null
+            });
+            el.viewportLoad.classList.add('hidden');
+            el.modeChip.textContent = '2D Preview';
+        }
+    });
+}
+
+function refreshViewerColor () {
+    if (viewer) {
+        BB3D.setViewerColor(viewer, state.color);
+    } else {
+        // 2D mode: redraw
+        BB3D.draw2DGuard(el.viewerCanvas, {
+            bg: '#1B2D3E',
+            color: state.color,
+            label: state.brandText || null
+        });
+    }
+}
+function refreshViewerFinish () {
+    if (viewer) BB3D.setViewerFinish(viewer, state.finish);
+}
+function refreshLabel () {
+    if (!state.brandText) return;
+    const opts = {
+        color:      state.textColor,
+        fontFamily: state.textFont,
+        textScale:  state.textSize / 100
+    };
+    if (viewer) BB3D.setViewerLabel(viewer, state.brandText, opts);
+    else BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color, label: state.brandText || null });
+}
+function refreshLogoSize () {
+    if (viewer && state.logoDataUrl) BB3D.setViewerLogo(viewer, state.logoDataUrl, { scale: state.logoScale / 100 });
+}
+
+/* ── 5. Panel events ────────────────────────────────────────────────── */
+el.swatchGrid.addEventListener('click', (e) => {
+    const s = e.target.closest('.swatch');
+    if (!s) return;
+    state.color = s.dataset.color;
+    syncSwatches();
+    refreshViewerColor();
+    persistLocal();
+});
+el.colorPicker.addEventListener('input', (e) => {
+    state.color = e.target.value;
+    syncSwatches();
+    refreshViewerColor();
+    persistLocal();
+});
+el.finishButtons.forEach(b => b.addEventListener('click', () => {
+    state.finish = b.dataset.finish;
+    syncFinishButtons();
+    refreshViewerFinish();
+    persistLocal();
+}));
+el.brandText.addEventListener('input', (e) => {
+    state.brandText = e.target.value.slice(0, 32);
+    refreshLabel();
+    syncOverlays();
+    persistLocal();
+});
+el.textColorPicker.addEventListener('input', (e) => {
+    state.textColor = e.target.value;
+    el.textColorVal.textContent = e.target.value.toUpperCase();
+    refreshLabel();
+    persistLocal();
+});
+el.textSizeSlider.addEventListener('input', (e) => {
+    state.textSize = +e.target.value;
+    el.textSizeVal.textContent = e.target.value + '%';
+    updateSliderFill(e.target);
+    refreshLabel();
+    persistLocal();
+});
+el.uploadZone.addEventListener('click', () => el.logoFile.click());
+el.logoFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return alert('Please upload a PNG, JPG or SVG image.');
+    if (file.size > 2 * 1024 * 1024)     return alert('Logo must be under 2 MB.');
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        state.logoDataUrl  = ev.target.result;
+        state.logoFilename = file.name;
+        if (viewer) BB3D.setViewerLogo(viewer, state.logoDataUrl, { scale: state.logoScale / 100 });
+        el.logoControls.classList.add('visible');
+        syncOverlays();
+        persistLocal();
+    };
+    reader.readAsDataURL(file);
+});
+el.quantity.addEventListener('input', (e) => {
+    let q = parseInt(e.target.value, 10);
+    if (isNaN(q) || q < 0) q = 0;
+    state.quantity = q;
+    syncPricing();
+    persistLocal();
+});
+el.quantity.addEventListener('blur', () => {
+    if (state.quantity < MIN_QTY) {
+        state.quantity = MIN_QTY;
+        syncQuantity();
+        syncPricing();
+        persistLocal();
+    }
+});
+el.logoSizeSlider.addEventListener('input', (e) => {
+    state.logoScale = +e.target.value;
+    el.logoSizeVal.textContent = e.target.value + '%';
+    updateSliderFill(e.target);
+    refreshLogoSize();
+    persistLocal();
+});
+
+/* ── 6. Save / save-modal flow ──────────────────────────────────────── */
+function openSaveModal () {
+    const t = getAuthToken();
+    if (!t) {
+        el.saveMsg.textContent = 'You need a free Beauty Bite account to sync designs to the cloud. Your design is safe on this device while you sign in.';
+        el.saveConfirm.textContent = 'Log in to save';
+        el.saveStatus.textContent  = '';
+        el.saveModal.classList.add('visible');
+        return;
+    }
+    el.saveMsg.textContent = 'Give this design a name so you can find it later from your dashboard.';
+    el.saveConfirm.textContent = 'Save to my dashboard';
+    el.designName.value = (state.brandText || 'My design') + ' · ' + state.color.toUpperCase();
+    el.saveStatus.textContent = '';
+    el.saveModal.classList.add('visible');
+    setTimeout(() => el.designName.focus(), 50);
+}
+function closeSaveModal () { el.saveModal.classList.remove('visible'); }
+
+el.saveBtn.addEventListener('click', openSaveModal);
+el.saveCancel.addEventListener('click', closeSaveModal);
+el.saveModal.addEventListener('click', (e) => { if (e.target === el.saveModal) closeSaveModal(); });
+
+el.saveConfirm.addEventListener('click', async () => {
+    const t = getAuthToken();
+    if (!t) {
+        // Stash design so login / register can pick it up
+        sessionStorage.setItem('bb_pending_design', JSON.stringify(serializeDesign()));
+        window.location.href = '/login?next=' + encodeURIComponent('/design-studio?restore=pending');
+        return;
+    }
+    const name = (el.designName.value || 'My design').slice(0, 60);
+    const payload = serializeDesign();
+
+    // Storage safety: if logoDataUrl is huge, strip it to just the filename
+    // so backend storage stays text-only and compact. The device copy keeps the image.
+    let compactLogo = null;
+    if (payload.logoDataUrl && payload.logoDataUrl.length < 48 * 1024) {
+        compactLogo = payload.logoDataUrl; // small enough to store as text
+    }
+    const config = {
+        v:         1,
+        color:     payload.color,
+        finish:    payload.finish,
+        brandText: payload.brandText,
+        logoFilename: payload.logoFilename || null,
+        logoDataUrl:  compactLogo,   // null if too large — the filename survives
+        quantity:  payload.quantity
     };
 
-    const UNIT_PRICE = 300;
+    el.saveStatus.textContent = 'Saving…';
+    el.saveConfirm.disabled   = true;
 
-    // ─── Three.js Scene ───────────────────────────────────────────────────────
-    let scene, camera, renderer, controls, model;
-
-    function initScene() {
-        const viewport = document.getElementById('viewport');
-        const canvas   = document.getElementById('canvas');
-
-        scene    = new THREE.Scene();
-        scene.background = new THREE.Color(0x111827);
-
-        // Subtle grid / environment
-        const gridHelper = new THREE.GridHelper(6, 12, 0x1e293b, 0x1e293b);
-        scene.add(gridHelper);
-
-        camera = new THREE.PerspectiveCamera(45, viewport.clientWidth / viewport.clientHeight, 0.1, 100);
-        camera.position.set(0, 1.5, 5);
-
-        renderer = new THREE.WebGLRenderer({
-            canvas,
-            antialias: false,
-            powerPreference: 'low-power',
-            failIfMajorPerformanceCaveat: false
-        });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setSize(viewport.clientWidth, viewport.clientHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.toneMapping = THREE.NoToneMapping;
-        renderer.toneMappingExposure = 1.8;
-
-        // Lights
-        const ambient = new THREE.AmbientLight(0xffffff, 2.0);
-        scene.add(ambient);
-
-        const key = new THREE.DirectionalLight(0xffffff, 3.0);
-        key.position.set(4, 6, 4);
-        key.castShadow = true;
-        scene.add(key);
-
-        const fill = new THREE.DirectionalLight(0x4DA6FF, 1.5);
-        fill.position.set(-4, 2, -3);
-        scene.add(fill);
-
-        const rim = new THREE.DirectionalLight(0x14B8A6, 1.0);
-        rim.position.set(0, -2, -5);
-        scene.add(rim);
-
-        const back = new THREE.DirectionalLight(0x8bb8cc, 0.8);
-        back.position.set(0, -4, -6);
-        scene.add(back);
-
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.06;
-        controls.minDistance = 1;
-        controls.maxDistance = 12;
-        controls.enablePan = true;
-
-        loadModel();
-        animate();
-
-        window.addEventListener('resize', onResize);
-    }
-
-    function loadModel() {
-        const loader = new THREE.GLTFLoader();
-        loader.load(
-            '/Meshy_AI_Dental_Guard_Design_D_0118023519_generate.glb',
-            (gltf) => {
-                model = gltf.scene;
-
-                // Center & fit
-                const box    = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                const size   = box.getSize(new THREE.Vector3());
-                model.position.sub(center);
-                const scale = 2.5 / Math.max(size.x, size.y, size.z);
-                model.scale.setScalar(scale);
-                model.position.y += 0.1;
-
-                model.traverse((child) => {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
-
-                scene.add(model);
-                state.material = 'metallic';
-                state.color = '#0066CC';
-                applyMaterialSettings();
-                document.getElementById('loadingOverlay').style.display = 'none';
-            },
-            undefined,
-            (err) => {
-                console.error('Model load error:', err);
-                document.getElementById('loadingOverlay').innerHTML =
-                    '<div style="color:#f87171;font-size:0.9rem;">Could not load 3D model. Check that the .glb file is in the production/ folder.</div>';
-            }
-        );
-    }
-
-    function applyMaterialSettings() {
-        if (!model) return;
-        const color = new THREE.Color(state.color);
-
-        model.traverse((child) => {
-            if (!child.isMesh) return;
-
-            let mat;
-            switch (state.material) {
-                case 'glossy':
-                    mat = new THREE.MeshPhysicalMaterial({
-                        color, roughness: 0.05, metalness: 0.0,
-                        clearcoat: 0.8, clearcoatRoughness: 0.1,
-                        emissive: new THREE.Color(state.color),
-                        emissiveIntensity: 0.3
-                    });
-                    break;
-                case 'metallic':
-                    mat = new THREE.MeshStandardMaterial({
-                        color, roughness: 0.1, metalness: 0.95,
-                        emissive: color.clone().multiplyScalar(0.2),
-                        emissiveIntensity: 1.0
-                    });
-                    break;
-                default: // matte / standard
-                    mat = new THREE.MeshStandardMaterial({
-                        color, roughness: 0.7, metalness: 0.0,
-                        emissive: color.clone().multiplyScalar(0.1),
-                        emissiveIntensity: 1.0
-                    });
-            }
-
-            child.material = mat;
-            child.material.needsUpdate = true;
-        });
-        if (renderer && scene && camera) renderer.render(scene, camera);
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-    }
-
-    function onResize() {
-        const vp = document.getElementById('viewport');
-        camera.aspect = vp.clientWidth / vp.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(vp.clientWidth, vp.clientHeight);
-    }
-
-    // ─── UI Controls ──────────────────────────────────────────────────────────
-
-    // Color swatches
-    document.querySelectorAll('.swatch').forEach(s => {
-        s.addEventListener('click', () => {
-            document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
-            s.classList.add('active');
-            state.color = s.dataset.color;
-            document.getElementById('colorPicker').value = state.color;
-            applyMaterialSettings();
-            renderTextOverlay();
-        });
-    });
-
-    // Custom color picker
-    document.getElementById('colorPicker').addEventListener('input', (e) => {
-        state.color = e.target.value;
-        document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
-        applyMaterialSettings();
-        renderTextOverlay();
-    });
-
-    // Material
-    function setMaterial(type, btn) {
-        state.material = type;
-        document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        applyMaterialSettings();
-    }
-
-    // ── Draggable text overlay ──────────────────────────────────────────────────
-    const textCanvas = document.getElementById('text-overlay');
-    const textCtx = textCanvas ? textCanvas.getContext('2d') : null;
-    let textState = { x: 0.5, y: 0.6, fontSize: 28, text: '', dragging: false, resizing: false, startX: 0, startY: 0, startFontSize: 28 };
-
-    function renderTextOverlay() {
-        if (!textCtx || !textCanvas) return;
-        textCanvas.width = textCanvas.offsetWidth;
-        textCanvas.height = textCanvas.offsetHeight;
-        textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-        if (!textState.text) return;
-
-        const x = textState.x * textCanvas.width;
-        const y = textState.y * textCanvas.height;
-        const fs = textState.fontSize;
-
-        textCtx.font = `bold ${fs}px 'Pacifico', cursive`;
-        textCtx.textAlign = 'center';
-        textCtx.textBaseline = 'middle';
-
-        // Shadow for depth
-        textCtx.shadowColor = 'rgba(0,0,0,0.6)';
-        textCtx.shadowBlur = 8;
-        textCtx.strokeStyle = 'rgba(0,0,0,0.5)';
-        textCtx.lineWidth = 3;
-        textCtx.strokeText(textState.text, x, y);
-
-        textCtx.shadowBlur = 0;
-        textCtx.fillStyle = state.color === '#ffffff' ? '#14B8A6' : '#ffffff';
-        textCtx.fillText(textState.text, x, y);
-
-        // Resize handle
-        const tw = textCtx.measureText(textState.text).width;
-        textCtx.strokeStyle = 'rgba(20,184,166,0.8)';
-        textCtx.lineWidth = 1;
-        textCtx.setLineDash([4,4]);
-        textCtx.strokeRect(x - tw/2 - 8, y - fs/2 - 6, tw + 16, fs + 12);
-        textCtx.setLineDash([]);
-        // Resize corner handle
-        textCtx.fillStyle = '#14B8A6';
-        textCtx.fillRect(x + tw/2 + 2, y + fs/2 - 2, 12, 12);
-    }
-
-    if (textCanvas) {
-        textCanvas.addEventListener('mousedown', function(e) {
-            const rect = textCanvas.getBoundingClientRect();
-            const mx = (e.clientX - rect.left) * (textCanvas.width / rect.width);
-            const my = (e.clientY - rect.top) * (textCanvas.height / rect.height);
-            const x = textState.x * textCanvas.width;
-            const y = textState.y * textCanvas.height;
-            const tw = textCtx ? textCtx.measureText(textState.text || '').width : 0;
-            const fs = textState.fontSize;
-
-            // Check resize handle
-            if (mx > x + tw/2 && mx < x + tw/2 + 14 && my > y + fs/2 - 4 && my < y + fs/2 + 14) {
-                textState.resizing = true;
-                textState.startX = mx; textState.startFontSize = fs;
-            } else if (mx > x - tw/2 - 10 && mx < x + tw/2 + 10 && my > y - fs/2 - 8 && my < y + fs/2 + 8) {
-                textState.dragging = true;
-                textState.startX = mx - x; textState.startY = my - y;
-            }
-        });
-        textCanvas.addEventListener('mousemove', function(e) {
-            if (!textState.dragging && !textState.resizing) return;
-            const rect = textCanvas.getBoundingClientRect();
-            const mx = (e.clientX - rect.left) * (textCanvas.width / rect.width);
-            const my = (e.clientY - rect.top) * (textCanvas.height / rect.height);
-            if (textState.dragging) {
-                textState.x = (mx - textState.startX) / textCanvas.width;
-                textState.y = (my - textState.startY) / textCanvas.height;
-                textState.x = Math.max(0.05, Math.min(0.95, textState.x));
-                textState.y = Math.max(0.05, Math.min(0.95, textState.y));
-            } else if (textState.resizing) {
-                const delta = mx - textState.startX;
-                textState.fontSize = Math.max(12, Math.min(72, textState.startFontSize + delta * 0.4));
-            }
-            renderTextOverlay();
-        });
-        textCanvas.addEventListener('mouseup', function() {
-            textState.dragging = false; textState.resizing = false;
-        });
-        textCanvas.addEventListener('mouseleave', function() {
-            textState.dragging = false; textState.resizing = false;
-        });
-    }
-
-    // Brand text — update overlay when input changes
-    document.getElementById('brandText').addEventListener('input', function(e) {
-        state.brandText = e.target.value;
-        textState.text = e.target.value;
-        renderTextOverlay();
-    });
-
-    // Logo upload
-    document.getElementById('logoFile').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            alert('Please upload an image file (PNG, SVG, JPG).');
-            return;
-        }
-        state.logoFile = file;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            state.logoDataUrl = ev.target.result;
-            document.getElementById('logo-preview').src = ev.target.result;
-            document.getElementById('upload-default').style.display = 'none';
-            document.getElementById('upload-preview').style.display = 'block';
-            document.getElementById('uploadZone').classList.add('has-logo');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // Quantity & pricing
-    document.getElementById('quantity').addEventListener('input', updatePricing);
-
-    function updatePricing() {
-        const qty    = parseInt(document.getElementById('quantity').value, 10) || 0;
-        state.quantity = qty;
-        const errEl  = document.getElementById('qty-error');
-        const buyBtn = document.getElementById('purchaseBtn');
-
-        if (qty < 1) {
-            errEl.classList.add('visible');
-            buyBtn.disabled = true;
-        } else {
-            errEl.classList.remove('visible');
-            buyBtn.disabled = false;
-        }
-
-        document.getElementById('price-qty').textContent   = qty.toLocaleString();
-        document.getElementById('price-total').textContent = '$' + (qty * UNIT_PRICE).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    }
-
-    // ─── Navigate to purchase ─────────────────────────────────────────────────
-    function goToPurchase() {
-        if (state.quantity < 1) return;
-
-        const config = {
-            color:      state.color,
-            material:   state.material,
-            brandText:  state.brandText,
-            logoFile:   state.logoFile ? state.logoFile.name : null,
-            quantity:   state.quantity,
-            unitPrice:  UNIT_PRICE,
-            totalPrice: state.quantity * UNIT_PRICE
-        };
-
-        // Store logo data in sessionStorage (it's too large for URL params)
-        if (state.logoDataUrl) {
-            try { sessionStorage.setItem('bb_logo_dataurl', state.logoDataUrl); }
-            catch (e) { /* storage full — skip */ }
-        }
-
-        window.location.href = '/checkout?config=' + encodeURIComponent(JSON.stringify(config));
-    }
-
-    // ─── Init ─────────────────────────────────────────────────────────────────
-    updatePricing();
     try {
-        initScene();
-    } catch(e) {
-        console.error('3D editor init failed:', e);
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) overlay.innerHTML = '<div style="color:#f87171;font-size:0.9rem;padding:1rem;text-align:center;">WebGL not available in this browser.<br>Try enabling GPU acceleration in Chrome settings.</div>';
+        const res = await fetch('/api/designs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + t
+            },
+            body: JSON.stringify({ name, config })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || ('HTTP ' + res.status));
+        }
+        el.saveStatus.textContent = 'Saved to your dashboard.';
+        el.studioStatus.textContent = 'Saved to your dashboard — view it at /dashboard.';
+        el.studioStatus.classList.add('ok');
+        setTimeout(closeSaveModal, 700);
+    } catch (err) {
+        el.saveStatus.textContent = 'Save failed — ' + err.message;
+        el.saveConfirm.disabled = false;
     }
+});
 
-    window.addEventListener('pagehide', function() {
-        if (renderer) { try { renderer.dispose(); } catch(e) {} renderer = null; }
-        if (controls) { try { controls.dispose(); } catch(e) {} }
-    }, {once: true});
+/* ── 7. Restore pending design after login ──────────────────────────── */
+function restorePending () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('restore') !== 'pending') return;
+    const raw = sessionStorage.getItem('bb_pending_design');
+    if (!raw) return;
+    try {
+        const d = JSON.parse(raw);
+        if (d.color)     state.color     = d.color;
+        if (d.finish)    state.finish    = d.finish;
+        if (d.brandText) state.brandText = d.brandText;
+        if (d.logoDataUrl) {
+            state.logoDataUrl  = d.logoDataUrl;
+            state.logoFilename = d.logoFilename;
+        }
+        if (d.quantity) state.quantity = Math.max(MIN_QTY, parseInt(d.quantity) || MIN_QTY);
+        sessionStorage.removeItem('bb_pending_design');
+        if (getAuthToken()) {
+            setTimeout(openSaveModal, 300);
+        }
+    } catch (_) {}
+}
 
+/* ── 8. Purchase flow ───────────────────────────────────────────────── */
+el.purchaseBtn.addEventListener('click', () => {
+    if (state.quantity < MIN_QTY) return;
+    const cfg = {
+        color: state.color, material: state.finish,
+        brandText: state.brandText,
+        logoFile:  state.logoFilename,
+        quantity:  state.quantity,
+        unitPrice: UNIT_PRICE,
+        totalPrice: state.quantity * UNIT_PRICE
+    };
+    try { if (state.logoDataUrl) sessionStorage.setItem('bb_logo_dataurl', state.logoDataUrl); } catch(_){}
+    window.location.href = '/checkout?config=' + encodeURIComponent(JSON.stringify(cfg));
+});
+
+/* ── 9. Boot ────────────────────────────────────────────────────────── */
+restoreLocal();
+restorePending();
+buildFontPicker();
+syncAll();
+initViewer();
+
+window.addEventListener('resize', () => {
+    // Canvas resize is handled automatically by BB3D's shared loop,
+    // but 2D fallback needs explicit redraw
+    if (!viewer) {
+        BB3D.draw2DGuard(el.viewerCanvas, {
+            bg: '#1B2D3E',
+            color: state.color,
+            label: state.brandText || null
+        });
+    }
+});
 </script>
 </body>
 </html>
