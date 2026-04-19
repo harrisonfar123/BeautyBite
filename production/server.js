@@ -321,7 +321,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const result = await pool.query(
-            'INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING id, email, name, role',
+            'INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING id, email, name',
             [email, hashedPassword, name]
         );
 
@@ -381,7 +381,7 @@ app.post('/api/auth/refresh', authLimiter, async (req, res) => {
 
         const hash = hashRefreshToken(refreshToken);
         const result = await pool.query(
-            'SELECT rt.*, u.id as uid, u.email, u.name, u.role FROM refresh_tokens rt JOIN users u ON rt.user_id = u.id WHERE rt.token_hash = $1 AND rt.revoked_at IS NULL AND rt.expires_at > NOW()',
+            'SELECT rt.*, u.id as uid, u.email, u.name FROM refresh_tokens rt JOIN users u ON rt.user_id = u.id WHERE rt.token_hash = $1 AND rt.revoked_at IS NULL AND rt.expires_at > NOW()',
             [hash]
         );
         if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid refresh token' });
@@ -391,7 +391,7 @@ app.post('/api/auth/refresh', authLimiter, async (req, res) => {
         // Revoke old, issue new (rotation)
         await pool.query('UPDATE refresh_tokens SET revoked_at = NOW() WHERE token_hash = $1', [hash]);
 
-        const user = { id: row.uid, email: row.email, name: row.name, role: row.role || 'customer' };
+        const user = { id: row.uid, email: row.email, name: row.name, role: 'customer' };
         const { accessToken, refreshToken: newRefresh } = await issueTokens(user);
 
         res.json({ token: accessToken, refreshToken: newRefresh, user });
