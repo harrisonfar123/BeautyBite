@@ -31,6 +31,16 @@ transporter.verify((error, success) => {
     }
 });
 
+// HTML escape — prevents stored XSS in customer-facing emails
+function escHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Helper: Format currency
 function formatCurrency(amount) {
     return new Intl.NumberFormat('en-US', {
@@ -95,7 +105,7 @@ function generateOrderConfirmationEmail(orderLog) {
         <div style="padding:40px 30px;">
             <h2 style="color:#667eea;margin-bottom:20px;">✅ Order Confirmed</h2>
             <p style="font-size:16px;line-height:1.6;margin-bottom:20px;">
-                Thank you ${billing_name || ''} for your order!
+                Thank you ${escHtml(billing_name || '')} for your order!
             </p>
             <div style="background:#f8f9fa;padding:20px;border-radius:8px;margin:30px 0;">
                 <h3 style="margin:0 0 15px 0;color:#333;">Order Details</h3>
@@ -143,14 +153,14 @@ function generateSupplierOrderLogEmail(orders, startDate, endDate) {
 
     const orderRows = orders.map(order => `
         <tr>
-            <td style="padding:10px;border-bottom:1px solid #eee;">${order.id}</td>
-            <td style="padding:10px;border-bottom:1px solid #eee;">${formatDateShort(order.created_at)}</td>
-            <td style="padding:10px;border-bottom:1px solid #eee;">${order.product_type || 'standard'}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${escHtml(order.id)}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${escHtml(formatDateShort(order.created_at))}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${escHtml(order.product_type || 'standard')}</td>
             <td style="padding:10px;border-bottom:1px solid #eee;">${order.order_type === 'one-time' ? 'One-Time' : order.order_type === 'subscription' ? 'Subscription' : 'Renewal'}</td>
-            <td style="padding:10px;border-bottom:1px solid #eee;">${order.quantity}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${escHtml(order.quantity)}</td>
             <td style="padding:10px;border-bottom:1px solid #eee;">${formatCurrency(order.amount)}</td>
-            <td style="padding:10px;border-bottom:1px solid #eee;font-size:0.85em;">${order.billing_email || 'N/A'}</td>
-            <td style="padding:10px;border-bottom:1px solid #eee;">${order.period_number && order.total_periods ? `${order.period_number}/${order.total_periods}` : '-'}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;font-size:0.85em;">${escHtml(order.billing_email || 'N/A')}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${order.period_number && order.total_periods ? `${escHtml(order.period_number)}/${escHtml(order.total_periods)}` : '-'}</td>
         </tr>
     `).join('');
 
@@ -316,7 +326,19 @@ async function sendSupplierOrderLog(orders, supplierEmail, startDate, endDate) {
     }
 }
 
+// Minimal test-email helper (admin-only smoke test)
+async function sendTestEmail(toEmail) {
+    const platformSender = EMAIL_CONFIG.auth.user;
+    return transporter.sendMail({
+        from:    `BeautyBite <${platformSender}>`,
+        to:      toEmail,
+        subject: 'BeautyBite test email',
+        html:    `<p>This is a BeautyBite test email sent to ${escHtml(toEmail)}.</p>`
+    });
+}
+
 module.exports = {
     sendOrderConfirmationEmail,
-    sendSupplierOrderLog
+    sendSupplierOrderLog,
+    sendTestEmail
 };

@@ -4,14 +4,22 @@ node_modules/
 
 # Environment & secrets
 .env
+.env.*
 *.env
 production/.env
 production/heroku_config.txt
 backend/.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*
+*secret*
 
 # OS
 .DS_Store
 Thumbs.db
+**/.DS_Store
 
 # Logs
 *.log
@@ -20,7 +28,22 @@ deployment.log
 # Claude/MCP tooling
 .claude-flow/
 .mcp.json
+.claude/
+.swarm/
+
+# Local database / vector store artifacts
+*.db
+*.db-journal
+*.rvf
+*.rvf.lock
+agentdb.*
+ruvector.*
+production/ruvector.*
 
 # Build artifacts
 dist/
 build/
+
+# Misc
+production/production/
+*.docx

@@ -353,9 +353,18 @@
             location.href = 'login.html';
         };
 
-        // Initialize Stripe
+        // Initialize Stripe — publishable key fetched from server
         let stripe, elements, clientSecret, currentOrderType;
-        stripe = Stripe('pk_test_51SU97uGiZtqZsqe8gZyp6Y1HyBdqlUHqNbukme3En5TRj8YVEXXoUwEv9dGIDt62hFybhy2qdJ7zvYfKYqC8nPug00EinP5Wp9');
+        (async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/config/stripe-publishable-key`);
+                if (!res.ok) throw new Error('Stripe key endpoint returned ' + res.status);
+                const { publishableKey } = await res.json();
+                stripe = Stripe(publishableKey);
+            } catch (err) {
+                console.error('Failed to load Stripe key:', err);
+            }
+        })();
 
         // Buy Now button (one-time purchase)
         document.getElementById('buy-now').onclick = async () => {
