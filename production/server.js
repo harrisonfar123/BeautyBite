@@ -109,11 +109,22 @@ app.use(helmet({
 // CORS — env-driven allowlist (no wildcards, no localhost regex in prod)
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:5500,http://localhost:8080')
     .split(',').map(s => s.trim()).filter(Boolean);
+function isAllowedOrigin(origin) {
+    if (!origin) return true; // same-origin / curl / mobile
+    if (allowedOrigins.includes(origin)) return true;
+    try {
+        const host = new URL(origin).host;
+        // Auto-allow our Heroku deploys and BeautyBite domains
+        if (host.endsWith('.herokuapp.com')) return true;
+        if (host === 'beautybite.co' || host.endsWith('.beautybite.co')) return true;
+    } catch (_) {}
+    return false;
+}
 app.use(cors({
     origin: (origin, cb) => {
-        if (!origin) return cb(null, true); // same-origin / curl
-        if (allowedOrigins.includes(origin)) return cb(null, true);
-        return cb(new Error('CORS blocked: ' + origin));
+        if (isAllowedOrigin(origin)) return cb(null, true);
+        console.warn('CORS blocked:', origin);
+        return cb(null, false); // reject without throwing → no 500
     },
     credentials: true
 }));
