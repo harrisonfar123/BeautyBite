@@ -54,11 +54,11 @@
             label: null
         },
         'beautybite-branded': {
-            color: '#F4F6F8', bg: '#13243A', finish: 'silicone',
-            finishLabel: 'Signature White',
+            color: '#C8D4DC', bg: '#13243A', finish: 'silicone',
+            finishLabel: 'Signature',
             label: 'Beauty Bite',
             labelColor:    '#5C8EA6',
-            labelColorway: 'badge'
+            labelColorway: null   // default: blue text, no badge
         },
         'custom-branded': {
             color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
@@ -342,9 +342,52 @@
             camZ:          3.6,
             camY:          0.5,
             interactive:   true,
-            onReady:    hideLoader,
+            labelLocked:   product.id === 'beautybite-branded',
+            onReady:    function () { hideLoader(); if (product.id === 'beautybite-branded') renderColorwayOptions(); },
             onFallback: hideLoader
         });
+    }
+
+    // ── Colorway toggle for BeautyBite Signature ──────────────────────────
+    function renderColorwayOptions () {
+        // Only for branded product — inject once below the viewer footer
+        const foot = document.querySelector('.viewer-foot');
+        if (!foot || document.getElementById('colorway-row')) return;
+
+        const row = document.createElement('div');
+        row.id = 'colorway-row';
+        row.style.cssText = 'display:flex;gap:0.6rem;align-items:center;justify-content:center;margin-top:0.75rem;';
+
+        const options = [
+            { key: null,    label: 'Classic',  desc: 'Blue text on guard',    chip: 'color:#5C8EA6;background:#EEF6FA;border:2px solid #5C8EA6;' },
+            { key: 'badge', label: 'Badge',    desc: 'White text, blue badge', chip: 'color:#fff;background:#5C8EA6;border:2px solid #5C8EA6;'   }
+        ];
+
+        options.forEach(function (opt, idx) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.colorway = opt.key || '';
+            btn.title = opt.desc;
+            btn.style.cssText = 'padding:0.3rem 0.85rem;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:Inter,sans-serif;' + opt.chip;
+            btn.textContent = opt.label;
+            if (idx === 0) btn.style.boxShadow = '0 0 0 2px rgba(92,142,166,0.4)';
+            btn.addEventListener('click', function () {
+                row.querySelectorAll('button').forEach(function (b) { b.style.boxShadow = ''; });
+                btn.style.boxShadow = '0 0 0 2px rgba(92,142,166,0.4)';
+                const cw = opt.key;
+                const view = VIEW_CONFIGS['beautybite-branded'];
+                if (viewer && window.BB3D) {
+                    window.BB3D.setViewerLabel(viewer, view.label, {
+                        color:     cw ? '#FFFFFF' : view.labelColor,
+                        colorway:  cw || null,
+                        fontFamily: 'Pacifico'
+                    });
+                }
+            });
+            row.appendChild(btn);
+        });
+
+        foot.parentNode.insertBefore(row, foot.nextSibling);
     }
 
     // ────────────────────────────────────────────────────────────

@@ -14,13 +14,13 @@
             labelColor: '#5C8EA6'
         },
         'beautybite-branded': {
-            color:    '#F4F6F8',
+            color:    '#C8D4DC',
             bg:       '#13243A',
             finish:   'silicone',
             rotSpeed: 0.0030,
             label:    'Beauty Bite',
             labelColor:    '#5C8EA6',
-            labelColorway: 'badge'
+            labelColorway: null
         },
         'custom-branded': {
             color:    '#5C8EA6',

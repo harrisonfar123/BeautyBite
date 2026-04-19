@@ -394,7 +394,7 @@
                 background: isBadge ? (opts.labelColor || '#5C8EA6') : null
             });
             if (decal) {
-                decal.scale.setScalar(labelScale * 0.68);
+                decal.scale.setScalar(labelScale * 1.1);
 
                 // Raycast from camera position toward the guard's front surface.
                 // This snaps the decal to the actual mesh face instead of a fixed offset.
@@ -422,27 +422,20 @@
                 const hits2 = rc2.intersectObjects(guardMeshes, false);
                 if (hits2.length > 0) {
                     const hit = hits2[0];
-                    // Get world-space face normal; ensure it faces the camera
-                    const wNorm = hit.face.normal.clone()
-                        .transformDirection(hit.object.matrixWorld).normalize();
+                    // Push the hit point toward the camera to sit proud of the surface.
+                    // We use camera direction instead of mesh normals to avoid winding issues.
                     const toCam = camPos.clone().sub(hit.point).normalize();
-                    if (wNorm.dot(toCam) < 0) wNorm.negate();
-
-                    const invM = new THREE.Matrix4().copy(clone.matrixWorld).invert();
-                    const lNorm = wNorm.clone().transformDirection(invM).normalize();
-                    const lPos  = clone.worldToLocal(hit.point.clone());
-                    // Push the decal 1.5% of model size off the surface so it doesn't z-fight
-                    lPos.addScaledVector(lNorm, 0.015 / (clone.scale.x || 1));
+                    const worldPos = hit.point.clone().addScaledVector(toCam, 0.08);
+                    const lPos = clone.worldToLocal(worldPos);
                     decal.position.copy(lPos);
-                    // Align decal plane's +Z with the outward surface normal
-                    decal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
-                    decal.userData.surfaceSnapped = true;
+                    // Leave quaternion at identity — PlaneGeometry's +Z faces clone's local +Z,
+                    // which is world +Z (toward camera) when guard is unrotated.
+                    // Visibility is controlled per-frame in the render loop based on rotation.y.
                     placed = true;
                 }
 
                 if (!placed) {
-                    // Fallback: centre of the anterior face
-                    decal.position.set(0, sz.y * 0.05, sz.z * 0.52);
+                    decal.position.set(0, sz.y * 0.1, sz.z * 0.55);
                 }
 
                 clone.add(decal);
@@ -633,10 +626,11 @@
             labelColor: cfg.labelColor || '#1B2D3E',
             labelColorway: cfg.labelColorway || null,
             logo:     cfg.logo || null,
-            onReady:  cfg.onReady,
-            controls: null,
-            _paused:  false,
-            interactive: !!cfg.interactive
+            onReady:     cfg.onReady,
+            controls:    null,
+            _paused:     false,
+            interactive: !!cfg.interactive,
+            labelLocked: !!cfg.labelLocked
         };
 
         load().then(() => {
@@ -703,6 +697,7 @@
                     }
 
                     if (!hits.length) return;
+                    if (v.labelLocked && hits[0].object.userData && hits[0].object.userData.isLabelDecal) return;
                     e.stopPropagation();
                     if (v.controls) v.controls.enabled = false;
                     const hit = hits[0];
@@ -943,6 +938,20 @@
                 } else {
                     v.model.rotation.y = state.sharedRotY;
                 }
+
+                // Hide label decals when guard's back faces the camera (prevents bleed-through)
+                v.model.traverse(function (ch) {
+                    if (!ch.userData || !ch.userData.isLabelDecal) return;
+                    if (v.controls) {
+                        // Orbit controls: camera moves, model stays. Show if camera is in front (+Z side).
+                        ch.visible = v.camera.position.z > 0;
+                    } else {
+                        // Auto-spin: hide when guard shows its back (rotation.y between 90° and 270°)
+                        const r = ((v.model.rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                        ch.visible = r < Math.PI * 0.55 || r > Math.PI * 1.45;
+                    }
+                });
+
                 renderer.setSize(w, h, false);
                 v.camera.aspect = w / h;
                 v.camera.updateProjectionMatrix();

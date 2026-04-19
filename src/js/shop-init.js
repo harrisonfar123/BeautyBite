@@ -9,7 +9,7 @@
     // ── Product tiers & their BB3D viewer configs ────────────────────────
     const TIER_VIEWS = {
         'clear-bulk':         { color: '#6E7E88', bg: '#0A1929', finish: 'clear',    rotSpeed: 0.0035, label: null,           labelColor: '#5C8EA6' },
-        'beautybite-branded': { color: '#F4F6F8', bg: '#13243A', finish: 'silicone', rotSpeed: 0.0030, label: 'Beauty Bite',  labelColor: '#5C8EA6', labelColorway: 'badge' },
+        'beautybite-branded': { color: '#C8D4DC', bg: '#13243A', finish: 'silicone', rotSpeed: 0.0030, label: 'Beauty Bite', labelColor: '#5C8EA6', labelColorway: null },
         'custom-branded':     { color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',   rotSpeed: 0.0050, label: null,           labelColor: '#5C8EA6' }
     };
 
