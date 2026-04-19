@@ -6,25 +6,28 @@
 
     const TIER_VIEWS = {
         'clear-bulk': {
-            color:    '#B8E4FF',
+            color:    '#FFFFFF',
             bg:       '#0A1929',
-            finish:   'glossy',
+            finish:   'clear',
             rotSpeed: 0.0075,
-            label:    null
+            label:    null,
+            labelColor: '#1B2D3E'
         },
         'beautybite-branded': {
-            color:    '#8BB8CC',
-            bg:       '#081422',
+            color:    '#F4F6F8',
+            bg:       '#13243A',
             finish:   'silicone',
             rotSpeed: 0.0065,
-            label:    null
+            label:    'Beauty Bite',
+            labelColor: '#1B2D3E'
         },
         'custom-branded': {
             color:    '#5C8EA6',
             bg:       '#080F1E',
             finish:   'glossy',
             rotSpeed: 0.011,
-            label:    null
+            label:    null,
+            labelColor: '#1B2D3E'
         }
     };
 
@@ -61,14 +64,15 @@
 
         BB3D.registerViewer({
             canvas,
-            color:    view.color,
-            bg:       view.bg,
-            finish:   view.finish,
-            rotSpeed: view.rotSpeed,
-            label:    view.label,
-            scale:    1.85,
-            camZ:     4.0,
-            camY:     0.6,
+            color:      view.color,
+            bg:         view.bg,
+            finish:     view.finish,
+            rotSpeed:   view.rotSpeed,
+            label:      view.label,
+            labelColor: view.labelColor,
+            scale:      1.85,
+            camZ:       4.0,
+            camY:       0.6,
             onReady:    function () { hideLoader(productId); },
             onFallback: function () { hideLoader(productId); }
         });

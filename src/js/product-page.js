@@ -2,7 +2,6 @@
 // Dependencies on page:
 //   window.productCatalog   (src/js/products.js)
 //   window.BB3D             (src/js/bb3d.js)
-//   window.Stripe           (Stripe.js v3)
 
 (function () {
     'use strict';
@@ -50,16 +49,20 @@
     // ────────────────────────────────────────────────────────────
     const VIEW_CONFIGS = {
         'clear-bulk': {
-            color: '#B8E4FF', bg: '#0A1929', finish: 'glossy',
-            finishLabel: 'Clear EVA'
+            color: '#FFFFFF', bg: '#0A1929', finish: 'clear',
+            finishLabel: 'Clear EVA',
+            label: null
         },
         'beautybite-branded': {
-            color: '#8BB8CC', bg: '#081422', finish: 'silicone',
-            finishLabel: 'Signature Silicone'
+            color: '#F4F6F8', bg: '#13243A', finish: 'silicone',
+            finishLabel: 'Signature White',
+            label: 'Beauty Bite',
+            labelColor: '#1B2D3E'
         },
         'custom-branded': {
             color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
-            finishLabel: 'Custom Silicone'
+            finishLabel: 'Custom Silicone',
+            label: null
         }
     };
 
@@ -153,134 +156,6 @@
             cart.items.push(newItem);
         }
         saveCart(cart);
-    }
-
-    // ────────────────────────────────────────────────────────────
-    // Stripe checkout flow
-    // ────────────────────────────────────────────────────────────
-    const stripeState = {
-        stripe:   null,
-        elements: null,
-        mounted:  false,
-        clientSecret: null
-    };
-
-    async function fetchStripeKey () {
-        try {
-            const r = await fetch('/api/config/stripe-publishable-key');
-            if (!r.ok) return null;
-            const j = await r.json();
-            return j.publishableKey || null;
-        } catch (_) { return null; }
-    }
-
-    async function openStripeCheckout (ctx) {
-        const { product, quantity, option, total, metadata } = ctx;
-
-        $('stripe-summary-text').textContent =
-            `${product.name} × ${quantity}`;
-        $('stripe-summary-total').textContent = fmt(total);
-        $('stripe-error').textContent = '';
-        $('stripe-pay-label').textContent = 'Pay ' + fmt(total);
-        $('stripe-overlay').classList.add('show');
-
-        try {
-            if (!window.Stripe) {
-                $('stripe-error').textContent = 'Payment system unavailable. Please refresh.';
-                return;
-            }
-            if (!stripeState.stripe) {
-                const key = await fetchStripeKey();
-                if (!key) {
-                    $('stripe-error').textContent = 'Payment not configured. Contact us to order.';
-                    return;
-                }
-                stripeState.stripe = Stripe(key);
-            }
-
-            // Request PaymentIntent
-            const r = await fetch('/api/stripe/create-payment-intent-custom', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productType: product.id,
-                    quantity,
-                    currency: 'usd',
-                    metadata: metadata || {}
-                })
-            });
-            if (!r.ok) {
-                const err = await r.json().catch(() => ({}));
-                $('stripe-error').textContent = err.error || 'Could not start checkout.';
-                return;
-            }
-            const { clientSecret } = await r.json();
-            if (!clientSecret) {
-                $('stripe-error').textContent = 'Payment init failed.';
-                return;
-            }
-            stripeState.clientSecret = clientSecret;
-
-            // Mount Payment Element (recreate per-session so amount changes take effect)
-            const el = $('stripe-payment-element');
-            el.innerHTML = '';
-            stripeState.elements = stripeState.stripe.elements({
-                clientSecret,
-                appearance: {
-                    theme: 'stripe',
-                    variables: {
-                        colorPrimary:    '#5C8EA6',
-                        colorBackground: '#ffffff',
-                        colorText:       '#1B2D3E',
-                        fontFamily:      'Inter, system-ui, sans-serif',
-                        borderRadius:    '6px'
-                    }
-                }
-            });
-            const paymentEl = stripeState.elements.create('payment');
-            paymentEl.mount('#stripe-payment-element');
-            stripeState.mounted = true;
-
-        } catch (e) {
-            console.error(e);
-            $('stripe-error').textContent = 'Checkout error. Please try again.';
-        }
-    }
-
-    function closeStripeCheckout () {
-        $('stripe-overlay').classList.remove('show');
-        stripeState.mounted = false;
-        stripeState.elements = null;
-        stripeState.clientSecret = null;
-        $('stripe-payment-element').innerHTML = '';
-    }
-
-    async function confirmStripePayment () {
-        if (!stripeState.stripe || !stripeState.elements) return;
-        const btn = $('stripe-pay');
-        btn.disabled = true;
-        const prev = $('stripe-pay-label').textContent;
-        $('stripe-pay-label').textContent = 'Processing…';
-        $('stripe-error').textContent = '';
-
-        const { error } = await stripeState.stripe.confirmPayment({
-            elements: stripeState.elements,
-            confirmParams: {
-                return_url: location.origin + '/dashboard'
-            },
-            redirect: 'if_required'
-        });
-
-        if (error) {
-            $('stripe-error').textContent = error.message || 'Payment failed.';
-            btn.disabled = false;
-            $('stripe-pay-label').textContent = prev;
-            return;
-        }
-        toast('Payment successful — check your email for confirmation.');
-        setTimeout(() => {
-            location.href = '/dashboard';
-        }, 1400);
     }
 
     // ────────────────────────────────────────────────────────────
@@ -439,13 +314,15 @@
 
         viewer = window.BB3D.registerViewer({
             canvas,
-            color:    view.color,
-            bg:       view.bg,
-            finish:   view.finish,
-            rotSpeed: 0.007,
-            scale:    2.0,
-            camZ:     3.6,
-            camY:     0.5,
+            color:      view.color,
+            bg:         view.bg,
+            finish:     view.finish,
+            label:      view.label || null,
+            labelColor: view.labelColor || '#1B2D3E',
+            rotSpeed:   0.007,
+            scale:      2.0,
+            camZ:       3.6,
+            camY:       0.5,
             interactive: true,
             onReady:    hideLoader,
             onFallback: hideLoader
@@ -514,30 +391,6 @@
             } catch (e) {
                 toast(e.message || 'Could not add to cart', true);
             }
-        });
-
-        $('btn-checkout').addEventListener('click', () => {
-            const qty = state.getQty();
-            const opt = state.getOption();
-            const metadata = {};
-            if (product.id === 'custom-branded' && selectedDesign) {
-                metadata.design    = selectedDesign.id;
-                metadata.designName = selectedDesign.name;
-            }
-            openStripeCheckout({
-                product,
-                quantity: qty,
-                option:   opt,
-                total:    state.currentTotal,
-                metadata
-            });
-        });
-
-        $('stripe-close').addEventListener('click', closeStripeCheckout);
-        $('stripe-cancel').addEventListener('click', closeStripeCheckout);
-        $('stripe-pay').addEventListener('click', confirmStripePayment);
-        $('stripe-overlay').addEventListener('click', (e) => {
-            if (e.target === $('stripe-overlay')) closeStripeCheckout();
         });
     }
 

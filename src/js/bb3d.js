@@ -66,16 +66,19 @@
             off.width = 480; off.height = 320;
             const r = new THREE.WebGLRenderer({
                 canvas: off,
-                antialias: false,
+                antialias: true,
                 alpha: false,
                 preserveDrawingBuffer: true,
                 powerPreference: 'default',
                 failIfMajorPerformanceCaveat: false
             });
             r.setPixelRatio(1);
-            r.outputEncoding = THREE.sRGBEncoding || r.outputEncoding;
+            // Linear output + no tone mapping keeps colors predictable on r128.
+            // sRGBEncoding + MeshPhysicalMaterial without an envMap was rendering
+            // meshes fully black on some GPUs; linear path avoids that class of bug.
+            if ('outputEncoding' in r) r.outputEncoding = THREE.LinearEncoding;
             r.toneMapping    = THREE.NoToneMapping;
-            r.toneMappingExposure = 1.4;
+            r.toneMappingExposure = 1.0;
             state.renderer = r;
             return r;
         } catch (e) {
@@ -108,33 +111,97 @@
     // ────────────────────────────────────────────────────────────
     function makeMaterial (opts) {
         const o = opts || {};
-        const color    = new THREE.Color(o.color || BRAND_BLUE);
-        const finish   = o.finish || 'silicone';          // silicone | glossy | matte
-        const emiss    = new THREE.Color(o.color || BRAND_BLUE).multiplyScalar(0.18);
+        const base     = o.color || BRAND_BLUE;
+        const color    = new THREE.Color(base);
+        const finish   = o.finish || 'silicone';          // silicone | glossy | matte | clear
+        // Small emissive floor so the mesh is readable even on very dark backgrounds,
+        // but not so high that it washes out the actual color.
+        const emiss    = new THREE.Color(base).multiplyScalar(0.12);
 
+        if (finish === 'clear') {
+            // Translucent-looking EVA, rendered with MeshStandardMaterial so we do
+            // NOT need a PMREM environment map.
+            return new THREE.MeshStandardMaterial({
+                color: new THREE.Color('#E9F4FB'),
+                roughness: 0.25,
+                metalness: 0.0,
+                transparent: true,
+                opacity: 0.72,
+                emissive: new THREE.Color('#B8E4FF').multiplyScalar(0.15),
+                emissiveIntensity: 0.4,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+        }
         if (finish === 'glossy') {
-            return new THREE.MeshPhysicalMaterial({
-                color, roughness: 0.08, metalness: 0.05,
-                clearcoat: 0.9, clearcoatRoughness: 0.08,
-                emissive: emiss, emissiveIntensity: 0.45,
+            return new THREE.MeshStandardMaterial({
+                color, roughness: 0.22, metalness: 0.1,
+                emissive: emiss, emissiveIntensity: 0.25,
                 side: THREE.DoubleSide
             });
         }
         if (finish === 'matte') {
             return new THREE.MeshStandardMaterial({
-                color, roughness: 0.78, metalness: 0.0,
-                emissive: emiss, emissiveIntensity: 0.35,
+                color, roughness: 0.75, metalness: 0.0,
+                emissive: emiss, emissiveIntensity: 0.2,
                 side: THREE.DoubleSide
             });
         }
-        // default "silicone" — medical-grade feel
-        return new THREE.MeshPhysicalMaterial({
-            color, roughness: 0.35, metalness: 0.0,
-            clearcoat: 0.4, clearcoatRoughness: 0.35,
-            emissive: emiss, emissiveIntensity: 0.4,
-            transmission: 0.0, ior: 1.45,
+        // default "silicone" — medical-grade feel, no envMap dependency.
+        return new THREE.MeshStandardMaterial({
+            color, roughness: 0.4, metalness: 0.0,
+            emissive: emiss, emissiveIntensity: 0.22,
             side: THREE.DoubleSide
         });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Build a CanvasTexture with branded text for label decals.
+    // ────────────────────────────────────────────────────────────
+    function makeLabelTexture (text, opts) {
+        const o = opts || {};
+        const W = 1024, H = 256;
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, W, H);
+
+        // soft shadow under text for legibility on any base color
+        ctx.font = '700 ' + (o.fontSize || 130) + 'px "Pacifico", "Brush Script MT", cursive';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(20,40,60,0.35)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 3;
+        ctx.fillStyle = o.color || '#1B2D3E';
+        ctx.fillText(text, W / 2, H / 2);
+
+        const tex = new THREE.CanvasTexture(c);
+        // Linear to match renderer.outputEncoding = LinearEncoding.
+        if ('encoding' in tex) tex.encoding = THREE.LinearEncoding;
+        tex.anisotropy = 4;
+        tex.needsUpdate = true;
+        return tex;
+    }
+
+    function buildLabelDecal (text, opts) {
+        if (!text) return null;
+        const o = opts || {};
+        const tex = makeLabelTexture(text, { color: o.color || '#1B2D3E', fontSize: 130 });
+        const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        });
+        const w = o.width  || 0.85;
+        const h = o.height || 0.22;
+        const geom = new THREE.PlaneGeometry(w, h);
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.position.set(o.x || 0, o.y || 0.02, o.z || 0.42);
+        mesh.userData.isLabelDecal = true;
+        return mesh;
     }
 
     // ────────────────────────────────────────────────────────────
@@ -144,17 +211,19 @@
         const sc = new THREE.Scene();
         sc.background = new THREE.Color(bgHex || NAVY);
 
-        // Ambient
-        sc.add(new THREE.AmbientLight(0xffffff, 2.2));
-        // Key
-        const key  = new THREE.DirectionalLight(0xffffff, 3.4);
-        key.position.set(4, 6, 4); sc.add(key);
-        // Fill (brand blue)
-        const fill = new THREE.DirectionalLight(new THREE.Color(BRAND_LIGHT), 1.6);
-        fill.position.set(-4, 2, -3); sc.add(fill);
-        // Rim (navy glow)
-        const rim  = new THREE.DirectionalLight(new THREE.Color(BRAND_DARK), 1.0);
-        rim.position.set(0, -2, -5);  sc.add(rim);
+        // Hemisphere provides a soft wrap-around fill so the mesh is never fully dark.
+        sc.add(new THREE.HemisphereLight(0xffffff, new THREE.Color(BRAND_DARK), 0.45));
+        // Ambient — global baseline.
+        sc.add(new THREE.AmbientLight(0xffffff, 0.3));
+        // Key — front-top.
+        const key  = new THREE.DirectionalLight(0xffffff, 0.9);
+        key.position.set(4, 6, 5); sc.add(key);
+        // Fill — brand light, opposite side.
+        const fill = new THREE.DirectionalLight(new THREE.Color(BRAND_LIGHT), 0.5);
+        fill.position.set(-4, 2, 3); sc.add(fill);
+        // Rim — edge lift from behind.
+        const rim  = new THREE.DirectionalLight(new THREE.Color(BRAND_LIGHT), 0.35);
+        rim.position.set(0, 1, -5); sc.add(rim);
 
         return sc;
     }
@@ -171,12 +240,54 @@
         clone.position.y += (opts.yOffset != null ? opts.yOffset : -0.05);
         clone.traverse(c => {
             if (c.isMesh) {
+                // The shipped GLB has no vertex normals — without normals, any lit
+                // material (Standard / Physical) renders pure black. Generate them
+                // on first use so lighting + shading works everywhere.
+                if (c.geometry && !c.geometry.getAttribute('normal')) {
+                    c.geometry.computeVertexNormals();
+                }
                 c.material = makeMaterial({ color: opts.color, finish: opts.finish });
                 c.castShadow = false; c.receiveShadow = false;
             }
         });
+        if (opts.label) {
+            const labelScale = 1 / ((opts.scale || 1.6) / maxDim);
+            const decal = buildLabelDecal(opts.label, { color: opts.labelColor || '#1B2D3E' });
+            if (decal) {
+                decal.scale.setScalar(labelScale);
+                clone.add(decal);
+            }
+        }
         scene.add(clone);
         return clone;
+    }
+
+    function removeLabelDecal (model) {
+        if (!model) return;
+        const toRemove = [];
+        model.traverse(c => { if (c.userData && c.userData.isLabelDecal) toRemove.push(c); });
+        toRemove.forEach(n => {
+            if (n.parent) n.parent.remove(n);
+            if (n.material) {
+                if (n.material.map) n.material.map.dispose();
+                n.material.dispose();
+            }
+            if (n.geometry) n.geometry.dispose();
+        });
+    }
+
+    function setViewerLabel (v, label, opts) {
+        if (!v || !v.model) return;
+        removeLabelDecal(v.model);
+        if (!label) return;
+        const box = new THREE.Box3().setFromObject(v.model);
+        const sz = box.getSize(new THREE.Vector3());
+        const scaleFactor = 1 / v.model.scale.x;
+        const decal = buildLabelDecal(label, { color: (opts && opts.color) || '#1B2D3E' });
+        if (decal) {
+            decal.scale.setScalar(scaleFactor);
+            v.model.add(decal);
+        }
     }
 
     // ────────────────────────────────────────────────────────────
@@ -211,6 +322,8 @@
             rotSpeed: cfg.rotSpeed != null ? cfg.rotSpeed : 0.008,
             yOffset:  cfg.yOffset,
             scale:    cfg.scale,
+            label:    cfg.label || null,
+            labelColor: cfg.labelColor || '#1B2D3E',
             onReady:  cfg.onReady,
             controls: null,
             _paused:  false,
@@ -245,7 +358,9 @@
         if (!v || !v.model) return;
         v.color = hex;
         v.model.traverse(c => {
-            if (c.isMesh) c.material = makeMaterial({ color: v.color, finish: v.finish });
+            if (c.isMesh && !(c.userData && c.userData.isLabelDecal)) {
+                c.material = makeMaterial({ color: v.color, finish: v.finish });
+            }
         });
     }
 
@@ -253,7 +368,9 @@
         if (!v || !v.model) return;
         v.finish = finish;
         v.model.traverse(c => {
-            if (c.isMesh) c.material = makeMaterial({ color: v.color, finish: v.finish });
+            if (c.isMesh && !(c.userData && c.userData.isLabelDecal)) {
+                c.material = makeMaterial({ color: v.color, finish: v.finish });
+            }
         });
     }
 
@@ -430,7 +547,7 @@
         probeWebGL,
         load,
         registerViewer, unregisterViewer,
-        setViewerColor, setViewerFinish,
+        setViewerColor, setViewerFinish, setViewerLabel,
         startLoop,
         makeMaterial,
         draw2DGuard,

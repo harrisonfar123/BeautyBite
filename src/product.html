@@ -416,64 +416,6 @@
         }
         .toast.error { background: #c0392b; }
 
-        /* Stripe modal */
-        .stripe-overlay {
-            position: fixed; inset: 0;
-            background: rgba(8, 18, 30, 0.68);
-            backdrop-filter: blur(6px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-        .stripe-overlay.show { display: flex; animation: fadeIn 0.25s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .stripe-modal {
-            background: white;
-            border-radius: var(--radius-lg);
-            max-width: 460px;
-            width: 100%;
-            padding: 2rem 2rem 1.5rem;
-            box-shadow: var(--shadow-xl);
-        }
-        .stripe-modal-head {
-            display: flex; align-items: flex-start; justify-content: space-between;
-            margin-bottom: 1.25rem;
-        }
-        .stripe-modal-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
-        .stripe-modal-sub { font-size: 0.88rem; color: var(--text-secondary); }
-        .stripe-modal-close {
-            background: var(--gray-50); border: none; cursor: pointer;
-            width: 32px; height: 32px; border-radius: 50%;
-            font-size: 1.1rem; color: var(--text-secondary);
-            transition: var(--transition);
-        }
-        .stripe-modal-close:hover { background: var(--gray-100); color: var(--text-primary); }
-        .stripe-modal-summary {
-            background: var(--gray-50);
-            border-radius: var(--radius-sm);
-            padding: 0.85rem 1rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.92rem;
-            color: var(--text-secondary);
-            display: flex; justify-content: space-between;
-        }
-        .stripe-modal-summary strong { color: var(--text-primary); }
-        #stripe-payment-element {
-            min-height: 200px;
-        }
-        .stripe-modal-error {
-            color: #c0392b;
-            font-size: 0.85rem;
-            min-height: 1.2rem;
-            margin: 0.5rem 0;
-        }
-        .stripe-modal-actions {
-            display: flex; gap: 0.75rem; margin-top: 1rem;
-        }
-        .stripe-modal-actions .btn { flex: 1; }
-
         @media (max-width: 900px) {
             .product-grid { grid-template-columns: 1fr; gap: 2rem; }
             .viewer-panel { position: static; }
@@ -571,10 +513,7 @@
                     </div>
 
                     <div class="action-row">
-                        <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-checkout">
-                            <span id="btn-checkout-label">Checkout with Stripe</span>
-                        </button>
-                        <button type="button" class="btn btn-outline btn-block" id="btn-cart">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-cart">
                             Add to Cart
                         </button>
                     </div>
@@ -665,38 +604,13 @@
     </div>
 </footer>
 
-<!-- Toast + Stripe modal -->
+<!-- Toast -->
 <div class="toast" id="toast"></div>
-
-<div class="stripe-overlay" id="stripe-overlay">
-    <div class="stripe-modal">
-        <div class="stripe-modal-head">
-            <div>
-                <div class="stripe-modal-title">Secure Checkout</div>
-                <div class="stripe-modal-sub">Powered by Stripe — your card details never touch our servers.</div>
-            </div>
-            <button class="stripe-modal-close" id="stripe-close" aria-label="Close">×</button>
-        </div>
-        <div class="stripe-modal-summary">
-            <span id="stripe-summary-text">—</span>
-            <strong id="stripe-summary-total">$0.00</strong>
-        </div>
-        <div id="stripe-payment-element"></div>
-        <div class="stripe-modal-error" id="stripe-error"></div>
-        <div class="stripe-modal-actions">
-            <button type="button" class="btn btn-ghost" id="stripe-cancel">Cancel</button>
-            <button type="button" class="btn btn-primary" id="stripe-pay">
-                <span id="stripe-pay-label">Pay Now</span>
-            </button>
-        </div>
-    </div>
-</div>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
 <script src="/js/header-init.js"></script>
 <script src="/js/products.js"></script>
 <script src="/js/bb3d.js"></script>
