@@ -280,12 +280,9 @@
         });
         const mat = new THREE.MeshBasicMaterial({
             map: tex, transparent: true,
-            depthTest: true,   // hides behind guard when rotated
+            depthTest: false,   // always on top — visible through guard from any angle
             depthWrite: false,
-            polygonOffset: true,
-            polygonOffsetFactor: -3,
-            polygonOffsetUnits: -3,
-            side: THREE.FrontSide  // only visible when facing camera
+            side: THREE.DoubleSide  // visible and raycaster-hittable from both sides
         });
         const geom = new THREE.PlaneGeometry((o.width || 1.0) * ts, (o.height || 0.25) * ts);
         const mesh = new THREE.Mesh(geom, mat);
@@ -679,8 +676,32 @@
                 v.canvas.addEventListener('pointerdown', (e) => {
                     if (!v.model) return;
                     toNDC(e);
+                    v.model.updateMatrixWorld(true);
                     raycaster.setFromCamera(ptr, v.camera);
-                    const hits = raycaster.intersectObjects(decals(), false);
+
+                    // Primary: mesh raycast against decal geometries
+                    let hits = raycaster.intersectObjects(decals(), false);
+
+                    // Fallback: screen-space proximity check for surface-snapped decals
+                    // (thin plane can be missed by the raycast if the view angle is shallow)
+                    if (!hits.length) {
+                        const r   = v.canvas.getBoundingClientRect();
+                        const clickX = e.clientX - r.left;
+                        const clickY = e.clientY - r.top;
+                        const PAD = 18; // pixel tolerance
+                        for (const d of decals()) {
+                            const b = getDecalScreenBounds(v, d);
+                            if (!b) continue;
+                            if (clickX >= b.minX - PAD && clickX <= b.maxX + PAD &&
+                                clickY >= b.minY - PAD && clickY <= b.maxY + PAD) {
+                                const wp = new THREE.Vector3();
+                                d.getWorldPosition(wp);
+                                hits = [{ object: d, point: wp, distance: v.camera.position.distanceTo(wp) }];
+                                break;
+                            }
+                        }
+                    }
+
                     if (!hits.length) return;
                     e.stopPropagation();
                     if (v.controls) v.controls.enabled = false;
@@ -716,30 +737,41 @@
                 v.canvas.addEventListener('pointermove', (e) => {
                     if (!drag) return;
                     toNDC(e);
+                    v.model.updateMatrixWorld(true);
                     raycaster.setFromCamera(ptr, v.camera);
 
                     if (drag.decal.userData && drag.decal.userData.surfaceSnapped) {
-                        // Re-project onto the model surface at the new pointer position
+                        // Try to re-project onto the model surface first
                         const meshes = [];
                         v.model.traverse(c => {
                             if (c.isMesh && !c.userData.isLabelDecal && !c.userData.isLogoDecal) meshes.push(c);
                         });
-                        const hits = raycaster.intersectObjects(meshes, false);
-                        if (hits.length > 0) {
-                            const hit   = hits[0];
+                        const surfaceHits = raycaster.intersectObjects(meshes, false);
+                        if (surfaceHits.length > 0) {
+                            const hit   = surfaceHits[0];
                             const s     = v.model.scale.x || 1;
                             const wNorm = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
                             const invM  = new THREE.Matrix4().copy(v.model.matrixWorld).invert();
                             const lNorm = wNorm.clone().transformDirection(invM).normalize();
                             const lPos  = v.model.worldToLocal(hit.point.clone());
                             lPos.addScaledVector(lNorm, 0.012 / s);
-                            // Preserve the user-applied rotation on top of the new surface orientation
                             const baseQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
-                            if (drag.userRotQ) {
-                                baseQ.multiply(drag.userRotQ);
-                            }
+                            if (drag.userRotQ) baseQ.multiply(drag.userRotQ);
                             drag.decal.quaternion.copy(baseQ);
                             drag.decal.position.copy(lPos);
+                        } else {
+                            // Fallback: slide along the camera-perpendicular plane so
+                            // the drag still feels responsive when pointer leaves the guard.
+                            const worldPt = new THREE.Vector3();
+                            if (raycaster.ray.intersectPlane(drag.plane, worldPt)) {
+                                const worldDelta = worldPt.clone().sub(drag.startWorld);
+                                const s  = v.model.scale.x || 1;
+                                drag.decal.position.set(
+                                    drag.startLocal.x + worldDelta.x / s,
+                                    drag.startLocal.y + worldDelta.y / s,
+                                    drag.startLocal.z
+                                );
+                            }
                         }
                     } else {
                         const worldPt = new THREE.Vector3();
