@@ -391,21 +391,63 @@
         });
         if (opts.label) {
             const labelScale = 1 / ((opts.scale || 1.6) / maxDim);
-            // Single decal on the front (lip-facing) surface of the guard.
-            // The camera sits at +Z, so +sz.z * 0.55 places the plane just proud
-            // of the front surface. PlaneGeometry normal points +Z → faces camera.
-            // depthTest:true + FrontSide hides it when the guard rotates away.
             const isBadge = opts.labelColorway === 'badge' || opts.labelColorway === 'reverse';
             const decal = buildLabelDecal(opts.label, {
                 color:      isBadge ? '#FFFFFF' : (opts.labelColor || '#5C8EA6'),
                 background: isBadge ? (opts.labelColor || '#5C8EA6') : null
             });
             if (decal) {
-                // Scale down slightly to fit the narrower anterior arch section.
                 decal.scale.setScalar(labelScale * 0.68);
-                // Move downward in Y to the anterior (front-teeth) bite area,
-                // staying on the outer face of the guard (sz.z * 0.52).
-                decal.position.set(0, sz.y * -0.38, sz.z * 0.52);
+
+                // Raycast from camera position toward the guard's front surface.
+                // This snaps the decal to the actual mesh face instead of a fixed offset.
+                clone.updateMatrix();
+                clone.updateMatrixWorld(true);
+
+                const camY = opts.camY != null ? opts.camY : 0.4;
+                const camZ = opts.camZ != null ? opts.camZ : 3.8;
+                const camPos = new THREE.Vector3(0, camY, camZ);
+                // Aim slightly toward the anterior (center-front) of the arch
+                const target = new THREE.Vector3(0, camY * 0.15, 0);
+                const rayDir = target.clone().sub(camPos).normalize();
+
+                const rc2 = new THREE.Raycaster();
+                rc2.set(camPos, rayDir);
+
+                const guardMeshes = [];
+                clone.traverse(ch => {
+                    if (ch.isMesh && !ch.userData.isLabelDecal && !ch.userData.isLogoDecal) {
+                        guardMeshes.push(ch);
+                    }
+                });
+
+                let placed = false;
+                const hits2 = rc2.intersectObjects(guardMeshes, false);
+                if (hits2.length > 0) {
+                    const hit = hits2[0];
+                    // Get world-space face normal; ensure it faces the camera
+                    const wNorm = hit.face.normal.clone()
+                        .transformDirection(hit.object.matrixWorld).normalize();
+                    const toCam = camPos.clone().sub(hit.point).normalize();
+                    if (wNorm.dot(toCam) < 0) wNorm.negate();
+
+                    const invM = new THREE.Matrix4().copy(clone.matrixWorld).invert();
+                    const lNorm = wNorm.clone().transformDirection(invM).normalize();
+                    const lPos  = clone.worldToLocal(hit.point.clone());
+                    // Push the decal 1.5% of model size off the surface so it doesn't z-fight
+                    lPos.addScaledVector(lNorm, 0.015 / (clone.scale.x || 1));
+                    decal.position.copy(lPos);
+                    // Align decal plane's +Z with the outward surface normal
+                    decal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
+                    decal.userData.surfaceSnapped = true;
+                    placed = true;
+                }
+
+                if (!placed) {
+                    // Fallback: centre of the anterior face
+                    decal.position.set(0, sz.y * 0.05, sz.z * 0.52);
+                }
+
                 clone.add(decal);
             }
         }
@@ -588,8 +630,11 @@
             rotSpeed: cfg.rotSpeed != null ? cfg.rotSpeed : 0.008,
             yOffset:  cfg.yOffset,
             scale:    cfg.scale,
+            camY:     cfg.camY != null ? cfg.camY : 0.4,
+            camZ:     cfg.camZ || 3.8,
             label:    cfg.label || null,
             labelColor: cfg.labelColor || '#1B2D3E',
+            labelColorway: cfg.labelColorway || null,
             logo:     cfg.logo || null,
             onReady:  cfg.onReady,
             controls: null,
