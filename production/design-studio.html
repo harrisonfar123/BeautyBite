@@ -407,6 +407,41 @@
         .logo-controls.visible { display: block; }
         .logo-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; }
 
+        /* ── Transform gizmo overlay ─────────────────────────── */
+        #gizmo-overlay {
+            position: absolute; inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 12;
+        }
+        #gizmo-lines {
+            position: absolute; inset: 0;
+            pointer-events: none;
+            width: 100%; height: 100%;
+        }
+        .gizmo-handle {
+            position: absolute;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 2.5px solid #5C8EA6;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            z-index: 13;
+            display: none;
+            box-shadow: 0 1px 4px rgba(27,45,62,0.35);
+            cursor: nwse-resize;
+            transition: background 0.1s;
+        }
+        .gizmo-handle:hover { background: #E0EEF5; }
+        .gizmo-handle.rotate {
+            background: #5C8EA6;
+            cursor: grab;
+            width: 16px; height: 16px;
+        }
+        .gizmo-handle.rotate:hover { background: #1B2D3E; }
+        .gizmo-handle.ne, .gizmo-handle.sw { cursor: nesw-resize; }
+
         @media (max-width: 920px) {
             body { overflow: auto; height: auto; }
             .studio-shell {
@@ -583,6 +618,23 @@
         </div>
 
         <canvas id="viewer-canvas"></canvas>
+
+        <!-- Transform gizmo overlay — handles are positioned by JS each frame -->
+        <div id="gizmo-overlay">
+            <canvas id="gizmo-lines"></canvas>
+            <!-- label decal handles -->
+            <div class="gizmo-handle nw" id="gh-label-tl" data-decal="label" data-corner="tl"></div>
+            <div class="gizmo-handle ne" id="gh-label-tr" data-decal="label" data-corner="tr"></div>
+            <div class="gizmo-handle sw" id="gh-label-bl" data-decal="label" data-corner="bl"></div>
+            <div class="gizmo-handle se" id="gh-label-br" data-decal="label" data-corner="br"></div>
+            <div class="gizmo-handle rotate" id="gh-label-rot" data-decal="label" data-corner="rot"></div>
+            <!-- logo decal handles -->
+            <div class="gizmo-handle nw" id="gh-logo-tl" data-decal="logo" data-corner="tl"></div>
+            <div class="gizmo-handle ne" id="gh-logo-tr" data-decal="logo" data-corner="tr"></div>
+            <div class="gizmo-handle sw" id="gh-logo-bl" data-decal="logo" data-corner="bl"></div>
+            <div class="gizmo-handle se" id="gh-logo-br" data-decal="logo" data-corner="br"></div>
+            <div class="gizmo-handle rotate" id="gh-logo-rot" data-decal="logo" data-corner="rot"></div>
+        </div>
 
         <div class="viewport-label-overlay">
             <img class="logo-overlay" id="logo-overlay" alt="">
@@ -1124,8 +1176,6 @@ syncAll();
 initViewer();
 
 window.addEventListener('resize', () => {
-    // Canvas resize is handled automatically by BB3D's shared loop,
-    // but 2D fallback needs explicit redraw
     if (!viewer) {
         BB3D.draw2DGuard(el.viewerCanvas, {
             bg: '#1B2D3E',
@@ -1134,6 +1184,160 @@ window.addEventListener('resize', () => {
         });
     }
 });
+
+/* ── 10. Transform gizmo ─────────────────────────────────────────────── */
+(function () {
+    const gizmoLines = $('gizmo-lines');
+    const overlay    = $('gizmo-overlay');
+
+    const HANDLES = {
+        label: {
+            tl: $('gh-label-tl'), tr: $('gh-label-tr'),
+            bl: $('gh-label-bl'), br: $('gh-label-br'),
+            rot: $('gh-label-rot')
+        },
+        logo: {
+            tl: $('gh-logo-tl'), tr: $('gh-logo-tr'),
+            bl: $('gh-logo-bl'), br: $('gh-logo-br'),
+            rot: $('gh-logo-rot')
+        }
+    };
+
+    function getViewerDecalByType(type) {
+        if (!viewer) return null;
+        const decals = BB3D.getViewerDecals(viewer);
+        return decals.find(d => type === 'label' ? d.userData.isLabelDecal : d.userData.isLogoDecal) || null;
+    }
+
+    function positionHandle(el, x, y) {
+        el.style.left = x + 'px';
+        el.style.top  = y + 'px';
+        el.style.display = 'block';
+    }
+
+    function hideHandles(type) {
+        Object.values(HANDLES[type]).forEach(h => { h.style.display = 'none'; });
+    }
+
+    function drawGizmo() {
+        const cW = overlay.offsetWidth, cH = overlay.offsetHeight;
+        if (gizmoLines.width  !== cW) gizmoLines.width  = cW;
+        if (gizmoLines.height !== cH) gizmoLines.height = cH;
+
+        const ctx = gizmoLines.getContext('2d');
+        ctx.clearRect(0, 0, cW, cH);
+
+        ['label', 'logo'].forEach(type => {
+            const decal = getViewerDecalByType(type);
+            if (!decal) { hideHandles(type); return; }
+
+            const b = BB3D.getDecalScreenBounds(viewer, decal);
+            if (!b || (b.maxX - b.minX) < 4 || (b.maxY - b.minY) < 4) { hideHandles(type); return; }
+
+            const pad = 7;
+            const x1 = b.minX - pad, y1 = b.minY - pad;
+            const x2 = b.maxX + pad, y2 = b.maxY + pad;
+            const mx = (x1 + x2) / 2;
+
+            // Dashed border
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255,255,255,0.80)';
+            ctx.lineWidth   = 1.5;
+            ctx.setLineDash([5, 4]);
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            ctx.restore();
+
+            // Line to rotation handle
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255,255,255,0.60)';
+            ctx.lineWidth   = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(mx, y1);
+            ctx.lineTo(b.rotX, b.rotY);
+            ctx.stroke();
+            ctx.restore();
+
+            // Position corner handles
+            positionHandle(HANDLES[type].tl, x1, y1);
+            positionHandle(HANDLES[type].tr, x2, y1);
+            positionHandle(HANDLES[type].bl, x1, y2);
+            positionHandle(HANDLES[type].br, x2, y2);
+            positionHandle(HANDLES[type].rot, b.rotX, b.rotY);
+        });
+    }
+
+    // Run the gizmo draw in sync with the 3D loop
+    (function gizmoLoop() { drawGizmo(); requestAnimationFrame(gizmoLoop); })();
+
+    // ── Handle interactions ──────────────────────────────────────────
+    // corner drag  → scale
+    // rotate drag  → rotate around surface normal
+    let gizmoOp = null; // { type, corner, decal, startDist/startAngle, startPos }
+
+    function handleCenter(type) {
+        const b = BB3D.getDecalScreenBounds(viewer, getViewerDecalByType(type));
+        if (!b) return { x: 0, y: 0 };
+        return { x: (b.minX + b.maxX) / 2 + overlay.getBoundingClientRect().left,
+                 y: (b.minY + b.maxY) / 2 + overlay.getBoundingClientRect().top };
+    }
+
+    function setupHandlePointer(handleEl, type, corner) {
+        handleEl.addEventListener('pointerdown', (e) => {
+            if (!viewer) return;
+            e.stopPropagation();
+            const decal = getViewerDecalByType(type);
+            if (!decal) return;
+            handleEl.setPointerCapture(e.pointerId);
+
+            const rect = overlay.getBoundingClientRect();
+            const cx   = (BB3D.getDecalScreenBounds(viewer, decal).minX + BB3D.getDecalScreenBounds(viewer, decal).maxX) / 2;
+            const cy   = (BB3D.getDecalScreenBounds(viewer, decal).minY + BB3D.getDecalScreenBounds(viewer, decal).maxY) / 2;
+            const px   = e.clientX - rect.left;
+            const py   = e.clientY - rect.top;
+
+            if (corner === 'rot') {
+                gizmoOp = {
+                    type, corner, decal,
+                    startAngle: Math.atan2(py - cy, px - cx),
+                    cx, cy
+                };
+            } else {
+                const startDist = Math.hypot(px - cx, py - cy);
+                gizmoOp = { type, corner, decal, startDist, cx, cy };
+            }
+        });
+    }
+
+    ['label', 'logo'].forEach(type => {
+        ['tl', 'tr', 'bl', 'br', 'rot'].forEach(corner => {
+            setupHandlePointer(HANDLES[type][corner], type, corner);
+        });
+    });
+
+    document.addEventListener('pointermove', (e) => {
+        if (!gizmoOp) return;
+        const rect  = overlay.getBoundingClientRect();
+        const px    = e.clientX - rect.left;
+        const py    = e.clientY - rect.top;
+        const decal = gizmoOp.decal;
+
+        if (gizmoOp.corner === 'rot') {
+            const currAngle = Math.atan2(py - gizmoOp.cy, px - gizmoOp.cx);
+            const delta     = currAngle - gizmoOp.startAngle;
+            BB3D.rotateDecalBy(viewer, decal, delta);
+            gizmoOp.startAngle = currAngle;
+        } else {
+            const dist   = Math.hypot(px - gizmoOp.cx, py - gizmoOp.cy);
+            const factor = dist / Math.max(gizmoOp.startDist, 1);
+            BB3D.scaleDecalBy(viewer, decal, factor);
+            gizmoOp.startDist = dist;
+        }
+    });
+
+    document.addEventListener('pointerup', () => { gizmoOp = null; });
+    document.addEventListener('pointercancel', () => { gizmoOp = null; });
+})();
 </script>
 </body>
 </html>
