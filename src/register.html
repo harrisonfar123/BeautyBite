@@ -150,16 +150,17 @@
             <div class="form-group">
                 <label class="form-label" for="password">Password</label>
                 <input class="form-input" id="password" name="password" type="password"
-                       autocomplete="new-password" placeholder="At least 6 characters"
-                       minlength="6" required>
+                       autocomplete="new-password" placeholder="12+ chars, upper, lower, number"
+                       minlength="12" required>
                 <div class="pw-meter" id="pwMeter"><span></span><span></span><span></span><span></span></div>
                 <div class="pw-label" id="pwLabel"></div>
+                <div class="form-hint">Must be 12+ characters with uppercase, lowercase, and a number.</div>
             </div>
             <div class="form-group">
                 <label class="form-label" for="confirm">Confirm password</label>
                 <input class="form-input" id="confirm" name="confirm" type="password"
                        autocomplete="new-password" placeholder="Re-enter password"
-                       minlength="6" required>
+                       minlength="12" required>
             </div>
 
             <label class="terms-row">
@@ -253,13 +254,21 @@
 
     function passwordStrength (pw) {
         if (!pw) return { score: 0, label: '' };
+        const meets = {
+            len12:  pw.length >= 12,
+            upper:  /[A-Z]/.test(pw),
+            lower:  /[a-z]/.test(pw),
+            digit:  /[0-9]/.test(pw),
+            symbol: /[^A-Za-z0-9]/.test(pw),
+            len16:  pw.length >= 16
+        };
         let score = 0;
-        if (pw.length >= 6)  score++;
-        if (pw.length >= 10) score++;
-        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
-        if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
-        score = Math.min(score, 4);
-        const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        if (meets.len12) score++;
+        if (meets.upper && meets.lower) score++;
+        if (meets.digit) score++;
+        if (meets.symbol || meets.len16) score++;
+        if (!meets.len12) score = Math.min(score, 1);
+        const labels = ['', 'Too short', 'Weak', 'Good', 'Strong'];
         return { score, label: labels[score] };
     }
 
@@ -293,8 +302,20 @@
             showAlert('error', 'Please enter your email.');
             return;
         }
-        if (password.length < 6) {
-            showAlert('error', 'Password must be at least 6 characters.');
+        if (password.length < 12) {
+            showAlert('error', 'Password must be at least 12 characters.');
+            return;
+        }
+        if (!/[A-Z]/.test(password)) {
+            showAlert('error', 'Password must contain an uppercase letter.');
+            return;
+        }
+        if (!/[a-z]/.test(password)) {
+            showAlert('error', 'Password must contain a lowercase letter.');
+            return;
+        }
+        if (!/[0-9]/.test(password)) {
+            showAlert('error', 'Password must contain a number.');
             return;
         }
         if (password !== confirm) {
