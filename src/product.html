@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Beauty Bite</title>
+    <meta name="description" id="page-description" content="Beauty Bite — patented isolation guards for safe facial therapy.">
+    <link rel="icon" href="/logo2.webp" type="image/webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* ── Product page layout ─────────────────────────────── */
+        .product-hero {
+            background: linear-gradient(155deg, var(--navy) 0%, var(--navy-mid) 50%, #3A5570 100%);
+            color: white;
+            padding: 3.25rem 1.5rem 1.5rem;
+            position: relative;
+        }
+        .breadcrumb {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 1rem;
+        }
+        .breadcrumb a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .breadcrumb a:hover { color: white; }
+        .breadcrumb-sep { opacity: 0.4; }
+
+        .product-main {
+            background: var(--off-white);
+            padding: 0 0 5rem;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 3rem;
+            align-items: start;
+            position: relative;
+            z-index: 2;
+            margin-top: -1rem;
+        }
+
+        /* 3D viewer panel */
+        .viewer-panel {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 1.5rem;
+        }
+        .viewer-canvas-wrap {
+            position: relative;
+            height: 480px;
+            background: radial-gradient(circle at 50% 40%, #14304b 0%, #050d1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .viewer-canvas-wrap canvas {
+            display: block; width: 100%; height: 100%;
+        }
+        .viewer-loader {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .viewer-loader span {
+            width: 32px; height: 32px;
+            border: 2px solid rgba(255,255,255,0.18);
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: vSpin 0.8s linear infinite;
+        }
+        @keyframes vSpin { to { transform: rotate(360deg); } }
+        .viewer-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.4rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+        }
+        .viewer-foot-label { display: flex; align-items: center; gap: 0.5rem; }
+        .viewer-foot-label::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--brand);
+            display: inline-block;
+        }
+        .viewer-finish {
+            display: inline-flex; gap: 0.4rem; align-items: center;
+            background: var(--brand-bg);
+            color: var(--brand-dark);
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Detail panel */
+        .detail-panel { padding: 0 0 1rem; }
+        .detail-tag {
+            display: inline-block;
+            background: var(--brand-bg);
+            color: var(--brand-dark);
+            padding: 0.3rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .detail-name {
+            font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.7rem;
+            line-height: 1.1;
+        }
+        .detail-tagline {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .detail-price-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+        .detail-price-row {
+            display: flex; align-items: baseline; gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+        .detail-price {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+        .detail-unit { color: var(--text-secondary); font-size: 0.95rem; }
+        .detail-price-note { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+        .qty-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0 1.25rem;
+        }
+        .qty-block label,
+        .opt-block label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .qty-input-wrap {
+            display: flex;
+            align-items: stretch;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: white;
+        }
+        .qty-step {
+            background: var(--gray-50);
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            width: 42px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .qty-step:hover { background: var(--brand-bg); color: var(--brand-dark); }
+        .qty-input-wrap input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            font-family: var(--font-body);
+        }
+        .qty-input-wrap input:focus { outline: none; }
+        .qty-presets {
+            display: flex; gap: 0.4rem; flex-wrap: wrap;
+            margin-top: 0.6rem;
+        }
+        .qty-preset {
+            background: var(--gray-50);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-body);
+        }
+        .qty-preset:hover, .qty-preset.active {
+            background: var(--brand-bg);
+            color: var(--brand-dark);
+            border-color: var(--brand);
+        }
+
+        .opt-radio {
+            display: flex; align-items: center; gap: 0.7rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .opt-radio:hover { border-color: var(--brand); }
+        .opt-radio input { margin: 0; accent-color: var(--brand-dark); }
+        .opt-radio.checked { border-color: var(--brand); background: var(--brand-bg); }
+        .opt-radio .opt-label-row {
+            display: flex; align-items: baseline;
+            gap: 0.5rem; flex: 1;
+            font-size: 0.92rem;
+        }
+        .opt-radio .opt-label-row strong { color: var(--text-primary); font-weight: 600; }
+        .opt-radio .opt-label-row span   { color: var(--text-secondary); font-size: 0.82rem; }
+        .opt-radio .opt-save {
+            color: var(--brand-dark); font-weight: 700; font-size: 0.78rem;
+        }
+
+        .total-row {
+            display: flex; align-items: baseline; justify-content: space-between;
+            padding: 1rem 0 1.25rem;
+            border-top: 1px solid var(--border);
+            margin-top: 1.25rem;
+        }
+        .total-row .total-label { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .total-row .total-amount { font-size: 1.85rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+            margin-top: 0.4rem;
+        }
+        .ghost-link {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            text-decoration: none;
+            margin-top: 0.6rem;
+            transition: var(--transition);
+        }
+        .ghost-link:hover { color: var(--brand-dark); }
+
+        /* Features list */
+        .features-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.6rem 1.6rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .features-card h3 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 1rem;
+        }
+        .features-card ul { list-style: none; padding: 0; margin: 0; }
+        .features-card li {
+            display: flex; align-items: flex-start; gap: 0.65rem;
+            padding: 0.45rem 0; font-size: 0.93rem; color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .features-card li::before {
+            content: '✓'; color: var(--brand); font-weight: 700; flex-shrink: 0; margin-top: 0.05rem;
+        }
+
+        /* Custom design library */
+        .design-library {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem 1.5rem 1.75rem;
+            box-shadow: var(--shadow-sm);
+            margin-top: 1.5rem;
+        }
+        .design-library-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .design-library h3 {
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--brand-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin: 0;
+        }
+        .design-library-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0 0 1rem;
+        }
+        .design-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.7rem;
+            margin-bottom: 1rem;
+        }
+        .design-swatch {
+            position: relative;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            aspect-ratio: 1;
+            background: #fff;
+        }
+        .design-swatch:hover { transform: translateY(-2px); }
+        .design-swatch.selected {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(139,184,204,0.25);
+        }
+        .design-swatch-preview {
+            width: 100%; height: 70%;
+            display: block;
+        }
+        .design-swatch-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 0.2rem;
+            letter-spacing: 0.02em;
+        }
+
+        /* Spec table */
+        .spec-section {
+            background: white;
+            padding: 5rem 0 0;
+            border-top: 1px solid var(--border);
+        }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+        .spec-table tr { border-bottom: 1px solid var(--border); }
+        .spec-table tr:last-child { border-bottom: none; }
+        .spec-table th, .spec-table td {
+            text-align: left;
+            padding: 1rem 1.2rem;
+            font-size: 0.92rem;
+            vertical-align: top;
+        }
+        .spec-table th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--gray-50);
+            width: 38%;
+        }
+        .spec-table td { color: var(--text-secondary); }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--navy);
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 999px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast.error { background: #c0392b; }
+
+        /* Stripe modal */
+        .stripe-overlay {
+            position: fixed; inset: 0;
+            background: rgba(8, 18, 30, 0.68);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        .stripe-overlay.show { display: flex; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .stripe-modal {
+            background: white;
+            border-radius: var(--radius-lg);
+            max-width: 460px;
+            width: 100%;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: var(--shadow-xl);
+        }
+        .stripe-modal-head {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .stripe-modal-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
+        .stripe-modal-sub { font-size: 0.88rem; color: var(--text-secondary); }
+        .stripe-modal-close {
+            background: var(--gray-50); border: none; cursor: pointer;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 1.1rem; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .stripe-modal-close:hover { background: var(--gray-100); color: var(--text-primary); }
+        .stripe-modal-summary {
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            display: flex; justify-content: space-between;
+        }
+        .stripe-modal-summary strong { color: var(--text-primary); }
+        #stripe-payment-element {
+            min-height: 200px;
+        }
+        .stripe-modal-error {
+            color: #c0392b;
+            font-size: 0.85rem;
+            min-height: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .stripe-modal-actions {
+            display: flex; gap: 0.75rem; margin-top: 1rem;
+        }
+        .stripe-modal-actions .btn { flex: 1; }
+
+        @media (max-width: 900px) {
+            .product-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .viewer-panel { position: static; }
+            .viewer-canvas-wrap { height: 380px; }
+            .design-grid { grid-template-columns: repeat(3, 1fr); }
+            .qty-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Patent strip -->
+<div class="patent-strip">
+    <strong>US Patent Pending</strong> &nbsp;·&nbsp; Application No. C1688.70001US00 &nbsp;·&nbsp; Medical-grade proprietary material &nbsp;·&nbsp; FDA-compliant manufacturing
+</div>
+
+<!-- Navbar (replaced by header-init) -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:40px;width:auto;border-radius:10px;display:block;">
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/shop" class="nav-link active">Shop</a></li>
+        <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
+        <li><a href="/login" class="nav-link">Login</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="/cart" class="btn btn-ghost btn-sm">Cart</a>
+    </div>
+</nav>
+
+<!-- Hero (breadcrumb only) -->
+<section class="product-hero">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/">Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="/shop">Shop</a>
+            <span class="breadcrumb-sep">/</span>
+            <span id="crumb-product">Loading…</span>
+        </div>
+    </div>
+</section>
+
+<!-- Main product layout -->
+<section class="product-main">
+    <div class="container">
+        <div class="product-grid">
+
+            <!-- 3D viewer -->
+            <div class="viewer-panel">
+                <div class="viewer-canvas-wrap" id="viewer-wrap">
+                    <canvas id="product-canvas"></canvas>
+                    <div class="viewer-loader" id="viewer-loader"><span></span></div>
+                </div>
+                <div class="viewer-foot">
+                    <span class="viewer-foot-label" id="viewer-label">Live 3D preview</span>
+                    <span class="viewer-finish" id="viewer-finish">Silicone</span>
+                </div>
+            </div>
+
+            <!-- Detail / purchase -->
+            <div class="detail-panel">
+                <span class="detail-tag" id="detail-tag">Loading…</span>
+                <h1 class="detail-name" id="detail-name">Beauty Bite</h1>
+                <p class="detail-tagline" id="detail-tagline"></p>
+
+                <div class="detail-price-card">
+                    <div class="detail-price-row">
+                        <span class="detail-price" id="detail-price">$—</span>
+                        <span class="detail-unit">/ unit</span>
+                    </div>
+                    <p class="detail-price-note">Volume orders available — contact us for clinic pricing.</p>
+
+                    <div class="qty-row">
+                        <div class="qty-block">
+                            <label for="qty-input">Quantity</label>
+                            <div class="qty-input-wrap">
+                                <button type="button" class="qty-step" id="qty-minus" aria-label="Decrease">−</button>
+                                <input type="number" id="qty-input" value="1" min="1" max="100000" step="1">
+                                <button type="button" class="qty-step" id="qty-plus" aria-label="Increase">+</button>
+                            </div>
+                            <div class="qty-presets" id="qty-presets"></div>
+                        </div>
+                        <div class="opt-block">
+                            <label>Order type</label>
+                            <div id="opt-radios"></div>
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <span class="total-label">Total</span>
+                        <span class="total-amount" id="total-amount">$0.00</span>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-checkout">
+                            <span id="btn-checkout-label">Checkout with Stripe</span>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-block" id="btn-cart">
+                            Add to Cart
+                        </button>
+                    </div>
+
+                    <a href="/shop" class="ghost-link">&larr; Back to all tiers</a>
+                </div>
+
+                <div class="features-card">
+                    <h3>Included with every order</h3>
+                    <ul id="feature-list"></ul>
+                </div>
+
+                <!-- Custom-only design library -->
+                <div class="design-library" id="design-library" style="display:none;">
+                    <div class="design-library-head">
+                        <h3>Choose a Design</h3>
+                    </div>
+                    <p class="design-library-sub">Pick a curated finish — the preview updates live. Want something fully custom? Build it in the Design Studio.</p>
+                    <div class="design-grid" id="design-grid"></div>
+                    <a href="/design-studio" class="btn btn-brand btn-block">Open Design Studio &rarr;</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Specs strip -->
+        <div class="spec-section">
+            <div class="section-header" style="text-align:left;margin-bottom:0.5rem;">
+                <span class="section-tag">Specifications</span>
+                <h2 style="font-size:1.6rem;">Built to Clinical Standards</h2>
+            </div>
+            <table class="spec-table">
+                <tbody id="spec-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-banner">
+    <div class="container" style="max-width:720px;">
+        <h2>Questions before you order?</h2>
+        <p>Talk to our clinical team — we'll help you size up for your practice.</p>
+        <div class="hero-actions">
+            <a href="mailto:hello@beautybite.com" class="btn btn-white btn-xl">Contact Us</a>
+            <a href="/shop" class="btn btn-outline btn-xl" style="color:white;border-color:white;">View All Tiers</a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <img src="/logo2.webp" alt="Beauty Bite" class="footer-logo">
+                <p class="footer-tagline">Patented electrical-isolation guards for safe facial therapy with implants, fillings &amp; braces.</p>
+            </div>
+            <div>
+                <div class="footer-col-title">Shop</div>
+                <div class="footer-links">
+                    <a href="/product/clear">Clear · $100</a>
+                    <a href="/product/branded">Signature · $200</a>
+                    <a href="/product/custom">Custom · $300</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Company</div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/design-studio">Design Studio</a>
+                    <a href="/login">Account</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Legal</div>
+                <div class="footer-links">
+                    <a href="#">Patent No. C1688.70001US00</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Beauty Bite. All rights reserved.</span>
+            <span>Made for clinicians.</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast + Stripe modal -->
+<div class="toast" id="toast"></div>
+
+<div class="stripe-overlay" id="stripe-overlay">
+    <div class="stripe-modal">
+        <div class="stripe-modal-head">
+            <div>
+                <div class="stripe-modal-title">Secure Checkout</div>
+                <div class="stripe-modal-sub">Powered by Stripe — your card details never touch our servers.</div>
+            </div>
+            <button class="stripe-modal-close" id="stripe-close" aria-label="Close">×</button>
+        </div>
+        <div class="stripe-modal-summary">
+            <span id="stripe-summary-text">—</span>
+            <strong id="stripe-summary-total">$0.00</strong>
+        </div>
+        <div id="stripe-payment-element"></div>
+        <div class="stripe-modal-error" id="stripe-error"></div>
+        <div class="stripe-modal-actions">
+            <button type="button" class="btn btn-ghost" id="stripe-cancel">Cancel</button>
+            <button type="button" class="btn btn-primary" id="stripe-pay">
+                <span id="stripe-pay-label">Pay Now</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/js/header-init.js"></script>
+<script src="/js/products.js"></script>
+<script src="/js/bb3d.js"></script>
+<script src="/js/product-page.js"></script>
+
+</body>
+</html>

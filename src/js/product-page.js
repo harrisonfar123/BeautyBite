@@ -1,0 +1,593 @@
+// Product detail page controller — drives /product/:slug
+// Dependencies on page:
+//   window.productCatalog   (src/js/products.js)
+//   window.BB3D             (src/js/bb3d.js)
+//   window.Stripe           (Stripe.js v3)
+
+(function () {
+    'use strict';
+
+    // ────────────────────────────────────────────────────────────
+    // Helpers
+    // ────────────────────────────────────────────────────────────
+    const $ = (id) => document.getElementById(id);
+
+    function fmt (n) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(n);
+    }
+
+    function escapeHtml (s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function getSlugFromUrl () {
+        const m = location.pathname.match(/\/product\/([a-z0-9-]+)/i);
+        if (m) return m[1].toLowerCase();
+        const q = new URLSearchParams(location.search).get('slug');
+        return q ? q.toLowerCase() : 'branded';
+    }
+
+    function toast (msg, isError) {
+        const el = $('toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.toggle('error', !!isError);
+        el.classList.add('show');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Per-product visual + preset config
+    // ────────────────────────────────────────────────────────────
+    const VIEW_CONFIGS = {
+        'clear-bulk': {
+            color: '#B8E4FF', bg: '#0A1929', finish: 'glossy',
+            finishLabel: 'Clear EVA'
+        },
+        'beautybite-branded': {
+            color: '#8BB8CC', bg: '#081422', finish: 'silicone',
+            finishLabel: 'Signature Silicone'
+        },
+        'custom-branded': {
+            color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
+            finishLabel: 'Custom Silicone'
+        }
+    };
+
+    const QTY_PRESETS = {
+        'clear-bulk':         [1, 10, 50, 100, 500, 1000],
+        'beautybite-branded': [1, 5, 25, 50, 100],
+        'custom-branded':     [1, 5, 25, 50, 100]
+    };
+
+    const SPECS = {
+        'clear-bulk': [
+            ['Material',              'Medical-grade EVA, autoclave-stable'],
+            ['Finish',                'Crystal clear, discreet'],
+            ['Patented geometry',     'Electrical isolation profile (US Patent Pending C1688.70001US00)'],
+            ['Fit',                   'Universal adult — no molding required'],
+            ['Sterilization',         'Autoclave at 121°C · Cold disinfection compatible'],
+            ['Indications',           'Microcurrent, TENS, PEMF, interferential facial therapy']
+        ],
+        'beautybite-branded': [
+            ['Material',              'Premium medical-grade silicone'],
+            ['Finish',                'Matte-clear with subtle Beauty Bite signature engraving'],
+            ['Patented geometry',     'Electrical isolation profile (US Patent Pending C1688.70001US00)'],
+            ['Fit',                   'Universal adult — thinner rear wall for enhanced comfort'],
+            ['Sterilization',         'Autoclave at 121°C · Cold disinfection compatible'],
+            ['Indications',           'Microcurrent, TENS, PEMF, interferential facial therapy']
+        ],
+        'custom-branded': [
+            ['Material',              'Premium medical-grade silicone'],
+            ['Personalization',       'Choose from curated library or build in Design Studio'],
+            ['Options',               'Brand colors, logo engraving, finish selection'],
+            ['Production time',       '2–3 weeks from design approval'],
+            ['Patented geometry',     'Electrical isolation profile (US Patent Pending C1688.70001US00)'],
+            ['Sterilization',         'Autoclave at 121°C · Cold disinfection compatible']
+        ]
+    };
+
+    // Curated design library for the $300 tier — drives BB3D color/finish swap.
+    const DESIGN_LIBRARY = [
+        { id: 'signature-blue',  name: 'Signature Blue',  color: '#8BB8CC', finish: 'silicone' },
+        { id: 'navy-clinical',   name: 'Navy Clinical',   color: '#3A5F80', finish: 'silicone' },
+        { id: 'platinum',        name: 'Platinum',        color: '#D4DCE3', finish: 'glossy'   },
+        { id: 'rose-med-spa',    name: 'Rose Med-Spa',    color: '#D8A7B1', finish: 'glossy'   },
+        { id: 'sage-wellness',   name: 'Sage Wellness',   color: '#9DB5A3', finish: 'matte'    },
+        { id: 'graphite',        name: 'Graphite',        color: '#2D3A47', finish: 'matte'    },
+        { id: 'champagne',       name: 'Champagne',       color: '#D4B896', finish: 'glossy'   },
+        { id: 'custom-design',   name: 'Custom…',         custom: true                         }
+    ];
+
+    // ────────────────────────────────────────────────────────────
+    // Cart helpers (matches ShoppingCart schema in shop.js)
+    // ────────────────────────────────────────────────────────────
+    const CART_KEY = 'beautybite_cart';
+
+    function loadCart () {
+        try {
+            const raw = localStorage.getItem(CART_KEY);
+            return raw ? JSON.parse(raw) : { items: [], lastUpdated: new Date().toISOString() };
+        } catch (_) {
+            return { items: [], lastUpdated: new Date().toISOString() };
+        }
+    }
+
+    function saveCart (cart) {
+        cart.lastUpdated = new Date().toISOString();
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function addToCart (product, quantity, option, customization) {
+        const cart = loadCart();
+        const priceInfo = window.productCatalog.calculatePrice(product.id, quantity, option);
+        const newItem = {
+            productId:       product.id,
+            productName:     product.name,
+            quantity,
+            purchasingOption: option,
+            customization:    customization || {},
+            priceInfo,
+            addedAt:          new Date().toISOString()
+        };
+        const idx = cart.items.findIndex(i =>
+            i.productId === product.id &&
+            i.purchasingOption === option &&
+            JSON.stringify(i.customization) === JSON.stringify(newItem.customization)
+        );
+        if (idx > -1) {
+            cart.items[idx].quantity += quantity;
+            cart.items[idx].priceInfo = window.productCatalog.calculatePrice(
+                product.id, cart.items[idx].quantity, option
+            );
+        } else {
+            cart.items.push(newItem);
+        }
+        saveCart(cart);
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Stripe checkout flow
+    // ────────────────────────────────────────────────────────────
+    const stripeState = {
+        stripe:   null,
+        elements: null,
+        mounted:  false,
+        clientSecret: null
+    };
+
+    async function fetchStripeKey () {
+        try {
+            const r = await fetch('/api/config/stripe-publishable-key');
+            if (!r.ok) return null;
+            const j = await r.json();
+            return j.publishableKey || null;
+        } catch (_) { return null; }
+    }
+
+    async function openStripeCheckout (ctx) {
+        const { product, quantity, option, total, metadata } = ctx;
+
+        $('stripe-summary-text').textContent =
+            `${product.name} × ${quantity}`;
+        $('stripe-summary-total').textContent = fmt(total);
+        $('stripe-error').textContent = '';
+        $('stripe-pay-label').textContent = 'Pay ' + fmt(total);
+        $('stripe-overlay').classList.add('show');
+
+        try {
+            if (!window.Stripe) {
+                $('stripe-error').textContent = 'Payment system unavailable. Please refresh.';
+                return;
+            }
+            if (!stripeState.stripe) {
+                const key = await fetchStripeKey();
+                if (!key) {
+                    $('stripe-error').textContent = 'Payment not configured. Contact us to order.';
+                    return;
+                }
+                stripeState.stripe = Stripe(key);
+            }
+
+            // Request PaymentIntent
+            const r = await fetch('/api/stripe/create-payment-intent-custom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productType: product.id,
+                    quantity,
+                    currency: 'usd',
+                    metadata: metadata || {}
+                })
+            });
+            if (!r.ok) {
+                const err = await r.json().catch(() => ({}));
+                $('stripe-error').textContent = err.error || 'Could not start checkout.';
+                return;
+            }
+            const { clientSecret } = await r.json();
+            if (!clientSecret) {
+                $('stripe-error').textContent = 'Payment init failed.';
+                return;
+            }
+            stripeState.clientSecret = clientSecret;
+
+            // Mount Payment Element (recreate per-session so amount changes take effect)
+            const el = $('stripe-payment-element');
+            el.innerHTML = '';
+            stripeState.elements = stripeState.stripe.elements({
+                clientSecret,
+                appearance: {
+                    theme: 'stripe',
+                    variables: {
+                        colorPrimary:    '#5C8EA6',
+                        colorBackground: '#ffffff',
+                        colorText:       '#1B2D3E',
+                        fontFamily:      'Inter, system-ui, sans-serif',
+                        borderRadius:    '6px'
+                    }
+                }
+            });
+            const paymentEl = stripeState.elements.create('payment');
+            paymentEl.mount('#stripe-payment-element');
+            stripeState.mounted = true;
+
+        } catch (e) {
+            console.error(e);
+            $('stripe-error').textContent = 'Checkout error. Please try again.';
+        }
+    }
+
+    function closeStripeCheckout () {
+        $('stripe-overlay').classList.remove('show');
+        stripeState.mounted = false;
+        stripeState.elements = null;
+        stripeState.clientSecret = null;
+        $('stripe-payment-element').innerHTML = '';
+    }
+
+    async function confirmStripePayment () {
+        if (!stripeState.stripe || !stripeState.elements) return;
+        const btn = $('stripe-pay');
+        btn.disabled = true;
+        const prev = $('stripe-pay-label').textContent;
+        $('stripe-pay-label').textContent = 'Processing…';
+        $('stripe-error').textContent = '';
+
+        const { error } = await stripeState.stripe.confirmPayment({
+            elements: stripeState.elements,
+            confirmParams: {
+                return_url: location.origin + '/dashboard'
+            },
+            redirect: 'if_required'
+        });
+
+        if (error) {
+            $('stripe-error').textContent = error.message || 'Payment failed.';
+            btn.disabled = false;
+            $('stripe-pay-label').textContent = prev;
+            return;
+        }
+        toast('Payment successful — check your email for confirmation.');
+        setTimeout(() => {
+            location.href = '/dashboard';
+        }, 1400);
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Page bootstrap
+    // ────────────────────────────────────────────────────────────
+    let viewer = null;
+    let selectedDesign = null;
+
+    function renderFeatures (product) {
+        const ul = $('feature-list');
+        ul.innerHTML = (product.features || [])
+            .map(f => `<li>${escapeHtml(f)}</li>`).join('');
+    }
+
+    function renderSpecs (productId) {
+        const rows = SPECS[productId] || [];
+        $('spec-tbody').innerHTML = rows
+            .map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(v)}</td></tr>`)
+            .join('');
+    }
+
+    function renderQtyPresets (product) {
+        const presets = QTY_PRESETS[product.id] || [1, 5, 10, 25];
+        const wrap = $('qty-presets');
+        wrap.innerHTML = presets
+            .map(q => `<button type="button" class="qty-preset" data-qty="${q}">${q.toLocaleString()}</button>`)
+            .join('');
+        wrap.querySelectorAll('.qty-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const q = parseInt(btn.dataset.qty, 10);
+                $('qty-input').value = q;
+                wrap.querySelectorAll('.qty-preset').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.recompute();
+            });
+        });
+    }
+
+    function renderOptions (product) {
+        const opts = Object.entries(product.purchasingOptions || {});
+        const wrap = $('opt-radios');
+        if (opts.length <= 1) {
+            wrap.innerHTML = `
+                <div class="opt-radio checked">
+                    <input type="radio" id="opt-only" name="purchasing-option" value="${opts[0] ? opts[0][0] : 'oneTime'}" checked>
+                    <label for="opt-only" class="opt-label-row">
+                        <strong>${escapeHtml(opts[0] ? opts[0][1].label : 'One-time order')}</strong>
+                    </label>
+                </div>
+            `;
+            return;
+        }
+        wrap.innerHTML = opts.map(([key, o], idx) => `
+            <label class="opt-radio ${idx === 0 ? 'checked' : ''}" data-opt="${key}">
+                <input type="radio" name="purchasing-option" value="${key}" ${idx === 0 ? 'checked' : ''}>
+                <span class="opt-label-row">
+                    <strong>${escapeHtml(o.label)}</strong>
+                    <span>${escapeHtml(o.description || '')}</span>
+                </span>
+                ${o.discount && o.discount > 0 ? `<span class="opt-save">Save ${Math.round(o.discount * 100)}%</span>` : ''}
+            </label>
+        `).join('');
+
+        wrap.querySelectorAll('.opt-radio').forEach(el => {
+            el.addEventListener('click', () => {
+                wrap.querySelectorAll('.opt-radio').forEach(x => x.classList.remove('checked'));
+                el.classList.add('checked');
+                const input = el.querySelector('input');
+                if (input) input.checked = true;
+                state.recompute();
+            });
+        });
+    }
+
+    function renderDesignLibrary (product) {
+        const section = $('design-library');
+        if (product.id !== 'custom-branded') { section.style.display = 'none'; return; }
+        section.style.display = 'block';
+
+        const grid = $('design-grid');
+        grid.innerHTML = DESIGN_LIBRARY.map((d, i) => {
+            if (d.custom) {
+                return `
+                    <div class="design-swatch" data-design-idx="${i}" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EEF6FA,#ffffff);border:2px dashed var(--brand);">
+                        <div style="text-align:center;padding:0.5rem;">
+                            <div style="font-size:1.3rem;color:var(--brand-dark);margin-bottom:0.2rem;">+</div>
+                            <div class="design-swatch-name" style="padding:0;">Build Custom</div>
+                        </div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="design-swatch ${i === 0 ? 'selected' : ''}" data-design-idx="${i}">
+                    <div class="design-swatch-preview" style="background:radial-gradient(circle at 35% 30%, ${d.color}, ${shade(d.color, -25)});"></div>
+                    <div class="design-swatch-name">${escapeHtml(d.name)}</div>
+                </div>
+            `;
+        }).join('');
+
+        selectedDesign = DESIGN_LIBRARY[0];
+
+        grid.querySelectorAll('.design-swatch').forEach(sw => {
+            sw.addEventListener('click', () => {
+                const idx = parseInt(sw.dataset.designIdx, 10);
+                const design = DESIGN_LIBRARY[idx];
+                if (design.custom) {
+                    // Redirect to Design Studio as requested
+                    location.href = '/design-studio';
+                    return;
+                }
+                selectedDesign = design;
+                grid.querySelectorAll('.design-swatch').forEach(x => x.classList.remove('selected'));
+                sw.classList.add('selected');
+                // Live-swap the 3D viewer material
+                if (viewer && window.BB3D) {
+                    window.BB3D.setViewerColor  && window.BB3D.setViewerColor(viewer, design.color);
+                    window.BB3D.setViewerFinish && window.BB3D.setViewerFinish(viewer, design.finish);
+                }
+                $('viewer-finish').textContent = design.name;
+            });
+        });
+    }
+
+    function shade (hex, pct) {
+        // Lighten (+) or darken (-) a hex color by pct %
+        const h = hex.replace('#', '');
+        const r = parseInt(h.substr(0, 2), 16);
+        const g = parseInt(h.substr(2, 2), 16);
+        const b = parseInt(h.substr(4, 2), 16);
+        const f = (c) => {
+            const v = Math.round(Math.max(0, Math.min(255, c + (c * pct / 100))));
+            return v.toString(16).padStart(2, '0');
+        };
+        return '#' + f(r) + f(g) + f(b);
+    }
+
+    function bootViewer (product) {
+        const canvas = $('product-canvas');
+        const view = VIEW_CONFIGS[product.id] || VIEW_CONFIGS['beautybite-branded'];
+        $('viewer-finish').textContent = view.finishLabel;
+        $('viewer-wrap').style.background =
+            `radial-gradient(circle at 50% 40%, ${shade(view.bg, 30)} 0%, ${view.bg} 100%)`;
+
+        const hideLoader = () => {
+            const el = $('viewer-loader');
+            if (el) {
+                el.style.opacity = '0';
+                setTimeout(() => { el.style.display = 'none'; }, 280);
+            }
+        };
+
+        if (!window.BB3D) {
+            hideLoader();
+            return;
+        }
+
+        viewer = window.BB3D.registerViewer({
+            canvas,
+            color:    view.color,
+            bg:       view.bg,
+            finish:   view.finish,
+            rotSpeed: 0.007,
+            scale:    2.0,
+            camZ:     3.6,
+            camY:     0.5,
+            interactive: true,
+            onReady:    hideLoader,
+            onFallback: hideLoader
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Live state / pricing
+    // ────────────────────────────────────────────────────────────
+    const state = {
+        product: null,
+        currentTotal: 0,
+        currentUnit: 0,
+        getQty () {
+            const v = parseInt($('qty-input').value, 10);
+            if (isNaN(v) || v < 1) return 1;
+            return Math.min(v, state.product.maxQuantity || 100000);
+        },
+        getOption () {
+            const checked = document.querySelector('#opt-radios input[type="radio"]:checked');
+            return checked ? checked.value : 'oneTime';
+        },
+        recompute () {
+            if (!state.product) return;
+            const qty = state.getQty();
+            const opt = state.getOption();
+            try {
+                const info = window.productCatalog.calculatePrice(state.product.id, qty, opt);
+                state.currentUnit  = info.unitPrice;
+                state.currentTotal = info.subtotal;
+                $('total-amount').textContent = fmt(info.subtotal);
+                $('detail-price').textContent = fmt(info.unitPrice);
+            } catch (_) {
+                $('total-amount').textContent = fmt(state.product.basePrice * qty);
+            }
+        }
+    };
+
+    function bindActions (product) {
+        $('qty-minus').addEventListener('click', () => {
+            const v = state.getQty();
+            $('qty-input').value = Math.max(1, v - 1);
+            state.recompute();
+        });
+        $('qty-plus').addEventListener('click', () => {
+            const v = state.getQty();
+            $('qty-input').value = v + 1;
+            state.recompute();
+        });
+        $('qty-input').addEventListener('input', () => {
+            let v = parseInt($('qty-input').value, 10);
+            if (isNaN(v)) v = 1;
+            $('qty-input').value = Math.max(1, Math.min(v, product.maxQuantity || 100000));
+            state.recompute();
+        });
+
+        $('btn-cart').addEventListener('click', () => {
+            const qty = state.getQty();
+            const opt = state.getOption();
+            const customization = (product.id === 'custom-branded' && selectedDesign)
+                ? { design: selectedDesign.id, designName: selectedDesign.name }
+                : {};
+            try {
+                addToCart(product, qty, opt, customization);
+                toast('Added to cart ✓');
+            } catch (e) {
+                toast(e.message || 'Could not add to cart', true);
+            }
+        });
+
+        $('btn-checkout').addEventListener('click', () => {
+            const qty = state.getQty();
+            const opt = state.getOption();
+            const metadata = {};
+            if (product.id === 'custom-branded' && selectedDesign) {
+                metadata.design    = selectedDesign.id;
+                metadata.designName = selectedDesign.name;
+            }
+            openStripeCheckout({
+                product,
+                quantity: qty,
+                option:   opt,
+                total:    state.currentTotal,
+                metadata
+            });
+        });
+
+        $('stripe-close').addEventListener('click', closeStripeCheckout);
+        $('stripe-cancel').addEventListener('click', closeStripeCheckout);
+        $('stripe-pay').addEventListener('click', confirmStripePayment);
+        $('stripe-overlay').addEventListener('click', (e) => {
+            if (e.target === $('stripe-overlay')) closeStripeCheckout();
+        });
+    }
+
+    function fillMeta (product) {
+        document.title = product.name + ' — Beauty Bite';
+        $('page-title').textContent = product.name + ' — Beauty Bite';
+        $('page-description').setAttribute('content',
+            (product.shortDescription || product.description || 'Beauty Bite therapy isolation guard.').slice(0, 160));
+        $('crumb-product').textContent = product.name;
+        $('detail-tag').textContent = product.badge || 'Beauty Bite';
+        $('detail-name').textContent = product.name;
+        $('detail-tagline').textContent = product.shortDescription || product.tagline || product.description || '';
+        $('detail-price').textContent = fmt(product.basePrice);
+    }
+
+    function renderNotFound () {
+        document.querySelector('.product-main .container').innerHTML = `
+            <div style="text-align:center;padding:5rem 1rem;">
+                <h1>Product not found</h1>
+                <p style="color:var(--text-secondary);margin:1rem 0 2rem;">That product doesn't exist. Browse our full range below.</p>
+                <a href="/shop" class="btn btn-primary btn-lg">View All Tiers</a>
+            </div>
+        `;
+    }
+
+    function whenCatalogReady (cb, tries) {
+        tries = tries || 0;
+        if (window.productCatalog || tries > 40) { cb(); return; }
+        setTimeout(() => whenCatalogReady(cb, tries + 1), 80);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        whenCatalogReady(() => {
+            const slug = getSlugFromUrl();
+            const product = window.productCatalog
+                ? window.productCatalog.getProductBySlug(slug)
+                : null;
+
+            if (!product) { renderNotFound(); return; }
+            state.product = product;
+
+            fillMeta(product);
+            renderFeatures(product);
+            renderSpecs(product.id);
+            renderOptions(product);
+            renderQtyPresets(product);
+            renderDesignLibrary(product);
+            bootViewer(product);
+            bindActions(product);
+            state.recompute();
+        });
+    });
+})();

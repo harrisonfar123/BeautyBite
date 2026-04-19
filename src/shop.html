@@ -3,571 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop - BeautyBite</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Shop — Beauty Bite Patented Therapy Isolation Guards</title>
+    <meta name="description" content="Three tiers of patented Beauty Bite isolation guards — Clear Standard $100, Signature Branded $200, and fully Custom $300. Medical-grade, FDA-compliant, made for med spas and clinics.">
+    <link rel="icon" href="/logo2.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
     <style>
-        :root {
-            --navy: #1B2D3E;
-            --teal: #14B8A6;
-            --blue: #0066CC;
-            --bg: #F8FAFC;
-            --border: #e2e8f0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            margin: 0;
-        }
-
-        /* ── Hero ── */
+        /* Shop hero — same DNA as the home hero */
         .shop-hero {
-            background: linear-gradient(135deg, var(--teal) 0%, var(--navy) 60%);
+            background: linear-gradient(155deg, var(--navy) 0%, var(--navy-mid) 50%, #3A5570 100%);
             color: white;
-            padding: 2.5rem 2rem;
+            padding: 5.5rem 1.5rem 7rem;
             text-align: center;
-        }
-
-        .shop-hero h1 {
-            font-family: 'Pacifico', cursive;
-            font-size: 2.4rem;
-            margin: 0 0 0.5rem;
-            letter-spacing: 0.01em;
-        }
-
-        .shop-hero p {
-            font-size: 1rem;
-            opacity: 0.88;
-            margin: 0;
-            font-weight: 400;
-        }
-
-        /* ── Products section ── */
-        .products-section {
-            max-width: 1200px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-        }
-
-        .section-heading {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .section-heading h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin: 0 0 0.4rem;
-        }
-
-        .section-heading p {
-            color: #64748b;
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        #products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        /* ── Product card ── */
-        .product-card {
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-            padding: 1.75rem;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
             position: relative;
+            overflow: hidden;
         }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 28px rgba(0,0,0,0.13);
-        }
-
-        .product-badge {
+        .shop-hero::after {
+            content: '';
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--teal);
-            color: white;
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 0.25rem 0.65rem;
+            bottom: -2px; left: 0; right: 0;
+            height: 70px;
+            background: var(--off-white);
+            clip-path: ellipse(55% 100% at 50% 100%);
+        }
+        .shop-hero-eyebrow {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.22);
+            color: rgba(255,255,255,0.92);
+            padding: 0.4rem 1.1rem;
             border-radius: 999px;
-            letter-spacing: 0.04em;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
+            margin-bottom: 1.5rem;
         }
-
-        .product-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin: 0 0 0.4rem;
+        .shop-hero h1 {
+            color: white;
+            font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
         }
-
-        .base-price {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--blue);
-        }
-
-        /* ── Use cases section ── */
-        .use-cases-section {
-            background: white;
-            border-top: 1px solid var(--border);
-            padding: 3.5rem 2rem;
-        }
-
-        .use-cases-inner {
-            max-width: 1100px;
+        .shop-hero p {
+            color: rgba(255,255,255,0.82);
+            font-size: 1.1rem;
+            max-width: 620px;
             margin: 0 auto;
         }
 
-        .use-cases-inner h2 {
-            text-align: center;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin: 0 0 0.5rem;
+        /* Tier cards */
+        .shop-section {
+            background: var(--off-white);
+            padding: 4rem 0 5rem;
         }
-
-        .use-cases-inner .subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 0.95rem;
-            margin: 0 0 2.5rem;
-        }
-
-        .use-cases-grid {
+        .shop-tiers {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .use-case-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem 1rem;
-            text-align: center;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .use-case-card:hover {
-            border-color: var(--teal);
-            box-shadow: 0 4px 16px rgba(20,184,166,0.12);
-        }
-
-        .use-case-icon-num {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #14B8A6, #0066CC);
-            border-radius: 50%;
-            color: white;
-            font-weight: 700;
-            font-size: 0.85rem;
-            margin: 0 auto 0.75rem;
-        }
-
-        .use-case-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--navy);
-        }
-
-        /* ── Modal ── */
-        .bb-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 9000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .bb-modal {
-            background: white;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 840px;
-            max-height: 90vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: row;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.75rem;
+            align-items: stretch;
+            margin-top: -3rem;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 2;
         }
-
-        @media (max-width: 640px) {
-            .bb-modal { flex-direction: column; }
-        }
-
-        .bb-modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #64748b;
-            cursor: pointer;
-            z-index: 10;
-            line-height: 1;
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.15s;
-        }
-
-        .bb-modal-close:hover {
-            background: #f1f5f9;
-            color: var(--navy);
-        }
-
-        .bb-modal-visual {
-            width: 320px;
-            min-width: 280px;
-            background: #081422;
-            border-radius: 16px 0 0 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        @media (max-width: 640px) {
-            .bb-modal-visual {
-                width: 100%;
-                min-width: unset;
-                height: 220px;
-                border-radius: 16px 16px 0 0;
-            }
-        }
-
-        #modal-canvas-3d {
-            display: block;
-            width: 100%;
-            height: 300px;
-        }
-
-        @media (max-width: 640px) {
-            #modal-canvas-3d { height: 220px; }
-        }
-
-        .bb-modal-body {
-            flex: 1;
-            padding: 2rem 2rem 2rem 1.75rem;
+        .shop-tier {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 0;
             display: flex;
             flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .shop-tier:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-6px);
+        }
+        .shop-tier.featured {
+            border-color: var(--brand);
+            border-width: 2px;
+            box-shadow: 0 0 0 1px var(--brand), var(--shadow-md);
+        }
+        .shop-tier-featured-label {
+            position: absolute;
+            top: -1px; left: 50%; transform: translateX(-50%);
+            background: var(--brand);
+            color: white;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            padding: 0.35rem 1.2rem;
+            border-radius: 0 0 999px 999px;
+            white-space: nowrap;
+            z-index: 3;
         }
 
-        .bb-modal-name {
-            font-size: 1.6rem;
+        .shop-tier-visual {
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .shop-tier-visual canvas {
+            width: 100%; height: 100%; display: block;
+        }
+        .shop-tier-visual.clear   { background: radial-gradient(circle at 50% 40%, #14304b 0%, #0a1929 100%); }
+        .shop-tier-visual.branded { background: radial-gradient(circle at 50% 40%, #1c3656 0%, #081422 100%); }
+        .shop-tier-visual.custom  { background: radial-gradient(circle at 50% 40%, #1e3a5f 0%, #080f1e 100%); }
+        .shop-tier-loader {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+        .shop-tier-loader span {
+            width: 26px; height: 26px;
+            border: 2px solid rgba(255,255,255,0.18);
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: shopSpin 0.8s linear infinite;
+        }
+        @keyframes shopSpin { to { transform: rotate(360deg); } }
+
+        .shop-tier-body {
+            padding: 1.75rem 1.75rem 2rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .shop-tier-tag {
+            display: inline-block;
+            background: var(--brand-bg);
+            color: var(--brand-dark);
+            padding: 0.28rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
             font-weight: 700;
-            color: var(--navy);
-            margin: 0 2.5rem 0.25rem 0;
-        }
-
-        .bb-modal-tagline {
-            color: var(--teal);
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin: 0 0 1rem;
-        }
-
-        .bb-modal-desc {
-            color: #4a5568;
-            font-size: 0.95rem;
-            line-height: 1.65;
-            margin: 0 0 1rem;
-        }
-
-        .bb-modal-use-cases {
-            margin-bottom: 1.25rem;
-        }
-
-        .bb-modal-use-cases-label {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
             letter-spacing: 0.07em;
-            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            margin-bottom: 0.85rem;
+            align-self: flex-start;
         }
-
-        .bb-modal-price-row {
+        .shop-tier-name {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.015em;
+        }
+        .shop-tier-tagline {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            margin-bottom: 1.35rem;
+            line-height: 1.55;
+            min-height: 2.6em;
+        }
+        .shop-tier-price-row {
             display: flex;
             align-items: baseline;
             gap: 0.5rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
         }
-
-        .bb-modal-price {
-            font-size: 2rem;
+        .shop-tier-price {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+        .shop-tier-price-unit {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+        .shop-tier-features {
+            list-style: none;
+            margin: 0 0 1.75rem;
+            padding: 0;
+            flex: 1;
+        }
+        .shop-tier-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .shop-tier-features li::before {
+            content: '✓';
+            color: var(--brand);
             font-weight: 700;
-            color: var(--blue);
+            flex-shrink: 0;
+            margin-top: 0.05rem;
         }
-
-        .bb-modal-price-note {
-            font-size: 0.85rem;
-            color: #94a3b8;
-        }
-
-        .bb-modal-qty-row {
-            display: flex;
+        .shop-tier-cta {
+            display: inline-flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            font-family: var(--font-body);
+            border: 2px solid transparent;
+        }
+        .shop-tier-cta-outline {
+            background: transparent;
+            color: var(--brand-dark);
+            border-color: var(--brand-dark);
+        }
+        .shop-tier-cta-outline:hover {
+            background: var(--brand-dark);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .shop-tier-cta-brand {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
+        .shop-tier-cta-brand:hover {
+            background: var(--brand-dark);
+            border-color: var(--brand-dark);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139,184,204,0.35);
+        }
+        .shop-tier-cta-primary {
+            background: var(--brand-dark);
+            color: white;
+            border-color: var(--brand-dark);
+        }
+        .shop-tier-cta-primary:hover {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(92,142,166,0.35);
         }
 
-        .bb-modal-qty-row label {
+        /* Comparison strip */
+        .shop-compare {
+            margin-top: 5rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .shop-compare h2 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .shop-compare-sub {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+        }
+        .shop-compare-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .shop-compare-grid > div {
+            padding: 0.95rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
             font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: white;
+        }
+        .shop-compare-grid > div:nth-child(4n) { border-right: none; }
+        .shop-compare-grid > div:nth-last-child(-n+4) { border-bottom: none; }
+        .shop-compare-head {
+            background: var(--brand-bg) !important;
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            font-size: 0.88rem !important;
+        }
+        .shop-compare-feature {
             font-weight: 600;
-            color: var(--navy);
-            white-space: nowrap;
+            color: var(--text-primary) !important;
+            background: var(--gray-50) !important;
         }
+        .shop-compare-yes  { color: var(--brand-dark) !important; font-weight: 700; }
+        .shop-compare-no   { color: var(--gray-400) !important; }
 
-        .bb-modal-qty-input {
-            width: 90px;
-            padding: 0.55rem 0.75rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            transition: border-color 0.2s;
+        /* Use cases */
+        .shop-uses {
+            padding: 6rem 0;
+            background: white;
+            border-top: 1px solid var(--border);
         }
-
-        .bb-modal-qty-input:focus {
-            outline: none;
-            border-color: var(--teal);
+        .shop-uses-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-top: 3rem;
         }
-
-        .bb-modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin-top: auto;
+        .shop-use { text-align: left; }
+        .shop-use-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            margin-bottom: 0.6rem;
         }
+        .shop-use h4 { margin-bottom: 0.5rem; font-size: 1.05rem; }
+        .shop-use p { font-size: 0.94rem; line-height: 1.7; }
 
-        .btn-cart {
-            flex: 1;
-            min-width: 130px;
-            padding: 0.85rem 1.25rem;
-            background: var(--blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-cart:hover { background: #0052a3; }
-
-        .btn-checkout {
-            flex: 1;
-            min-width: 130px;
-            padding: 0.85rem 1.25rem;
-            background: var(--teal);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-checkout:hover { background: #0ea898; }
-
-        /* ── Spin animation for 3D loading ── */
-        @keyframes spin3d {
-            to { transform: rotate(360deg); }
+        @media (max-width: 960px) {
+            .shop-tiers       { grid-template-columns: 1fr; max-width: 460px; margin: -3rem auto 0; }
+            .shop-uses-grid   { grid-template-columns: 1fr; max-width: 460px; margin: 3rem auto 0; }
+            .shop-compare     { padding: 2rem 1.25rem; }
+            .shop-compare-grid > div { padding: 0.6rem 0.55rem; font-size: 0.78rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <div id="nav-root"></div>
-    <script src="/js/header-init.js"></script>
+<!-- Patent strip -->
+<div class="patent-strip">
+    <strong>US Patent Pending</strong> &nbsp;·&nbsp; Application No. C1688.70001US00 &nbsp;·&nbsp; Medical-grade proprietary material &nbsp;·&nbsp; FDA-compliant manufacturing
+</div>
 
-    <!-- Hero -->
-    <section class="shop-hero">
-        <h1>Shop BeautyBite</h1>
-        <p>Patented Electrical Isolation Guards for Facial Therapy</p>
-    </section>
+<!-- Navbar (replaced by header-init) -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:40px;width:auto;border-radius:10px;display:block;">
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/shop" class="nav-link active">Shop</a></li>
+        <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
+        <li><a href="/login" class="nav-link">Login</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="/shop" class="btn btn-primary btn-sm">Order Now</a>
+    </div>
+</nav>
 
-    <!-- Products -->
-    <section class="products-section">
-        <div class="section-heading">
-            <h2>Choose Your Guard</h2>
-            <p>Click any product to see details and place an order</p>
+<!-- Hero -->
+<section class="shop-hero">
+    <div class="shop-hero-eyebrow">Three Tiers · Built for Every Practice</div>
+    <h1>Choose Your Beauty Bite</h1>
+    <p>Patented electrical-isolation guards in three tiers — from a discreet clinic standard to a fully custom branded experience. Every guard is medical-grade, autoclave-sterilizable, and FDA-compliant.</p>
+</section>
+
+<!-- Tier cards -->
+<section class="shop-section">
+    <div class="container">
+        <div class="shop-tiers">
+
+            <!-- Clear $100 -->
+            <article class="shop-tier" id="tier-clear">
+                <div class="shop-tier-visual clear">
+                    <canvas id="tier-canvas-clear-bulk"></canvas>
+                    <div class="shop-tier-loader" id="tier-loader-clear-bulk"><span></span></div>
+                </div>
+                <div class="shop-tier-body">
+                    <span class="shop-tier-tag">Tier 1 · Essential</span>
+                    <h3 class="shop-tier-name">BeautyBite Clear</h3>
+                    <p class="shop-tier-tagline">The discreet workhorse — medical-grade EVA in our patented isolation geometry.</p>
+                    <div class="shop-tier-price-row">
+                        <span class="shop-tier-price">$100</span>
+                        <span class="shop-tier-price-unit">/ unit</span>
+                    </div>
+                    <ul class="shop-tier-features">
+                        <li>Medical-grade EVA — electrically insulating</li>
+                        <li>Universal adult fit, no molding</li>
+                        <li>Autoclave sterilizable & reusable</li>
+                        <li>Safe with implants, fillings & braces</li>
+                    </ul>
+                    <a href="/product/clear" class="shop-tier-cta shop-tier-cta-outline">View Clear &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Signature $200 -->
+            <article class="shop-tier featured" id="tier-branded">
+                <span class="shop-tier-featured-label">Most Popular</span>
+                <div class="shop-tier-visual branded">
+                    <canvas id="tier-canvas-beautybite-branded"></canvas>
+                    <div class="shop-tier-loader" id="tier-loader-beautybite-branded"><span></span></div>
+                </div>
+                <div class="shop-tier-body">
+                    <span class="shop-tier-tag">Tier 2 · Signature</span>
+                    <h3 class="shop-tier-name">BeautyBite Signature</h3>
+                    <p class="shop-tier-tagline">Premium silicone with our signature finish — the on-brand experience clinics love.</p>
+                    <div class="shop-tier-price-row">
+                        <span class="shop-tier-price">$200</span>
+                        <span class="shop-tier-price-unit">/ unit</span>
+                    </div>
+                    <ul class="shop-tier-features">
+                        <li>Premium medical-grade silicone</li>
+                        <li>Superior electrical isolation rating</li>
+                        <li>BeautyBite signature engraving</li>
+                        <li>Enhanced comfort — thinner rear wall</li>
+                    </ul>
+                    <a href="/product/branded" class="shop-tier-cta shop-tier-cta-brand">View Signature &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Custom $300 -->
+            <article class="shop-tier" id="tier-custom">
+                <div class="shop-tier-visual custom">
+                    <canvas id="tier-canvas-custom-branded"></canvas>
+                    <div class="shop-tier-loader" id="tier-loader-custom-branded"><span></span></div>
+                </div>
+                <div class="shop-tier-body">
+                    <span class="shop-tier-tag">Tier 3 · Custom</span>
+                    <h3 class="shop-tier-name">BeautyBite Custom</h3>
+                    <p class="shop-tier-tagline">Pick a curated design or build your own — your clinic's identity, in premium silicone.</p>
+                    <div class="shop-tier-price-row">
+                        <span class="shop-tier-price">$300</span>
+                        <span class="shop-tier-price-unit">/ unit</span>
+                    </div>
+                    <ul class="shop-tier-features">
+                        <li>Curated design library — preview live</li>
+                        <li>Logo, colors & engraving</li>
+                        <li>Premium medical-grade silicone</li>
+                        <li>Interactive 3D design studio</li>
+                    </ul>
+                    <a href="/product/custom" class="shop-tier-cta shop-tier-cta-primary">View Custom &rarr;</a>
+                </div>
+            </article>
         </div>
-        <div id="products-grid">
-            <!-- Rendered by shop-init.js -->
-        </div>
-    </section>
 
-    <!-- Use Cases -->
-    <section class="use-cases-section">
-        <div class="use-cases-inner">
-            <h2>Who BeautyBite Is For</h2>
-            <p class="subtitle">Protecting dental hardware during electrical facial therapy treatments</p>
-            <div class="use-cases-grid">
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">01</span>
-                    <div class="use-case-label">Med Spa Clients</div>
-                </div>
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">02</span>
-                    <div class="use-case-label">TENS Therapy Patients</div>
-                </div>
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">03</span>
-                    <div class="use-case-label">PEMF Treatment</div>
-                </div>
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">04</span>
-                    <div class="use-case-label">Dental Implant Patients</div>
-                </div>
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">05</span>
-                    <div class="use-case-label">Esthetic Clinics</div>
-                </div>
-                <div class="use-case-card">
-                    <span class="use-case-icon-num">06</span>
-                    <div class="use-case-label">Wellness Centers</div>
-                </div>
-            </div>
-        </div>
-    </section>
+        <!-- Compare -->
+        <div class="shop-compare">
+            <h2>Compare the Tiers</h2>
+            <p class="shop-compare-sub">All three guards share the same patented isolation geometry. Pick the finish that fits your practice.</p>
+            <div class="shop-compare-grid">
+                <div class="shop-compare-head">Feature</div>
+                <div class="shop-compare-head">Clear</div>
+                <div class="shop-compare-head">Signature</div>
+                <div class="shop-compare-head">Custom</div>
 
-    <!-- Product Detail Modal -->
-    <div id="product-modal" class="bb-modal-overlay" style="display:none;">
-        <div class="bb-modal">
-            <button class="bb-modal-close" onclick="closeProductModal()" aria-label="Close">&times;</button>
+                <div class="shop-compare-feature">Material</div>
+                <div>Medical-grade EVA</div>
+                <div>Premium silicone</div>
+                <div>Premium silicone</div>
 
-            <!-- 3D Visual -->
-            <div class="bb-modal-visual">
-                <canvas id="modal-canvas-3d"></canvas>
-            </div>
+                <div class="shop-compare-feature">Patented isolation geometry</div>
+                <div class="shop-compare-yes">✓</div>
+                <div class="shop-compare-yes">✓</div>
+                <div class="shop-compare-yes">✓</div>
 
-            <!-- Details -->
-            <div class="bb-modal-body">
-                <h2 class="bb-modal-name" id="modal-product-name"></h2>
-                <p class="bb-modal-tagline" id="modal-product-tagline"></p>
-                <p class="bb-modal-desc" id="modal-product-desc"></p>
+                <div class="shop-compare-feature">Autoclave sterilizable</div>
+                <div class="shop-compare-yes">✓</div>
+                <div class="shop-compare-yes">✓</div>
+                <div class="shop-compare-yes">✓</div>
 
-                <div class="bb-modal-use-cases">
-                    <div class="bb-modal-use-cases-label">Use Cases</div>
-                    <div id="modal-use-cases"></div>
-                </div>
+                <div class="shop-compare-feature">BeautyBite signature engraving</div>
+                <div class="shop-compare-no">—</div>
+                <div class="shop-compare-yes">✓</div>
+                <div class="shop-compare-yes">✓</div>
 
-                <div class="bb-modal-price-row">
-                    <span class="bb-modal-price" id="modal-product-price"></span>
-                    <span class="bb-modal-price-note">/ unit</span>
-                </div>
+                <div class="shop-compare-feature">Custom logo &amp; colors</div>
+                <div class="shop-compare-no">—</div>
+                <div class="shop-compare-no">—</div>
+                <div class="shop-compare-yes">✓</div>
 
-                <div class="bb-modal-qty-row">
-                    <label for="modal-qty">Quantity</label>
-                    <input type="number" id="modal-qty" class="bb-modal-qty-input" value="1" min="1" max="10000">
-                </div>
+                <div class="shop-compare-feature">Curated design library</div>
+                <div class="shop-compare-no">—</div>
+                <div class="shop-compare-no">—</div>
+                <div class="shop-compare-yes">✓</div>
 
-                <div class="bb-modal-actions">
-                    <button class="btn-cart" id="modal-btn-cart">Add to Cart</button>
-                    <button class="btn-checkout" id="modal-btn-checkout">Checkout Now</button>
-                </div>
+                <div class="shop-compare-feature">Unit price</div>
+                <div><strong style="color:var(--brand-dark);">$100</strong></div>
+                <div><strong style="color:var(--brand-dark);">$200</strong></div>
+                <div><strong style="color:var(--brand-dark);">$300</strong></div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Scripts: Three.js from jsdelivr only -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="/js/products.js"></script>
-    <script src="/js/cartUtils.js"></script>
-    <script src="/js/shop-init.js"></script>
+<!-- Use cases -->
+<section class="shop-uses">
+    <div class="container">
+        <div class="section-header" style="margin-bottom:1rem;">
+            <span class="section-tag">Applications</span>
+            <h2>Built for Every Treatment Room</h2>
+            <p>Beauty Bite removes the last barrier to electrical facial therapy — implants, fillings, crowns, and orthodontic hardware are no longer a contraindication.</p>
+        </div>
+        <div class="shop-uses-grid">
+            <div class="shop-use">
+                <div class="shop-use-num">01</div>
+                <h4>Med Spas &amp; Facial Clinics</h4>
+                <p>Enable every client to safely receive microcurrent, PEMF, and interferential facial therapy — regardless of their dental history.</p>
+            </div>
+            <div class="shop-use">
+                <div class="shop-use-num">02</div>
+                <h4>Dental &amp; Medical Offices</h4>
+                <p>Offer a trusted isolation solution for patients undergoing electrical therapy on or near the jaw. Sterilizable and reusable.</p>
+            </div>
+            <div class="shop-use">
+                <div class="shop-use-num">03</div>
+                <h4>Wellness &amp; Physical Therapy</h4>
+                <p>Support TENS, PEMF, and FSM protocols near the jaw and face with confidence — a clinically appropriate barrier.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <script>
-        // Track active product id in modal
-        let _modalProductId = null;
+<!-- CTA banner -->
+<section class="cta-banner">
+    <div class="container" style="max-width:720px;">
+        <h2>Not sure which tier?</h2>
+        <p>Talk to our clinical team — we'll help you pick the right Beauty Bite for your practice.</p>
+        <div class="hero-actions">
+            <a href="mailto:hello@beautybite.com" class="btn btn-white btn-xl">Contact Us</a>
+            <a href="/design-studio" class="btn btn-outline btn-xl" style="color:white;border-color:white;">Open Design Studio</a>
+        </div>
+    </div>
+</section>
 
-        function openProductModal(productId) {
-            const product = window.productCatalog && window.productCatalog.getProduct(productId);
-            if (!product) return;
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <img src="/logo2.webp" alt="Beauty Bite" class="footer-logo">
+                <p class="footer-tagline">Patented electrical-isolation guards for safe facial therapy with implants, fillings &amp; braces.</p>
+            </div>
+            <div>
+                <div class="footer-col-title">Shop</div>
+                <div class="footer-links">
+                    <a href="/product/clear">Clear · $100</a>
+                    <a href="/product/branded">Signature · $200</a>
+                    <a href="/product/custom">Custom · $300</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Company</div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/design-studio">Design Studio</a>
+                    <a href="/login">Account</a>
+                </div>
+            </div>
+            <div>
+                <div class="footer-col-title">Legal</div>
+                <div class="footer-links">
+                    <a href="#">Patent No. C1688.70001US00</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Beauty Bite. All rights reserved.</span>
+            <span>Made for clinicians.</span>
+        </div>
+    </div>
+</footer>
 
-            _modalProductId = productId;
-
-            const modal = document.getElementById('product-modal');
-            document.getElementById('modal-product-name').textContent = product.name;
-            document.getElementById('modal-product-tagline').textContent = product.tagline || '';
-            document.getElementById('modal-product-desc').textContent = product.description;
-            document.getElementById('modal-product-price').textContent = '$' + product.basePrice;
-
-            const chips = document.getElementById('modal-use-cases');
-            if (chips) {
-                chips.innerHTML = (product.useCases || []).map(u =>
-                    `<span style="background:#EEF6FA;color:#1B2D3E;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.8rem;font-weight:500;margin:0.2rem;display:inline-block;">${u}</span>`
-                ).join('');
-            }
-
-            // Reset quantity input bounds
-            const qtyInput = document.getElementById('modal-qty');
-            if (qtyInput) {
-                qtyInput.value = product.minQuantity || 1;
-                qtyInput.min = product.minQuantity || 1;
-                qtyInput.max = product.maxQuantity || 10000;
-            }
-
-            // Wire cart/checkout buttons
-            document.getElementById('modal-btn-cart').onclick = function() {
-                if (typeof addToCart === 'function') {
-                    const qty = parseInt(document.getElementById('modal-qty').value) || 1;
-                    addToCart(_modalProductId, qty);
-                }
-            };
-            document.getElementById('modal-btn-checkout').onclick = function() {
-                const qty = parseInt(document.getElementById('modal-qty').value) || 1;
-                window.location.href = '/checkout.html?product=' + _modalProductId + '&qty=' + qty;
-            };
-
-            modal.style.display = 'flex';
-
-            // Init 3D in modal canvas
-            if (typeof initModalCanvas === 'function') {
-                initModalCanvas(productId);
-            }
-        }
-
-        function closeProductModal() {
-            document.getElementById('product-modal').style.display = 'none';
-            _modalProductId = null;
-        }
-
-        document.getElementById('product-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeProductModal();
-        });
-    </script>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="/js/header-init.js"></script>
+<script src="/js/products.js"></script>
+<script src="/js/shop-tiers.js"></script>
 
 </body>
 </html>
