@@ -3,594 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - BeautyBite</title>
-    <meta name="description" content="Manage your orders, subscriptions, and custom designs with BeautyBite">
+    <title>Dashboard — Beauty Bite</title>
+    <meta name="description" content="Manage your orders, subscriptions, and custom designs with Beauty Bite.">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <link rel="icon" href="logo2.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --navy: #1B2D3E;
-            --teal: #14B8A6;
-            --teal-light: #CCFBF1;
-            --bg: #F8FAFC;
-            --white: #FFFFFF;
-            --border: #E2E8F0;
-            --text: #1B2D3E;
-            --text-muted: #64748B;
-            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --sidebar-w: 240px;
+        /* ── Dashboard-only additions on top of styles.css ─────────────── */
+        .dash-hero {
+            background: linear-gradient(155deg, var(--brand-bg) 0%, #ffffff 85%);
+            border-bottom: 1px solid var(--border);
+            padding: 2.75rem 0 2rem;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
+        .dash-hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
             display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
+        .dash-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: var(--brand-dark);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .dash-hero h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+        .dash-hero p {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            margin-top: 0.4rem;
+            max-width: 38rem;
+        }
+        .dash-hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 
-        /* ── Sidebar ── */
-        .sidebar {
-            width: var(--sidebar-w);
-            min-height: 100vh;
-            background: var(--white);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
+        /* Section tabs replace the old sidebar */
+        .dash-tabs-wrap {
+            background: white;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            flex-shrink: 0;
+            z-index: 20;
         }
-
-        .sidebar-brand {
-            padding: 24px 20px 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sidebar-brand a {
-            font-family: 'Pacifico', cursive;
-            font-size: 20px;
-            color: var(--navy);
-            text-decoration: none;
-        }
-
-        .sidebar-brand a span {
-            color: var(--teal);
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 12px 0;
-        }
-
-        .nav-item {
+        .dash-tabs {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
             display: flex;
+            gap: 0.25rem;
+            overflow-x: auto;
+        }
+        .dash-tab {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
+            gap: 0.45rem;
+            padding: 1rem 1rem;
+            font-size: 0.92rem;
             font-weight: 500;
-            border-left: 3px solid transparent;
-            transition: color 0.15s, background 0.15s, border-color 0.15s;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
             cursor: pointer;
+            transition: var(--transition);
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
         }
-
-        .nav-item:hover {
-            background: var(--bg);
-            color: var(--navy);
+        .dash-tab:hover { color: var(--navy); }
+        .dash-tab.active {
+            color: var(--brand-dark);
+            border-bottom-color: var(--brand-dark);
         }
+        .dash-tab svg { width: 16px; height: 16px; }
 
-        .nav-item.active {
-            border-left-color: var(--teal);
-            color: var(--teal);
-            background: var(--teal-light);
+        /* Main container */
+        .dash-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
         }
-
-        .nav-item svg {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 8px 20px;
-        }
-
-        .nav-signout {
-            margin-top: auto;
-            padding: 12px 0;
-            border-top: 1px solid var(--border);
-        }
-
-        /* ── Main content ── */
-        .main {
-            flex: 1;
-            min-width: 0;
-            padding: 32px;
-            background: var(--bg);
-        }
-
         .section { display: none; }
-        .section.active { display: block; }
+        .section.active { display: block; animation: fade 0.25s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-        /* ── Section headings ── */
-        .section-header {
-            margin-bottom: 24px;
-        }
-
-        .section-header h1 {
-            font-size: 24px;
+        .section-header { margin-bottom: 1.5rem; }
+        .section-header h2 {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--navy);
+            letter-spacing: -0.01em;
         }
-
         .section-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 4px;
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            margin-top: 0.25rem;
         }
 
-        /* ── Cards ── */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        /* ── Stat cards ── */
+        /* Stat cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
-
         .stat-card {
-            background: var(--white);
-            border-radius: var(--radius);
+            background: white;
             border: 1px solid var(--border);
-            padding: 20px;
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.4rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
-
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
         .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            letter-spacing: 0.09em;
+            margin-bottom: 0.5rem;
         }
-
         .stat-value {
-            font-size: 32px;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--navy);
+            line-height: 1;
+        }
+        .stat-sub {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 0.4rem;
         }
 
-        /* ── Quick actions ── */
         .quick-actions {
             display: flex;
-            gap: 12px;
+            gap: 0.6rem;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 2rem;
         }
 
-        /* ── Buttons ── */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 9px 18px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            transition: opacity 0.15s, transform 0.1s;
-        }
-
-        .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
-
-        .btn-primary {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .btn-secondary {
-            background: var(--bg);
-            color: var(--navy);
-            border: 1px solid var(--border);
-        }
-
-        .btn-danger {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        /* ── Table ── */
+        /* Table */
         .table-wrap {
-            background: var(--white);
-            border-radius: var(--radius);
+            background: white;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
         }
-
         .table-head {
-            padding: 16px 20px;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
-        .table-head h2 {
-            font-size: 16px;
+        .table-head h3 {
+            font-size: 0.98rem;
             font-weight: 600;
             color: var(--navy);
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        table { width: 100%; border-collapse: collapse; }
         thead th {
-            padding: 12px 16px;
+            padding: 0.75rem 1rem;
             text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            background: var(--bg);
+            letter-spacing: 0.06em;
+            background: var(--gray-50);
             border-bottom: 1px solid var(--border);
         }
-
         tbody td {
-            padding: 14px 16px;
-            font-size: 14px;
+            padding: 0.9rem 1rem;
+            font-size: 0.91rem;
+            color: var(--text-primary);
             border-bottom: 1px solid var(--border);
         }
-
         tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover { background: #F8FAFC; }
+        tbody tr:hover { background: var(--gray-50); }
 
-        /* ── Badges ── */
+        /* Badges */
         .badge {
             display: inline-block;
             padding: 3px 10px;
             border-radius: 999px;
-            font-size: 12px;
+            font-size: 0.72rem;
             font-weight: 600;
+            letter-spacing: 0.02em;
         }
+        .badge-active    { background: #D5EFE4; color: #0F6B3E; }
+        .badge-paused    { background: #FEF3C7; color: #92400E; }
+        .badge-cancelled { background: #FDE8EC; color: #9C1F33; }
+        .badge-completed { background: var(--brand-bg); color: var(--brand-dark); }
+        .badge-pending   { background: var(--gray-100); color: var(--gray-600); }
 
-        .badge-active { background: #CCFBF1; color: #0F766E; }
-        .badge-paused { background: #FEF3C7; color: #92400E; }
-        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
-        .badge-completed { background: #DBEAFE; color: #1E40AF; }
-        .badge-pending { background: #F3F4F6; color: #374151; }
-
-        /* ── Sub cards (subscriptions, designs) ── */
+        /* Sub / design cards */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            gap: 1rem;
         }
-
         .sub-card, .design-card {
-            background: var(--white);
+            background: white;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
-
+        .sub-card:hover, .design-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
         .sub-card h3, .design-card h3 {
-            font-size: 15px;
+            font-size: 1rem;
             font-weight: 600;
             color: var(--navy);
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
         }
-
         .sub-card p, .design-card p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
         }
-
         .card-actions {
-            margin-top: 14px;
+            margin-top: 1rem;
             display: flex;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
-        /* ── Account form ── */
+        /* Account form */
         .form-section {
-            background: var(--white);
+            background: white;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.25rem;
         }
-
-        .form-section h2 {
-            font-size: 16px;
+        .form-section h3 {
+            font-size: 1rem;
             font-weight: 600;
             color: var(--navy);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            color: var(--navy);
-            background: var(--bg);
-            transition: border-color 0.15s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--teal);
-            background: var(--white);
-        }
-
-        .form-control[readonly] {
-            opacity: 0.7;
-            cursor: not-allowed;
+            margin-bottom: 1.25rem;
         }
 
         .form-msg {
-            font-size: 13px;
-            margin-top: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
+            font-size: 0.86rem;
+            margin-top: 0.75rem;
+            padding: 0.6rem 0.9rem;
+            border-radius: var(--radius-sm);
             display: none;
+            border: 1px solid transparent;
         }
+        .form-msg.success { background: #E5F6ED; color: #0F6B3E; border-color: #A8DCBF; display: block; }
+        .form-msg.error   { background: #FDE8EC; color: #9C1F33; border-color: #F5B9C2; display: block; }
 
-        .form-msg.success { background: #CCFBF1; color: #0F766E; display: block; }
-        .form-msg.error   { background: #FEE2E2; color: #991B1B; display: block; }
+        .btn-danger {
+            background: #FDE8EC;
+            color: #9C1F33;
+            border: 1px solid #F5B9C2;
+        }
+        .btn-danger:hover { background: #F5B9C2; color: #7a1826; }
 
-        /* ── Empty state ── */
+        /* Empty states */
         .empty-state {
             text-align: center;
-            padding: 48px 24px;
-            color: var(--text-muted);
+            padding: 3rem 1.5rem;
+            background: white;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-md);
         }
-
         .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            opacity: 0.4;
+            width: 40px;
+            height: 40px;
+            color: var(--brand);
+            margin-bottom: 0.75rem;
         }
-
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.35rem;
+        }
         .empty-state p {
-            font-size: 14px;
-            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
         }
 
-        /* ── Loading spinner ── */
-        .spinner {
+        /* Loading spinner — override styles.css sizing */
+        .dash-spinner {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid var(--border);
-            border-top-color: var(--teal);
+            border-top-color: var(--brand-dark);
             border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .loading-row td {
             text-align: center;
-            padding: 32px;
-            color: var(--text-muted);
+            padding: 2.5rem;
+            color: var(--text-secondary);
         }
 
-        /* ── Mobile toggle ── */
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 200;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px;
-            cursor: pointer;
+        .sign-out-link {
+            color: var(--text-secondary) !important;
         }
+        .sign-out-link:hover { color: #9C1F33 !important; }
 
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-
-            .sidebar {
-                position: fixed;
-                left: -var(--sidebar-w);
-                top: 0;
-                z-index: 100;
-                transform: translateX(calc(-1 * var(--sidebar-w)));
-                transition: transform 0.25s ease;
-            }
-
-            .sidebar.open { transform: translateX(0); }
-
-            .mobile-toggle { display: flex; }
-
-            .main { padding: 16px; padding-top: 60px; }
-
+            .dash-hero { padding: 2rem 0 1.5rem; }
+            .dash-hero h1 { font-size: 1.6rem; }
             .stats-grid { grid-template-columns: 1fr; }
+            .dash-main { padding: 1.75rem 1rem 3rem; }
+            .dash-tabs { padding: 0 1rem; }
         }
     </style>
 </head>
 <body>
 
-<button class="mobile-toggle" id="mobileToggle" aria-label="Open menu">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M3 12h18M3 6h18M3 18h18"/>
-    </svg>
-</button>
+<!-- Patent strip (same as every other page) -->
+<div class="patent-strip">
+    <strong>US Patent Pending</strong> &nbsp;·&nbsp; Application No. C1688.70001US00 &nbsp;·&nbsp; Medical-grade proprietary material &nbsp;·&nbsp; FDA-compliant manufacturing
+</div>
 
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <a href="/">Beauty<span>Bite</span></a>
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:40px;width:auto;border-radius:10px;display:block;">
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/shop" class="nav-link">Shop</a></li>
+        <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
+        <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="#" id="signOutBtn" class="nav-link sign-out-link" title="Sign out">Sign out</a>
+        <a href="/shop" class="btn btn-primary btn-sm">Order Now</a>
     </div>
+</nav>
 
-    <nav class="sidebar-nav">
-        <a class="nav-item active" data-section="section-overview" href="#overview">
+<!-- Hero -->
+<section class="dash-hero">
+    <div class="dash-hero-inner">
+        <div>
+            <div class="dash-eyebrow">Your Account</div>
+            <h1 id="welcomeHeading">Welcome back</h1>
+            <p id="welcomeSub">Manage your orders, subscriptions, and custom designs — all in one place.</p>
+        </div>
+        <div class="dash-hero-actions">
+            <a class="btn btn-brand" href="/shop">
+                Shop Products
+            </a>
+            <a class="btn btn-outline" href="/design-studio">
+                Design Studio
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Section tabs -->
+<div class="dash-tabs-wrap">
+    <div class="dash-tabs">
+        <button class="dash-tab active" data-section="section-overview" type="button">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                 <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
             Overview
-        </a>
-        <a class="nav-item" data-section="section-orders" href="#orders">
+        </button>
+        <button class="dash-tab" data-section="section-orders" type="button">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
             </svg>
             Orders
-        </a>
-        <a class="nav-item" data-section="section-subscriptions" href="#subscriptions">
+        </button>
+        <button class="dash-tab" data-section="section-subscriptions" type="button">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <polyline points="23 4 23 10 17 10"/>
                 <polyline points="1 20 1 14 7 14"/>
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
             </svg>
             Subscriptions
-        </a>
-        <a class="nav-item" data-section="section-designs" href="#designs">
+        </button>
+        <button class="dash-tab" data-section="section-designs" type="button">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
             Saved Designs
-        </a>
-
-        <div class="nav-divider"></div>
-
-        <a class="nav-item" data-section="section-account" href="#account">
+        </button>
+        <button class="dash-tab" data-section="section-account" type="button">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
             </svg>
             Account
-        </a>
-    </nav>
-
-    <div class="nav-signout">
-        <a class="nav-item" id="signOutBtn" href="#">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Sign Out
-        </a>
+        </button>
     </div>
-</aside>
+</div>
 
 <!-- Main content -->
-<main class="main">
+<main class="dash-main">
 
     <!-- Overview -->
     <section class="section active" id="section-overview">
-        <div class="section-header">
-            <h1 id="welcomeHeading">Hello!</h1>
-            <p>Here's a summary of your account.</p>
-        </div>
-
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total Orders</div>
                 <div class="stat-value" id="statOrders">—</div>
+                <div class="stat-sub">Lifetime</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Active Subscriptions</div>
                 <div class="stat-value" id="statSubs">—</div>
+                <div class="stat-sub">Recurring shipments</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Saved Designs</div>
                 <div class="stat-value" id="statDesigns">—</div>
+                <div class="stat-sub">In your studio</div>
             </div>
         </div>
 
-        <div class="quick-actions">
-            <a class="btn btn-primary" href="/shop">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                </svg>
-                Shop Products
-            </a>
-            <a class="btn btn-secondary" href="/design-studio">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
-                </svg>
-                Design Studio
-            </a>
-            <a class="btn btn-secondary" href="/shop">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                New Order
-            </a>
+        <div class="section-header">
+            <h2>Recent Orders</h2>
+            <p>Your three most recent purchases.</p>
+        </div>
+        <div class="table-wrap" id="recentOrdersWrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                    <tr class="loading-row"><td colspan="4"><span class="dash-spinner"></span></td></tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
     <!-- Orders -->
     <section class="section" id="section-orders">
         <div class="section-header">
-            <h1>Your Orders</h1>
+            <h2>Your Orders</h2>
+            <p>Every order you've placed with Beauty Bite.</p>
         </div>
         <div class="table-wrap">
             <div class="table-head">
-                <h2>Order History</h2>
+                <h3>Order History</h3>
             </div>
             <table>
                 <thead>
@@ -602,7 +492,7 @@
                     </tr>
                 </thead>
                 <tbody id="ordersTableBody">
-                    <tr class="loading-row"><td colspan="4"><span class="spinner"></span></td></tr>
+                    <tr class="loading-row"><td colspan="4"><span class="dash-spinner"></span></td></tr>
                 </tbody>
             </table>
         </div>
@@ -611,16 +501,13 @@
     <!-- Subscriptions -->
     <section class="section" id="section-subscriptions">
         <div class="section-header">
-            <h1>Subscriptions &amp; Recurring Orders</h1>
+            <h2>Subscriptions</h2>
+            <p>Manage your recurring Beauty Bite shipments.</p>
         </div>
         <div id="subsContainer">
             <div class="empty-state">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <polyline points="23 4 23 10 17 10"/>
-                    <polyline points="1 20 1 14 7 14"/>
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-                </svg>
-                <p>Loading subscriptions...</p>
+                <div class="dash-spinner"></div>
+                <p style="margin-top:0.75rem;">Loading your subscriptions…</p>
             </div>
         </div>
     </section>
@@ -628,14 +515,13 @@
     <!-- Saved Designs -->
     <section class="section" id="section-designs">
         <div class="section-header">
-            <h1>Saved Designs</h1>
+            <h2>Saved Designs</h2>
+            <p>Custom guards you've designed in the studio.</p>
         </div>
         <div id="designsContainer">
             <div class="empty-state">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                <p>Loading designs...</p>
+                <div class="dash-spinner"></div>
+                <p style="margin-top:0.75rem;">Loading your designs…</p>
             </div>
         </div>
     </section>
@@ -643,43 +529,88 @@
     <!-- Account -->
     <section class="section" id="section-account">
         <div class="section-header">
-            <h1>Account Settings</h1>
+            <h2>Account Settings</h2>
+            <p>Your profile and password.</p>
         </div>
 
         <div class="form-section">
-            <h2>Your Details</h2>
+            <h3>Your Details</h3>
             <div class="form-group">
-                <label>Name</label>
-                <input class="form-control" id="accountName" type="text" readonly>
+                <label class="form-label">Name</label>
+                <input class="form-input" id="accountName" type="text" readonly>
             </div>
             <div class="form-group">
-                <label>Email</label>
-                <input class="form-control" id="accountEmail" type="email" readonly>
+                <label class="form-label">Email</label>
+                <input class="form-input" id="accountEmail" type="email" readonly>
             </div>
         </div>
 
         <div class="form-section">
-            <h2>Change Password</h2>
+            <h3>Change Password</h3>
             <form id="passwordForm" novalidate>
                 <div class="form-group">
-                    <label for="oldPassword">Current Password</label>
-                    <input class="form-control" id="oldPassword" type="password" required>
+                    <label class="form-label" for="oldPassword">Current password</label>
+                    <input class="form-input" id="oldPassword" type="password" autocomplete="current-password" required>
                 </div>
                 <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input class="form-control" id="newPassword" type="password" required>
+                    <label class="form-label" for="newPassword">New password</label>
+                    <input class="form-input" id="newPassword" type="password" autocomplete="new-password" minlength="12" required>
+                    <div class="form-hint">12+ characters with uppercase, lowercase, and a number.</div>
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm New Password</label>
-                    <input class="form-control" id="confirmPassword" type="password" required>
+                    <label class="form-label" for="confirmPassword">Confirm new password</label>
+                    <input class="form-input" id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required>
                 </div>
-                <button class="btn btn-primary" type="submit">Update Password</button>
+                <button class="btn btn-brand" type="submit">Update Password</button>
                 <div class="form-msg" id="pwMsg"></div>
             </form>
         </div>
     </section>
 
 </main>
+
+<!-- Footer (same as home) -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <img src="logo2.webp" alt="Beauty Bite" class="footer-logo" style="height:30px;width:auto;border-radius:4px;margin-bottom:0.75rem;">
+                <p class="footer-tagline">Patented electrical isolation guard.<br>Built for therapy clinics &amp; med spas.</p>
+                <p style="margin-top:1rem;font-size:0.75rem;color:rgba(255,255,255,0.3);">Patent Pending · C1688.70001US00</p>
+            </div>
+            <div>
+                <div class="footer-col-title">Products</div>
+                <ul class="footer-links">
+                    <li><a href="/shop?tier=clear-bulk">BeautyBite Standard (Tier 1)</a></li>
+                    <li><a href="/shop?tier=beautybite-branded">BeautyBite Signature (Tier 2)</a></li>
+                    <li><a href="/design-studio">BeautyBite Custom (Tier 3)</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title">Account</div>
+                <ul class="footer-links">
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title">Company</div>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Beauty Bite. All rights reserved.</span>
+            <span>US Patent Pending &nbsp;·&nbsp; Medical-Grade Technology</span>
+        </div>
+    </div>
+</footer>
 
 <script>
 (function () {
@@ -705,60 +636,66 @@
     }
 
     const user = decodeJwt(token);
-    const userName = user.name || user.email || 'there';
 
     // Populate user info
-    document.getElementById('welcomeHeading').textContent = 'Hello, ' + (user.name || 'there') + '!';
+    document.getElementById('welcomeHeading').textContent = user.name
+        ? `Welcome back, ${user.name.split(' ')[0]}`
+        : 'Welcome back';
     document.getElementById('accountName').value  = user.name  || '';
     document.getElementById('accountEmail').value = user.email || '';
 
     // ── Fetch helper ─────────────────────────────────────────────────────────
     async function fetchWithAuth(url, opts = {}) {
-        const headers = Object.assign({ 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, opts.headers || {});
+        const headers = Object.assign(
+            { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            opts.headers || {}
+        );
         const res = await fetch(url, Object.assign({}, opts, { headers }));
-        if (res.status === 401) { localStorage.removeItem('bb_token'); window.location.href = '/login'; }
+        if (res.status === 401) {
+            localStorage.removeItem('bb_token');
+            window.location.href = '/login?next=/dashboard';
+        }
         return res;
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
-    const navItems = document.querySelectorAll('.nav-item[data-section]');
+    const tabs = document.querySelectorAll('.dash-tab[data-section]');
     const sections = document.querySelectorAll('.section');
 
     function showSection(id) {
         sections.forEach(s => s.classList.remove('active'));
-        navItems.forEach(n => n.classList.remove('active'));
+        tabs.forEach(t => t.classList.remove('active'));
         const sec = document.getElementById(id);
         if (sec) sec.classList.add('active');
-        navItems.forEach(n => { if (n.dataset.section === id) n.classList.add('active'); });
-        window.scrollTo(0, 0);
-        // Lazy-load section data on first visit
-        if (id === 'section-orders'        && !ordersLoaded)       loadOrders();
-        if (id === 'section-subscriptions' && !subsLoaded)         loadSubscriptions();
-        if (id === 'section-designs'       && !designsLoaded)      loadDesigns();
+        tabs.forEach(t => { if (t.dataset.section === id) t.classList.add('active'); });
+        if (id === 'section-orders'        && !ordersLoaded)  loadOrders();
+        if (id === 'section-subscriptions' && !subsLoaded)    loadSubscriptions();
+        if (id === 'section-designs'       && !designsLoaded) loadDesigns();
+        if (window.location.hash.replace('#', '') !== id.replace('section-', '')) {
+            history.replaceState(null, '', '#' + id.replace('section-', ''));
+        }
     }
 
-    navItems.forEach(item => {
-        item.addEventListener('click', e => {
+    tabs.forEach(tab => {
+        tab.addEventListener('click', e => {
             e.preventDefault();
-            showSection(item.dataset.section);
-            document.getElementById('sidebar').classList.remove('open');
+            showSection(tab.dataset.section);
         });
-    });
-
-    // Mobile sidebar toggle
-    document.getElementById('mobileToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
     });
 
     // Sign out
     document.getElementById('signOutBtn').addEventListener('click', e => {
         e.preventDefault();
         localStorage.removeItem('bb_token');
+        localStorage.removeItem('beautybite_jwt_token');
+        localStorage.removeItem('beautybite_refresh_token');
+        localStorage.removeItem('beautybite_user_data');
+        localStorage.removeItem('beautybite_token_expiry');
         localStorage.removeItem('bb_cart');
         window.location.href = '/';
     });
 
-    // ── Overview stats ────────────────────────────────────────────────────────
+    // ── Overview stats + recent orders ───────────────────────────────────────
     let ordersLoaded = false, subsLoaded = false, designsLoaded = false;
 
     async function loadOverviewStats() {
@@ -772,36 +709,63 @@
             const sData = sRes.ok ? await sRes.json() : { subscriptions: [] };
             const dData = dRes.ok ? await dRes.json() : { designs: [] };
 
-            document.getElementById('statOrders').textContent  = (oData.orders  || []).length;
-            document.getElementById('statSubs').textContent    = (sData.subscriptions || []).filter(s => s.status === 'active').length;
-            document.getElementById('statDesigns').textContent = (dData.designs || []).length;
+            const orders  = oData.orders  || [];
+            const subs    = sData.subscriptions || [];
+            const designs = dData.designs || [];
 
-            // Cache for section views
-            window._cachedOrders  = oData.orders  || [];
-            window._cachedSubs    = sData.subscriptions || [];
-            window._cachedDesigns = dData.designs || [];
-        } catch { /* stats stay as — */ }
+            document.getElementById('statOrders').textContent  = orders.length;
+            document.getElementById('statSubs').textContent    = subs.filter(s => s.status === 'active').length;
+            document.getElementById('statDesigns').textContent = designs.length;
+
+            window._cachedOrders  = orders;
+            window._cachedSubs    = subs;
+            window._cachedDesigns = designs;
+
+            // Paint recent-orders preview
+            const recent = document.getElementById('recentOrdersBody');
+            if (!orders.length) {
+                recent.innerHTML = `
+                    <tr><td colspan="4" style="padding:2rem;text-align:center;color:var(--text-secondary);">
+                        No orders yet — <a href="/shop" style="color:var(--brand-dark);font-weight:600;">browse the shop</a> to place your first.
+                    </td></tr>`;
+            } else {
+                recent.innerHTML = orders.slice(0, 3).map(o => `
+                    <tr>
+                        <td>${formatDate(o.created_at || o.date)}</td>
+                        <td>${escHtml(o.product_name || o.description || '—')}</td>
+                        <td>${formatMoney(o.amount || o.total_price)}</td>
+                        <td>${statusBadge(o.status)}</td>
+                    </tr>
+                `).join('');
+            }
+        } catch {
+            document.getElementById('recentOrdersBody').innerHTML =
+                '<tr><td colspan="4" style="padding:2rem;text-align:center;color:var(--text-secondary);">Couldn\'t load your orders right now.</td></tr>';
+        }
     }
 
     loadOverviewStats();
 
-    // ── Orders ────────────────────────────────────────────────────────────────
+    // ── Formatting helpers ───────────────────────────────────────────────────
     function statusBadge(status) {
-        const map = { completed: 'badge-completed', active: 'badge-active', pending: 'badge-pending', cancelled: 'badge-cancelled' };
+        const map = { completed: 'badge-completed', active: 'badge-active', pending: 'badge-pending', cancelled: 'badge-cancelled', paused: 'badge-paused' };
         const cls = map[(status || '').toLowerCase()] || 'badge-pending';
-        return '<span class="badge ' + cls + '">' + (status || 'Pending') + '</span>';
+        const label = (status || 'Pending');
+        return `<span class="badge ${cls}">${label.charAt(0).toUpperCase() + label.slice(1)}</span>`;
     }
-
     function formatDate(d) {
         if (!d) return '—';
         return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
-
     function formatMoney(n) {
         if (n == null) return '—';
         return '$' + Number(n).toFixed(2);
     }
+    function escHtml(str) {
+        return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
 
+    // ── Orders ────────────────────────────────────────────────────────────────
     async function loadOrders() {
         ordersLoaded = true;
         const tbody = document.getElementById('ordersTableBody');
@@ -810,19 +774,29 @@
             const data = res.ok ? await res.json() : { orders: [] };
             const orders = data.orders || window._cachedOrders || [];
             if (!orders.length) {
-                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state" style="padding:32px 0"><p>No orders yet. <a href="/shop" style="color:var(--teal)">Shop our products</a> to get started.</p></div></td></tr>';
+                tbody.innerHTML = `
+                    <tr><td colspan="4">
+                        <div class="empty-state" style="border:none;padding:3rem 1rem;">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                            <h4>No orders yet</h4>
+                            <p>When you place an order, it'll show up here.</p>
+                            <a class="btn btn-brand btn-sm" href="/shop">Browse the shop</a>
+                        </div>
+                    </td></tr>`;
                 return;
             }
             tbody.innerHTML = orders.map(o => `
                 <tr>
                     <td>${formatDate(o.created_at || o.date)}</td>
-                    <td>${o.product_name || o.description || '—'}</td>
+                    <td>${escHtml(o.product_name || o.description || '—')}</td>
                     <td>${formatMoney(o.amount || o.total_price)}</td>
                     <td>${statusBadge(o.status)}</td>
                 </tr>
             `).join('');
         } catch {
-            tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Failed to load orders.</td></tr>';
+            tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Couldn\'t load your orders.</td></tr>';
         }
     }
 
@@ -842,40 +816,35 @@
                             <polyline points="1 20 1 14 7 14"/>
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
                         </svg>
-                        <p>No active subscriptions yet.</p>
-                        <a class="btn btn-primary" href="/shop">Browse Plans</a>
+                        <h4>No active subscriptions</h4>
+                        <p>Set up a recurring plan and never run out of guards.</p>
+                        <a class="btn btn-brand" href="/shop">Browse plans</a>
                     </div>`;
                 return;
             }
-            const subBadge = s => {
-                if (s === 'active')    return '<span class="badge badge-active">Active</span>';
-                if (s === 'paused')    return '<span class="badge badge-paused">Paused</span>';
-                if (s === 'cancelled') return '<span class="badge badge-cancelled">Cancelled</span>';
-                return '<span class="badge badge-pending">' + (s || 'Unknown') + '</span>';
-            };
             container.innerHTML = '<div class="cards-grid">' + subs.map(s => `
                 <div class="sub-card">
-                    <h3>${s.product_name || s.plan || 'Subscription'}</h3>
-                    <p>${subBadge(s.status)}</p>
-                    <p>Next billing: ${formatDate(s.next_billing_date || s.next_payment)}</p>
-                    ${s.status === 'active' ? `<div class="card-actions"><button class="btn btn-danger btn-sm" data-cancel="${s.id}">Cancel</button></div>` : ''}
+                    <h3>${escHtml(s.product_name || s.plan || 'Subscription')}</h3>
+                    <p>${statusBadge(s.status)}</p>
+                    <p>Next billing: <strong style="color:var(--navy);">${formatDate(s.next_billing_date || s.next_payment)}</strong></p>
+                    ${s.status === 'active' ? `<div class="card-actions"><button class="btn btn-danger btn-sm" data-cancel="${s.id}">Cancel plan</button></div>` : ''}
                 </div>
             `).join('') + '</div>';
 
-            // Cancel handlers
             container.querySelectorAll('[data-cancel]').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     if (!confirm('Cancel this subscription?')) return;
-                    btn.textContent = '...';
+                    btn.textContent = 'Cancelling…';
                     btn.disabled = true;
                     try {
                         await fetchWithAuth(API + '/subscriptions/' + btn.dataset.cancel + '/cancel', { method: 'POST' });
+                        subsLoaded = false;
                         loadSubscriptions();
                     } catch { btn.textContent = 'Error'; }
                 });
             });
         } catch {
-            container.innerHTML = '<div class="empty-state"><p>Failed to load subscriptions.</p></div>';
+            container.innerHTML = '<div class="empty-state"><p>Couldn\'t load your subscriptions right now.</p></div>';
         }
     }
 
@@ -893,8 +862,9 @@
                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
-                        <p>Create your first custom design in the Design Studio.</p>
-                        <a class="btn btn-primary" href="/design-studio">Open Design Studio</a>
+                        <h4>No saved designs yet</h4>
+                        <p>Open the design studio to build your first custom guard.</p>
+                        <a class="btn btn-brand" href="/design-studio">Open Design Studio</a>
                     </div>`;
                 return;
             }
@@ -903,17 +873,16 @@
                     <h3>${escHtml(d.name || 'My Design')}</h3>
                     <p>Created ${formatDate(d.created_at)}</p>
                     <div class="card-actions">
-                        <a class="btn btn-primary btn-sm" href="/design-studio">Open in Studio</a>
+                        <a class="btn btn-brand btn-sm" href="/design-studio">Open</a>
                         <button class="btn btn-danger btn-sm" data-delete="${d.id}">Delete</button>
                     </div>
                 </div>
             `).join('') + '</div>';
 
-            // Delete handlers
             container.querySelectorAll('[data-delete]').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     if (!confirm('Delete this design?')) return;
-                    btn.textContent = '...';
+                    btn.textContent = 'Deleting…';
                     btn.disabled = true;
                     try {
                         await fetchWithAuth(API + '/designs/' + btn.dataset.delete, { method: 'DELETE' });
@@ -923,12 +892,8 @@
                 });
             });
         } catch {
-            container.innerHTML = '<div class="empty-state"><p>Failed to load designs.</p></div>';
+            container.innerHTML = '<div class="empty-state"><p>Couldn\'t load your designs right now.</p></div>';
         }
-    }
-
-    function escHtml(str) {
-        return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
     // ── Change password ───────────────────────────────────────────────────────
@@ -940,31 +905,42 @@
         const confPw = document.getElementById('confirmPassword').value;
 
         msg.className = 'form-msg';
-        if (newPw !== confPw) { msg.className = 'form-msg error'; msg.textContent = 'Passwords do not match.'; return; }
-        if (newPw.length < 8) { msg.className = 'form-msg error'; msg.textContent = 'Password must be at least 8 characters.'; return; }
+        if (newPw !== confPw) { msg.className = 'form-msg error'; msg.textContent = "Those new passwords don't match."; return; }
+        if (newPw.length < 12) { msg.className = 'form-msg error'; msg.textContent = 'New password needs at least 12 characters.'; return; }
+        if (!/[A-Z]/.test(newPw) || !/[a-z]/.test(newPw) || !/[0-9]/.test(newPw)) {
+            msg.className = 'form-msg error';
+            msg.textContent = 'Mix uppercase, lowercase, and a number into your new password.';
+            return;
+        }
 
         try {
             const res = await fetchWithAuth(API + '/auth/change-password', {
                 method: 'POST',
                 body: JSON.stringify({ oldPassword: oldPw, newPassword: newPw })
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
             if (res.ok) {
                 msg.className = 'form-msg success';
-                msg.textContent = 'Password updated successfully.';
+                msg.textContent = 'Password updated. You\'re all set.';
                 e.target.reset();
             } else {
                 msg.className = 'form-msg error';
-                msg.textContent = data.error || 'Failed to update password.';
+                msg.textContent = data.error || "Couldn't update your password. Double-check the current one.";
             }
         } catch {
             msg.className = 'form-msg error';
-            msg.textContent = 'Network error. Please try again.';
+            msg.textContent = 'Network hiccup — try again in a moment.';
         }
     });
 
     // ── Hash routing ──────────────────────────────────────────────────────────
-    const hashMap = { '#overview': 'section-overview', '#orders': 'section-orders', '#subscriptions': 'section-subscriptions', '#designs': 'section-designs', '#account': 'section-account' };
+    const hashMap = {
+        '#overview': 'section-overview',
+        '#orders': 'section-orders',
+        '#subscriptions': 'section-subscriptions',
+        '#designs': 'section-designs',
+        '#account': 'section-account'
+    };
     function routeFromHash() {
         const id = hashMap[window.location.hash];
         if (id) showSection(id);
