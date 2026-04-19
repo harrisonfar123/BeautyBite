@@ -3,8 +3,8 @@
     try {
       const raw = localStorage.getItem('beautybite_cart');
       if (!raw) return 0;
-      const items = JSON.parse(raw);
-      if (!Array.isArray(items)) return 0;
+      const data = JSON.parse(raw);
+      const items = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
       return items.reduce((sum, it) => sum + (parseInt(it.quantity, 10) || 0), 0);
     } catch (_) { return 0; }
   }
