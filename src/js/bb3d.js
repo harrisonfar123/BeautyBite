@@ -33,7 +33,8 @@
         glbScene:    null,
         glbPromise:  null,
         viewers:     [],
-        loopRunning: false
+        loopRunning: false,
+        sharedRotY:  0       // single rotation counter — all auto-spin viewers stay in sync
     };
 
     // ────────────────────────────────────────────────────────────
@@ -617,6 +618,14 @@
             requestAnimationFrame(step);
             if (!renderer) { state.loopRunning = false; return; }
 
+            // Advance the shared rotation once per frame using the slowest speed
+            // among auto-spin viewers so all guards turn together.
+            const autoViewers = state.viewers.filter(v => v.model && !v._paused && !v.controls);
+            if (autoViewers.length > 0) {
+                const speed = Math.min(...autoViewers.map(v => v.rotSpeed));
+                state.sharedRotY += speed;
+            }
+
             for (const v of state.viewers) {
                 if (!v.model || v._paused) continue;
                 const c  = v.canvas;
@@ -627,7 +636,7 @@
                 if (v.controls) {
                     v.controls.update();
                 } else {
-                    v.model.rotation.y += v.rotSpeed;
+                    v.model.rotation.y = state.sharedRotY;
                 }
                 renderer.setSize(w, h, false);
                 v.camera.aspect = w / h;
