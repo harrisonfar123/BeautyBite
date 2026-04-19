@@ -49,7 +49,7 @@
     // ────────────────────────────────────────────────────────────
     const VIEW_CONFIGS = {
         'clear-bulk': {
-            color: '#C4CDD4', bg: '#0A1929', finish: 'clear',
+            color: '#6E7E88', bg: '#0A1929', finish: 'clear',
             finishLabel: 'Grey Silicone',
             label: null
         },

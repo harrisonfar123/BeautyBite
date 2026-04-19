@@ -6,7 +6,7 @@
 
     const TIER_VIEWS = {
         'clear-bulk': {
-            color:    '#C4CDD4',
+            color:    '#6E7E88',
             bg:       '#0A1929',
             finish:   'clear',
             rotSpeed: 0.0035,

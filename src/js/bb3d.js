@@ -119,15 +119,15 @@
         const emiss    = new THREE.Color(base).multiplyScalar(0.12);
 
         if (finish === 'clear') {
-            // "Clear" is now a soft grey silicone — not translucent, just a neutral
-            // medical-grade look that reads cleanly on dark backgrounds.
-            const grey = new THREE.Color('#C4CDD4');
+            // Darker medical-grey silicone — strong enough to read against the dark
+            // background without going bright-white under the key light.
+            const grey = new THREE.Color('#6E7E88');
             return new THREE.MeshStandardMaterial({
                 color: grey,
-                roughness: 0.55,
+                roughness: 0.65,
                 metalness: 0.0,
-                emissive: new THREE.Color('#C4CDD4').multiplyScalar(0.10),
-                emissiveIntensity: 0.18,
+                emissive: new THREE.Color(0x000000),
+                emissiveIntensity: 0,
                 side: THREE.DoubleSide
             });
         }
@@ -354,8 +354,11 @@
                 background: isBadge ? (opts.labelColor || '#5C8EA6') : null
             });
             if (decal) {
-                decal.scale.setScalar(labelScale);
-                decal.position.set(0, sz.y * 0.05, sz.z * 0.55);
+                // Scale down slightly to fit the narrower anterior arch section.
+                decal.scale.setScalar(labelScale * 0.68);
+                // Move downward in Y to the anterior (front-teeth) bite area,
+                // staying on the outer face of the guard (sz.z * 0.52).
+                decal.position.set(0, sz.y * -0.38, sz.z * 0.52);
                 clone.add(decal);
             }
         }
