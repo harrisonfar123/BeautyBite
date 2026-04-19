@@ -6,28 +6,28 @@
 
     const TIER_VIEWS = {
         'clear-bulk': {
-            color:    '#FFFFFF',
+            color:    '#C4CDD4',
             bg:       '#0A1929',
             finish:   'clear',
-            rotSpeed: 0.0075,
+            rotSpeed: 0.0035,
             label:    null,
-            labelColor: '#1B2D3E'
+            labelColor: '#5C8EA6'
         },
         'beautybite-branded': {
             color:    '#F4F6F8',
             bg:       '#13243A',
             finish:   'silicone',
-            rotSpeed: 0.0065,
+            rotSpeed: 0.0030,
             label:    'Beauty Bite',
-            labelColor: '#1B2D3E'
+            labelColor: '#5C8EA6'
         },
         'custom-branded': {
             color:    '#5C8EA6',
             bg:       '#080F1E',
             finish:   'glossy',
-            rotSpeed: 0.011,
+            rotSpeed: 0.0050,
             label:    null,
-            labelColor: '#1B2D3E'
+            labelColor: '#5C8EA6'
         }
     };
 

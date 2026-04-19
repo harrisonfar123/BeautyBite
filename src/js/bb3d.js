@@ -119,18 +119,16 @@
         const emiss    = new THREE.Color(base).multiplyScalar(0.12);
 
         if (finish === 'clear') {
-            // Translucent-looking EVA, rendered with MeshStandardMaterial so we do
-            // NOT need a PMREM environment map.
+            // "Clear" is now a soft grey silicone — not translucent, just a neutral
+            // medical-grade look that reads cleanly on dark backgrounds.
+            const grey = new THREE.Color('#C4CDD4');
             return new THREE.MeshStandardMaterial({
-                color: new THREE.Color('#E9F4FB'),
-                roughness: 0.25,
+                color: grey,
+                roughness: 0.55,
                 metalness: 0.0,
-                transparent: true,
-                opacity: 0.72,
-                emissive: new THREE.Color('#B8E4FF').multiplyScalar(0.15),
-                emissiveIntensity: 0.4,
-                side: THREE.DoubleSide,
-                depthWrite: false
+                emissive: new THREE.Color('#C4CDD4').multiplyScalar(0.10),
+                emissiveIntensity: 0.18,
+                side: THREE.DoubleSide
             });
         }
         if (finish === 'glossy') {
@@ -166,41 +164,87 @@
         const ctx = c.getContext('2d');
         ctx.clearRect(0, 0, W, H);
 
-        // soft shadow under text for legibility on any base color
-        ctx.font = '700 ' + (o.fontSize || 130) + 'px "Pacifico", "Brush Script MT", cursive';
+        // Auto-fit the text width.
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(20,40,60,0.35)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 3;
+        let fs = o.fontSize || 160;
+        const maxTextWidth = W * 0.9;
+        do {
+            ctx.font = '700 ' + fs + 'px "Pacifico", "Brush Script MT", cursive';
+            if (ctx.measureText(text).width <= maxTextWidth) break;
+            fs -= 4;
+        } while (fs > 40);
+
+        // White stroke for legibility against any base color.
+        ctx.lineJoin = 'round';
+        ctx.miterLimit = 2;
+        ctx.lineWidth   = Math.max(4, fs * 0.06);
+        ctx.strokeStyle = 'rgba(255,255,255,0.88)';
+        ctx.strokeText(text, W / 2, H / 2);
+        ctx.shadowColor = 'rgba(15,26,46,0.35)';
+        ctx.shadowBlur  = 8;
+        ctx.shadowOffsetY = 2;
         ctx.fillStyle = o.color || '#1B2D3E';
         ctx.fillText(text, W / 2, H / 2);
 
         const tex = new THREE.CanvasTexture(c);
-        // Linear to match renderer.outputEncoding = LinearEncoding.
         if ('encoding' in tex) tex.encoding = THREE.LinearEncoding;
         tex.anisotropy = 4;
         tex.needsUpdate = true;
         return tex;
     }
 
+    function makeImageTexture (dataUrl, onLoad) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const tex = new THREE.Texture();
+        img.onload = () => {
+            tex.image = img;
+            if ('encoding' in tex) tex.encoding = THREE.LinearEncoding;
+            tex.anisotropy = 4;
+            tex.needsUpdate = true;
+            if (onLoad) onLoad(img);
+        };
+        img.src = dataUrl;
+        return tex;
+    }
+
     function buildLabelDecal (text, opts) {
         if (!text) return null;
         const o = opts || {};
-        const tex = makeLabelTexture(text, { color: o.color || '#1B2D3E', fontSize: 130 });
+        const tex = makeLabelTexture(text, { color: o.color || '#1B2D3E' });
         const mat = new THREE.MeshBasicMaterial({
             map: tex,
             transparent: true,
-            depthTest: true,
+            depthTest: false,   // sit visibly on top of the mesh
             depthWrite: false,
             side: THREE.DoubleSide
         });
-        const w = o.width  || 0.85;
-        const h = o.height || 0.22;
+        const w = o.width  || 1.0;
+        const h = o.height || 0.25;
         const geom = new THREE.PlaneGeometry(w, h);
         const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.set(o.x || 0, o.y || 0.02, o.z || 0.42);
+        mesh.renderOrder = 10;
         mesh.userData.isLabelDecal = true;
+        return mesh;
+    }
+
+    function buildLogoDecal (dataUrl, opts) {
+        if (!dataUrl) return null;
+        const o = opts || {};
+        const mat = new THREE.MeshBasicMaterial({
+            map: makeImageTexture(dataUrl),
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        });
+        const w = o.width  || 0.55;
+        const h = o.height || 0.35;
+        const geom = new THREE.PlaneGeometry(w, h);
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.renderOrder = 11;
+        mesh.userData.isLogoDecal = true;
         return mesh;
     }
 
@@ -252,20 +296,40 @@
         });
         if (opts.label) {
             const labelScale = 1 / ((opts.scale || 1.6) / maxDim);
-            const decal = buildLabelDecal(opts.label, { color: opts.labelColor || '#1B2D3E' });
-            if (decal) {
-                decal.scale.setScalar(labelScale);
-                clone.add(decal);
+            // Two back-to-back decals so the text is readable from either side
+            // as the model spins. The mesh's "front wall" (lip side) is on -Z;
+            // the "back" (palate side) is on +Z.
+            const front = buildLabelDecal(opts.label, { color: opts.labelColor || '#5C8EA6' });
+            if (front) {
+                front.scale.setScalar(labelScale);
+                front.position.set(0, sz.y * 0.05, -sz.z * 0.55);
+                front.rotation.y = Math.PI;
+                clone.add(front);
+            }
+            const back = buildLabelDecal(opts.label, { color: opts.labelColor || '#5C8EA6' });
+            if (back) {
+                back.scale.setScalar(labelScale);
+                back.position.set(0, sz.y * 0.05, sz.z * 0.55);
+                clone.add(back);
+            }
+        }
+        if (opts.logo) {
+            const logoScale = 1 / ((opts.scale || 1.6) / maxDim);
+            const logo = buildLogoDecal(opts.logo, { color: opts.logoColor });
+            if (logo) {
+                logo.scale.setScalar(logoScale);
+                logo.position.set(0, sz.y * 0.25, sz.z * 0.55);
+                clone.add(logo);
             }
         }
         scene.add(clone);
         return clone;
     }
 
-    function removeLabelDecal (model) {
+    function removeDecalsBy (model, key) {
         if (!model) return;
         const toRemove = [];
-        model.traverse(c => { if (c.userData && c.userData.isLabelDecal) toRemove.push(c); });
+        model.traverse(c => { if (c.userData && c.userData[key]) toRemove.push(c); });
         toRemove.forEach(n => {
             if (n.parent) n.parent.remove(n);
             if (n.material) {
@@ -278,15 +342,35 @@
 
     function setViewerLabel (v, label, opts) {
         if (!v || !v.model) return;
-        removeLabelDecal(v.model);
+        removeDecalsBy(v.model, 'isLabelDecal');
+        v.label = label || null;
         if (!label) return;
+        // v.model is scaled; compute world-space bbox, then convert to the
+        // model's local space so the decal sits just off the +Z face.
         const box = new THREE.Box3().setFromObject(v.model);
-        const sz = box.getSize(new THREE.Vector3());
-        const scaleFactor = 1 / v.model.scale.x;
-        const decal = buildLabelDecal(label, { color: (opts && opts.color) || '#1B2D3E' });
+        const sz  = box.getSize(new THREE.Vector3());
+        const s   = v.model.scale.x || 1;
+        const decal = buildLabelDecal(label, { color: (opts && opts.color) || v.labelColor || '#1B2D3E' });
         if (decal) {
-            decal.scale.setScalar(scaleFactor);
+            decal.scale.setScalar(1 / s);
+            decal.position.set(0, (sz.y * 0.05) / s, (sz.z * 0.55) / s);
             v.model.add(decal);
+        }
+    }
+
+    function setViewerLogo (v, dataUrl, opts) {
+        if (!v || !v.model) return;
+        removeDecalsBy(v.model, 'isLogoDecal');
+        v.logo = dataUrl || null;
+        if (!dataUrl) return;
+        const box = new THREE.Box3().setFromObject(v.model);
+        const sz  = box.getSize(new THREE.Vector3());
+        const s   = v.model.scale.x || 1;
+        const logo = buildLogoDecal(dataUrl, opts || {});
+        if (logo) {
+            logo.scale.setScalar(1 / s);
+            logo.position.set(0, (sz.y * 0.25) / s, (sz.z * 0.55) / s);
+            v.model.add(logo);
         }
     }
 
@@ -324,6 +408,7 @@
             scale:    cfg.scale,
             label:    cfg.label || null,
             labelColor: cfg.labelColor || '#1B2D3E',
+            logo:     cfg.logo || null,
             onReady:  cfg.onReady,
             controls: null,
             _paused:  false,
@@ -354,11 +439,15 @@
         return v;
     }
 
+    function isDecal (c) {
+        return c.userData && (c.userData.isLabelDecal || c.userData.isLogoDecal);
+    }
+
     function setViewerColor (v, hex) {
         if (!v || !v.model) return;
         v.color = hex;
         v.model.traverse(c => {
-            if (c.isMesh && !(c.userData && c.userData.isLabelDecal)) {
+            if (c.isMesh && !isDecal(c)) {
                 c.material = makeMaterial({ color: v.color, finish: v.finish });
             }
         });
@@ -368,7 +457,7 @@
         if (!v || !v.model) return;
         v.finish = finish;
         v.model.traverse(c => {
-            if (c.isMesh && !(c.userData && c.userData.isLabelDecal)) {
+            if (c.isMesh && !isDecal(c)) {
                 c.material = makeMaterial({ color: v.color, finish: v.finish });
             }
         });
@@ -547,7 +636,7 @@
         probeWebGL,
         load,
         registerViewer, unregisterViewer,
-        setViewerColor, setViewerFinish, setViewerLabel,
+        setViewerColor, setViewerFinish, setViewerLabel, setViewerLogo,
         startLoop,
         makeMaterial,
         draw2DGuard,

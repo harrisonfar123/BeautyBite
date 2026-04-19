@@ -49,15 +49,15 @@
     // ────────────────────────────────────────────────────────────
     const VIEW_CONFIGS = {
         'clear-bulk': {
-            color: '#FFFFFF', bg: '#0A1929', finish: 'clear',
-            finishLabel: 'Clear EVA',
+            color: '#C4CDD4', bg: '#0A1929', finish: 'clear',
+            finishLabel: 'Grey Silicone',
             label: null
         },
         'beautybite-branded': {
             color: '#F4F6F8', bg: '#13243A', finish: 'silicone',
             finishLabel: 'Signature White',
             label: 'Beauty Bite',
-            labelColor: '#1B2D3E'
+            labelColor: '#5C8EA6'
         },
         'custom-branded': {
             color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
@@ -178,7 +178,9 @@
     }
 
     function renderQtyPresets (product) {
-        const presets = QTY_PRESETS[product.id] || [1, 5, 10, 25];
+        const min = product.minQuantity || 1;
+        const presets = (QTY_PRESETS[product.id] || [1, 5, 10, 25]).filter(q => q >= min);
+        if (!presets.includes(min)) presets.unshift(min);
         const wrap = $('qty-presets');
         wrap.innerHTML = presets
             .map(q => `<button type="button" class="qty-preset" data-qty="${q}">${q.toLocaleString()}</button>`)
@@ -192,6 +194,21 @@
                 state.recompute();
             });
         });
+
+        // Apply minimum to the input element + show a small note.
+        const input = $('qty-input');
+        if (input) {
+            input.min = String(min);
+            input.value = String(min);
+        }
+        const noteHost = $('qty-presets').parentElement;
+        if (noteHost && !noteHost.querySelector('.qty-min-note')) {
+            const note = document.createElement('div');
+            note.className = 'qty-min-note';
+            note.style.cssText = 'font-size:0.75rem;color:var(--text-secondary);margin-top:0.5rem;';
+            note.textContent = 'Minimum order: ' + min.toLocaleString() + (min === 1 ? ' unit' : ' units');
+            noteHost.appendChild(note);
+        }
     }
 
     function renderOptions (product) {
@@ -215,7 +232,6 @@
                     <strong>${escapeHtml(o.label)}</strong>
                     <span>${escapeHtml(o.description || '')}</span>
                 </span>
-                ${o.discount && o.discount > 0 ? `<span class="opt-save">Save ${Math.round(o.discount * 100)}%</span>` : ''}
             </label>
         `).join('');
 
@@ -318,8 +334,8 @@
             bg:         view.bg,
             finish:     view.finish,
             label:      view.label || null,
-            labelColor: view.labelColor || '#1B2D3E',
-            rotSpeed:   0.007,
+            labelColor: view.labelColor || '#5C8EA6',
+            rotSpeed:   0.0035,
             scale:      2.0,
             camZ:       3.6,
             camY:       0.5,

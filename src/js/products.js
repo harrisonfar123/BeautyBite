@@ -25,7 +25,7 @@ window.productCatalog = {
             quantityStep: 1,
             purchasingOptions: {
                 oneTime: { label: 'One-time order', description: 'Single purchase', discount: 0 },
-                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, save 10%', discount: 0.10 }
+                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, monthly delivery', discount: 0 }
             }
         },
         'beautybite-branded': {
@@ -52,7 +52,7 @@ window.productCatalog = {
             quantityStep: 1,
             purchasingOptions: {
                 oneTime: { label: 'One-time order', description: 'Single purchase', discount: 0 },
-                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, save 10%', discount: 0.10 }
+                subscription: { label: 'Monthly Supply', description: 'Auto-reorder, monthly delivery', discount: 0 }
             }
         },
         'custom-branded': {

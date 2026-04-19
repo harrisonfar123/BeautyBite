@@ -175,8 +175,9 @@
         <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
         <li><a href="/login" class="nav-link">Login</a></li>
     </ul>
-    <div class="navbar-actions">
-        <a href="/shop" class="btn btn-primary btn-sm">Order Now</a>
+    <div class="navbar-actions" style="display:flex;align-items:center;gap:0.75rem;">
+        <a href="/cart" aria-label="Cart" title="Cart" style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#F0F4F8;color:#1B2D3E;text-decoration:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><span id="bb-cart-badge" style="display:none;position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;background:#5C8EA6;color:#fff;border-radius:9px;font-family:Inter,sans-serif;font-size:0.7rem;font-weight:700;align-items:center;justify-content:center;line-height:1;border:2px solid #fff;"></span></a>
+        <a href="/shop" style="padding:0.45rem 1.1rem;background:#5C8EA6;color:white;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:0.875rem;font-weight:600;">Order Now</a>
     </div>
 </nav>
 
@@ -234,12 +235,12 @@
                 <div class="tier-product-visual" style="position:relative;overflow:hidden;padding:0;background:#0d1f3c;">
                     <canvas id="hero3d-clear" style="width:100%;height:130px;display:block;background:#0d1f3c;"></canvas>
                     <div id="hero3d-clear-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0d1f3c;">
-                        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#14B8A6;border-radius:50%;animation:heroSpin 0.8s linear infinite;"></div>
+                        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#8BB8CC;border-radius:50%;animation:heroSpin 0.8s linear infinite;"></div>
                     </div>
                 </div>
                 <div class="tier-number">Tier 1</div>
                 <div class="tier-name">BeautyBite Standard</div>
-                <div class="tier-price">$89</div>
+                <div class="tier-price">$100</div>
                 <div class="tier-price-sub">per unit</div>
                 <hr class="tier-divider">
                 <ul class="tier-features">
@@ -263,7 +264,7 @@
                 </div>
                 <div class="tier-number">Tier 2</div>
                 <div class="tier-name">BeautyBite Signature</div>
-                <div class="tier-price">$149</div>
+                <div class="tier-price">$200</div>
                 <div class="tier-price-sub">per unit</div>
                 <hr class="tier-divider">
                 <ul class="tier-features">
@@ -281,12 +282,12 @@
                 <div class="tier-product-visual custom-tier" style="position:relative;overflow:hidden;padding:0;background:#0f1a2e;">
                     <canvas id="hero3d-custom" style="width:100%;height:130px;display:block;background:#0f1a2e;"></canvas>
                     <div id="hero3d-custom-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0f1a2e;">
-                        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#f59e0b;border-radius:50%;animation:heroSpin 0.8s linear infinite;"></div>
+                        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#5C8EA6;border-radius:50%;animation:heroSpin 0.8s linear infinite;"></div>
                     </div>
                 </div>
                 <div class="tier-number">Tier 3</div>
                 <div class="tier-name">BeautyBite Custom</div>
-                <div class="tier-price">$249</div>
+                <div class="tier-price">$300</div>
                 <div class="tier-price-sub">per unit</div>
                 <hr class="tier-divider">
                 <ul class="tier-features">
@@ -382,7 +383,7 @@
             <div class="step-item">
                 <div class="step-number">3</div>
                 <h4>Secure Checkout</h4>
-                <p>Pay securely via Stripe. Confirmation and order tracking sent immediately.</p>
+                <p>Complete your order online. Confirmation and order tracking sent immediately.</p>
             </div>
         </div>
     </div>
@@ -454,192 +455,45 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="/js/bb3d.js"></script>
 <script>
-// Shared single-context 3D viewers — no WebGL context limit errors
-(function(){
-  const s = document.createElement('style');
-  s.textContent = '@keyframes heroSpin{to{transform:rotate(360deg)}}';
-  document.head.appendChild(s);
+(function () {
+    const s = document.createElement('style');
+    s.textContent = '@keyframes heroSpin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+
+    const HERO_TIERS = [
+        { id: 'hero3d-clear',   color: '#C4CDD4', bg: '#0A1929', finish: 'clear',    rotSpeed: 0.0035, label: null,          labelColor: '#5C8EA6' },
+        { id: 'hero3d-branded', color: '#F4F6F8', bg: '#13243A', finish: 'silicone', rotSpeed: 0.0030, label: 'Beauty Bite', labelColor: '#5C8EA6' },
+        { id: 'hero3d-custom',  color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',   rotSpeed: 0.0050, label: null,          labelColor: '#5C8EA6' }
+    ];
+
+    function clearLoading (id) {
+        const el = document.getElementById(id + '-loading');
+        if (el) el.style.display = 'none';
+    }
+
+    window.addEventListener('load', function () {
+        HERO_TIERS.forEach(t => {
+            const canvas = document.getElementById(t.id);
+            if (!canvas) return;
+            BB3D.registerViewer({
+                canvas,
+                color:      t.color,
+                bg:         t.bg,
+                finish:     t.finish,
+                rotSpeed:   t.rotSpeed,
+                scale:      1.5,
+                camZ:       3.8,
+                camY:       0.5,
+                label:      t.label,
+                labelColor: t.labelColor,
+                onReady:     () => clearLoading(t.id),
+                onFallback:  () => clearLoading(t.id)
+            });
+        });
+    });
 })();
-
-const HERO_H = 130;
-
-const HERO_CFGS = {
-  'hero3d-clear': {
-    bgColor: 0x0a1929,
-    makeMat: () => new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0xb8e4ff), roughness: 0.05, metalness: 0.0,
-      clearcoat: 0.8, clearcoatRoughness: 0.1,
-      transparent: true, opacity: 0.85, side: THREE.DoubleSide,
-      emissive: new THREE.Color(0x1a4060), emissiveIntensity: 0.45
-    }),
-    lights: [['a',0xd0e8ff,3.3],['d',0xffffff,4.5,[4,6,4]],['d',0x88ccff,2.7,[-4,2,-3]],['d',0x44aaff,1.5,[0,-2,-5]]],
-    rotSpeed: 0.007
-  },
-  'hero3d-branded': {
-    bgColor: 0x081422,
-    makeMat: () => new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x2B5C8E), roughness: 0.2, metalness: 0.6,
-      emissive: new THREE.Color(0x0d2a50), emissiveIntensity: 0.75
-    }),
-    lights: [['a',0xffffff,3.0],['d',0xffffff,5.25,[4,6,4]],['d',0x8BB8CC,2.25,[-4,2,-3]],['d',0x14B8A6,1.5,[0,-2,-5]]],
-    rotSpeed: 0.006
-  },
-  'hero3d-custom': {
-    bgColor: 0x080f1e,
-    makeMat: () => new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x0066CC), roughness: 0.1, metalness: 0.95,
-      emissive: new THREE.Color(0x001a3d), emissiveIntensity: 0.6
-    }),
-    lights: [['a',0xffffff,2.7],['d',0xffffff,4.5,[4,6,4]],['d',0x14B8A6,2.7,[-4,2,-3]],['d',0xf59e0b,1.8,[2,-3,-4]]],
-    rotSpeed: 0.013
-  }
-};
-
-function buildHeroScene(cfg) {
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(cfg.bgColor);
-  cfg.lights.forEach(l => {
-    if (l[0]==='a') { scene.add(new THREE.AmbientLight(l[1],l[2])); }
-    else { const d=new THREE.DirectionalLight(l[1],l[2]); if(l[3]) d.position.set(...l[3]); scene.add(d); }
-  });
-  return scene;
-}
-
-window.addEventListener('load', function() {
-  const ids = ['hero3d-clear','hero3d-branded','hero3d-custom'];
-  const viewers = [];
-
-  // Build one shared offscreen renderer
-  let renderer;
-  try {
-    const oc = document.createElement('canvas');
-    oc.width = 380; oc.height = HERO_H;
-    renderer = new THREE.WebGLRenderer({
-      canvas: oc, antialias: false, alpha: false,
-      preserveDrawingBuffer: true,
-      powerPreference: 'low-power',
-      failIfMajorPerformanceCaveat: false
-    });
-  } catch(e) {
-    console.warn('WebGL unavailable — using 2D fallback', e);
-    ids.forEach(id => {
-      const el = document.getElementById(id + '-loading');
-      const canvas = document.getElementById(id);
-      if (el) el.style.display = 'none';
-      if (canvas) {
-        const heroTierMap = {'hero3d-clear':'clear-bulk','hero3d-branded':'beautybite-branded','hero3d-custom':'custom-branded'};
-        const tierId = heroTierMap[id] || 'beautybite-branded';
-        const palettes2 = {
-          'clear-bulk':         {bg:'#0a1929',outer:'rgba(140,210,255,0.82)',inner:'rgba(100,180,255,0.45)',shine:'rgba(220,245,255,0.55)',edge:'#44aaff',label:null},
-          'beautybite-branded': {bg:'#081422',outer:'#2B5C8E',               inner:'#1a3d6b',              shine:'rgba(100,180,255,0.35)',edge:'#14B8A6',label:'Beauty Bite'},
-          'custom-branded':     {bg:'#080f1e',outer:'#0066CC',               inner:'#004499',             shine:'rgba(0,160,255,0.3)',   edge:'#f59e0b',label:null}
-        };
-        const p2 = palettes2[tierId];
-        const cw = canvas.parentElement.clientWidth || 320;
-        const ch = 130;
-        canvas.width = cw; canvas.height = ch;
-        const cx2d = canvas.getContext('2d');
-        if (cx2d) {
-          cx2d.fillStyle = p2.bg; cx2d.fillRect(0,0,cw,ch);
-          cx2d.save(); cx2d.fillStyle = p2.outer; cx2d.shadowColor = p2.edge; cx2d.shadowBlur = 14;
-          const qx=cw/2,qy=ch*0.52,qow=cw*0.74,qoh=ch*0.62,qiw=cw*0.5,qih=ch*0.42,qbot=ch*0.84;
-          cx2d.beginPath();
-          cx2d.moveTo(qx-qow/2,qy);
-          cx2d.bezierCurveTo(qx-qow/2,qy-qoh*0.5,qx+qow/2,qy-qoh*0.5,qx+qow/2,qy);
-          cx2d.bezierCurveTo(qx+qow/2,qy+qoh*0.3,qx+qow/2*0.85,qbot,qx,qbot);
-          cx2d.bezierCurveTo(qx-qow/2*0.85,qbot,qx-qow/2,qy+qoh*0.3,qx-qow/2,qy);
-          cx2d.closePath();
-          cx2d.moveTo(qx-qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.bezierCurveTo(qx-qiw/2,qy-qih*0.4,qx+qiw/2,qy-qih*0.4,qx+qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.bezierCurveTo(qx+qiw/2,qy+qih*0.4,qx+qiw/2*0.8,qbot-ch*0.08,qx,qbot-ch*0.08);
-          cx2d.bezierCurveTo(qx-qiw/2*0.8,qbot-ch*0.08,qx-qiw/2,qy+qih*0.4,qx-qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.closePath();
-          cx2d.fill('evenodd'); cx2d.restore();
-          // shine
-          const sg=cx2d.createLinearGradient(cw*0.15,ch*0.1,cw*0.6,ch*0.55);
-          sg.addColorStop(0,p2.shine); sg.addColorStop(1,'rgba(255,255,255,0)');
-          cx2d.fillStyle=sg;
-          cx2d.beginPath();
-          cx2d.moveTo(qx-qow/2,qy); cx2d.bezierCurveTo(qx-qow/2,qy-qoh*0.5,qx+qow/2,qy-qoh*0.5,qx+qow/2,qy);
-          cx2d.bezierCurveTo(qx+qow/2,qy+qoh*0.3,qx+qow/2*0.85,qbot,qx,qbot);
-          cx2d.bezierCurveTo(qx-qow/2*0.85,qbot,qx-qow/2,qy+qoh*0.3,qx-qow/2,qy); cx2d.closePath();
-          cx2d.moveTo(qx-qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.bezierCurveTo(qx-qiw/2,qy-qih*0.4,qx+qiw/2,qy-qih*0.4,qx+qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.bezierCurveTo(qx+qiw/2,qy+qih*0.4,qx+qiw/2*0.8,qbot-ch*0.08,qx,qbot-ch*0.08);
-          cx2d.bezierCurveTo(qx-qiw/2*0.8,qbot-ch*0.08,qx-qiw/2,qy+qih*0.4,qx-qiw/2,qy+(qoh-qih)*0.1);
-          cx2d.closePath(); cx2d.fill('evenodd');
-          cx2d.strokeStyle=p2.edge; cx2d.lineWidth=1.5; cx2d.shadowBlur=5; cx2d.stroke();
-          if(p2.label){
-            cx2d.font='bold '+Math.round(cw*0.055)+'px Pacifico,cursive';
-            cx2d.textAlign='center'; cx2d.textBaseline='middle';
-            cx2d.strokeStyle='rgba(0,0,0,0.65)'; cx2d.lineWidth=3;
-            cx2d.strokeText(p2.label,qx,qy+qoh*0.08);
-            cx2d.fillStyle='#14B8A6'; cx2d.fillText(p2.label,qx,qy+qoh*0.08);
-          }
-        }
-      }
-    });
-    return;
-  }
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.toneMapping = THREE.NoToneMapping;
-  renderer.toneMappingExposure = 1.8;
-  renderer.setPixelRatio(1);
-
-  window.addEventListener('pagehide', function() {
-    if (renderer) { try { renderer.dispose(); } catch(e) {} renderer = null; }
-  }, {once: true});
-
-  ids.forEach(id => {
-    const canvas2d = document.getElementById(id);
-    if (!canvas2d) return;
-    const cfg = HERO_CFGS[id];
-    const container = canvas2d.parentElement;
-    const w = container.clientWidth || 320;
-    const scene = buildHeroScene(cfg);
-    const camera = new THREE.PerspectiveCamera(42, w/HERO_H, 0.1, 100);
-    camera.position.set(0, 0.5, 3.8);
-    viewers.push({id, canvas2d, scene, camera, cfg, model: null});
-  });
-
-  const loader = new THREE.GLTFLoader();
-  loader.load('/Meshy_AI_Dental_Guard_Design_D_0118023519_generate.glb', (gltf) => {
-    viewers.forEach(v => {
-      const clone = gltf.scene.clone(true);
-      const box = new THREE.Box3().setFromObject(clone);
-      const ctr = box.getCenter(new THREE.Vector3());
-      const sz = box.getSize(new THREE.Vector3());
-      clone.position.sub(ctr);
-      clone.scale.setScalar(1.5 / Math.max(sz.x, sz.y, sz.z));
-      clone.position.y -= 0.05;
-      clone.traverse(c => { if(c.isMesh) c.material = v.cfg.makeMat(); });
-      v.scene.add(clone);
-      v.model = clone;
-      const loadEl = document.getElementById(v.id + '-loading');
-      if (loadEl) loadEl.style.display = 'none';
-    });
-
-    (function loop() {
-      requestAnimationFrame(loop);
-      viewers.forEach(v => {
-        if (!v.model) return;
-        const container = v.canvas2d.parentElement;
-        const w = container.clientWidth || 320;
-        v.model.rotation.y += v.cfg.rotSpeed;
-        renderer.setSize(w, HERO_H, false);
-        v.camera.aspect = w / HERO_H;
-        v.camera.updateProjectionMatrix();
-        renderer.render(v.scene, v.camera);
-        if (v.canvas2d.width !== w) v.canvas2d.width = w;
-        if (v.canvas2d.height !== HERO_H) v.canvas2d.height = HERO_H;
-        v.canvas2d.getContext('2d').drawImage(renderer.domElement, 0, 0, w, HERO_H);
-      });
-    })();
-  }, undefined, err => {
-    viewers.forEach(v => { const el=document.getElementById(v.id+'-loading'); if(el) el.style.display='none'; });
-  });
-});
 </script>
 
 </body>
