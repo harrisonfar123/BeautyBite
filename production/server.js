@@ -131,7 +131,7 @@ app.use(cors({
 
 // Rate limiters
 const globalLimiter  = rateLimit({ windowMs: 15 * 60 * 1000, max: 1000, standardHeaders: true, legacyHeaders: false });
-const authLimiter    = rateLimit({ windowMs: 15 * 60 * 1000, max: 10,   standardHeaders: true, legacyHeaders: false, message: { error: 'Too many auth attempts, try again later' }});
+const authLimiter    = rateLimit({ windowMs: 15 * 60 * 1000, max: 30,   standardHeaders: true, legacyHeaders: false, message: { error: 'Too many auth attempts, try again later' }});
 const paymentLimiter = rateLimit({ windowMs:  1 * 60 * 1000, max: 20,   standardHeaders: true, legacyHeaders: false });
 app.use(globalLimiter);
 
