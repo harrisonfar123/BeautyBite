@@ -6,8 +6,8 @@
 
 class AuthManager {
     constructor() {
-        // Allow runtime override from the page: window.API_BASE (e.g. https://beautybite-36e5434be6c8.herokuapp.com)
-        this.baseURL = (window.API_BASE ? `${window.API_BASE}/api/auth` : 'http://localhost:5001/api/auth');
+        // Same-origin API by default; window.API_BASE override remains supported for cross-origin setups.
+        this.baseURL = (window.API_BASE ? `${window.API_BASE}/api/auth` : '/api/auth');
         this.storageKeys = {
             TOKEN: 'beautybite_jwt_token',
             REFRESH_TOKEN: 'beautybite_refresh_token',

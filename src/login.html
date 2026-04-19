@@ -1,608 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - BeautyBite</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Sign In — Beauty Bite</title>
+    <meta name="description" content="Sign in to your Beauty Bite account to access the design studio, saved designs, and order history.">
+    <link rel="icon" href="logo2.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #F8FAFC;
+        .auth-wrap {
+            min-height: calc(100vh - 72px - 48px);
+            background: linear-gradient(155deg, var(--brand-bg) 0%, #ffffff 100%);
+            padding: 4rem 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
         }
-
-        .auth-container {
-            max-width: 420px;
-            margin: 2rem auto;
-            padding: 2.5rem;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(27,45,62,0.10);
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2.75rem 2.5rem 2.25rem;
         }
-
-        .auth-header {
+        .auth-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .auth-logo img {
+            height: 48px;
+            width: auto;
+            border-radius: 10px;
+        }
+        .auth-title {
+            font-size: 1.7rem;
+            font-weight: 700;
             text-align: center;
+            margin-bottom: 0.4rem;
+        }
+        .auth-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
             margin-bottom: 2rem;
         }
-
-        .auth-logo {
-            font-family: 'Pacifico', cursive;
-            font-size: 1.6rem;
-            color: #14B8A6;
-            margin-bottom: 0.5rem;
+        .auth-switch {
+            text-align: center;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
         }
-
-        .auth-subtitle {
-            color: #1B2D3E;
-            font-size: 1.1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
-        }
-
-        .form-input.error {
-            border-color: var(--accent-red);
-        }
-
-        .error-message {
-            color: var(--accent-red);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .remember-forgot {
+        .auth-switch a { color: var(--brand-dark); font-weight: 600; }
+        .auth-row {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            margin-top: 0.6rem;
             margin-bottom: 1.5rem;
+            font-size: 0.88rem;
         }
-
-        .checkbox-group {
-            display: flex;
+        .auth-row label {
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .checkbox-label {
-            font-size: 0.9rem;
+            gap: 0.45rem;
             color: var(--text-secondary);
-        }
-
-        .forgot-link {
-            color: var(--accent-teal);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 0.85rem 1.5rem;
-            background: #14B8A6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
         }
-
-        .btn-primary:hover {
-            background: #0ea898;
-            transform: translateY(-1px);
+        .auth-row input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: var(--brand-dark);
         }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .auth-footer a {
-            color: var(--accent-teal);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .loading {
+        .auth-row a { color: var(--brand-dark); font-weight: 500; }
+        .auth-alert {
             display: none;
-            text-align: center;
-            margin: 1rem 0;
-        }
-
-        .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--border-light);
-            border-top: 3px solid var(--accent-teal);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .success-message {
-            display: none;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .demo-account {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid var(--primary-blue);
-            color: var(--primary-blue);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .demo-account h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1rem;
-        }
-
-        .demo-account p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .social-login {
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-
-        .social-divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-        }
-
-        .social-divider::before,
-        .social-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-light);
-        }
-
-        .social-divider span {
-            padding: 0 1rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .social-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
             padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 10px;
-            background: white;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
         }
-
-        .social-btn:hover {
-            border-color: var(--accent-teal);
-            transform: translateY(-1px);
+        .auth-alert.show { display: block; }
+        .auth-alert.error   { background: #fde8ec; color: #9c1f33; border-color: #f5b9c2; }
+        .auth-alert.success { background: #e5f6ed; color: #0f6b3e; border-color: #a8dcbf; }
+        .btn-loading .spinner {
+            width: 16px; height: 16px;
+            border-width: 2px;
+            border-color: rgba(255,255,255,0.35);
+            border-top-color: white;
+            margin-right: 0.5rem;
         }
-
-        .social-btn.google {
-            color: #DB4437;
-        }
-
-        .social-btn.facebook {
-            color: #4267B2;
-        }
-
-        .guest-option {
-            text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .guest-btn {
-            background: transparent;
-            border: 2px solid var(--accent-teal);
-            color: var(--accent-teal);
-            padding: 0.75rem 2rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .guest-btn:hover {
-            background: var(--accent-teal);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .auth-container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-
-            .remember-forgot {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-
-            .social-buttons {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 480px) {
+            .auth-card { padding: 2rem 1.5rem; }
+            .auth-wrap { padding: 2.5rem 1rem; }
         }
     </style>
 </head>
-
 <body>
-    <!-- Header will be loaded dynamically -->
-    <div id="header"></div>
 
-    <main class="main-content">
-        <div class="auth-container">
-            <div class="auth-header">
-                <div class="auth-logo">BeautyBite</div>
-                <h1 class="auth-subtitle">Welcome Back</h1>
+<!-- Patent strip -->
+<div class="patent-strip">
+    <strong>US Patent Pending</strong> &nbsp;·&nbsp; Application No. C1688.70001US00 &nbsp;·&nbsp; Medical-grade proprietary material &nbsp;·&nbsp; FDA-compliant manufacturing
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:40px;width:auto;border-radius:10px;display:block;">
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/shop" class="nav-link">Shop</a></li>
+        <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
+        <li><a href="/login" class="nav-link active">Login</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="/shop" class="btn btn-primary btn-sm">Order Now</a>
+    </div>
+</nav>
+
+<main class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <img src="/logo2.webp" alt="Beauty Bite">
+        </div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to manage your designs and orders.</p>
+
+        <div id="authAlert" class="auth-alert"></div>
+
+        <form id="loginForm" autocomplete="on" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-input" id="email" name="email" type="email"
+                       autocomplete="email" placeholder="you@clinic.com" required>
             </div>
-
-            <!-- Check for URL parameters for success messages -->
-            <div class="success-message" id="successMessage">
-                <!-- Message will be set dynamically based on URL parameters -->
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-input" id="password" name="password" type="password"
+                       autocomplete="current-password" placeholder="Your password" minlength="6" required>
             </div>
-
-            <!-- Demo account info -->
-            <div class="demo-account">
-                <h3>Demo Account</h3>
-                <p>Email: demo@beautybite.com | Password: any password</p>
+            <div class="auth-row">
+                <label>
+                    <input type="checkbox" id="remember" name="remember">
+                    Remember me
+                </label>
+                <a href="#" id="forgotLink">Forgot password?</a>
             </div>
+            <button type="submit" class="btn btn-brand btn-block btn-lg" id="submitBtn">
+                <span id="submitLabel">Sign In</span>
+            </button>
+        </form>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-input" required value="demo@beautybite.com">
-                    <div class="error-message" id="emailError">Please enter a valid email address</div>
-                </div>
+        <p class="auth-switch">
+            New to Beauty Bite? <a href="/register">Create an account</a>
+        </p>
+    </div>
+</main>
 
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required>
-                    <div class="error-message" id="passwordError">Please enter your password</div>
-                </div>
-
-                <div class="remember-forgot">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="rememberMe" name="rememberMe" class="checkbox-input">
-                        <label for="rememberMe" class="checkbox-label">Remember me</label>
-                    </div>
-                    <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
-                </div>
-
-                <div class="loading" id="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Signing you in...</p>
-                </div>
-
-                <button type="submit" class="btn-primary" id="submitBtn">
-                    Sign In
-                </button>
-            </form>
-
-            <div class="social-login">
-                <div class="social-divider">
-                    <span>Or sign in with</span>
-                </div>
-                <div class="social-buttons">
-                    <button type="button" class="social-btn google" onclick="socialLogin('google')">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="currentColor"
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                            <path fill="currentColor"
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                            <path fill="currentColor"
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                            <path fill="currentColor"
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                        </svg>
-                        Google
-                    </button>
-                    <button type="button" class="social-btn facebook" onclick="socialLogin('facebook')">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="currentColor"
-                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg>
-                        Facebook
-                    </button>
-                </div>
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <img src="logo2.webp" alt="Beauty Bite" class="footer-logo" style="height:30px;width:auto;border-radius:4px;margin-bottom:0.75rem;">
+                <p class="footer-tagline">Patented electrical isolation guard.<br>Built for therapy clinics &amp; med spas.</p>
+                <p style="margin-top:1rem;font-size:0.75rem;color:rgba(255,255,255,0.3);">Patent Pending · C1688.70001US00</p>
             </div>
-
-            <div class="guest-option">
-                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Don't want to create an account?</p>
-                <button type="button" class="guest-btn" onclick="continueAsGuest()">
-                    Continue as Guest
-                </button>
+            <div>
+                <div class="footer-col-title">Products</div>
+                <ul class="footer-links">
+                    <li><a href="/shop?tier=clear-bulk">BeautyBite Standard (Tier 1)</a></li>
+                    <li><a href="/shop?tier=beautybite-branded">BeautyBite Signature (Tier 2)</a></li>
+                    <li><a href="/design-studio">BeautyBite Custom (Tier 3)</a></li>
+                </ul>
             </div>
-
-            <div class="auth-footer">
-                <p>Don't have an account? <a href="register.html">Create one here</a></p>
+            <div>
+                <div class="footer-col-title">Account</div>
+                <ul class="footer-links">
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title">Company</div>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
             </div>
         </div>
-    </main>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Beauty Bite. All rights reserved.</span>
+            <span>US Patent Pending &nbsp;·&nbsp; Medical-Grade Technology</span>
+        </div>
+    </div>
+</footer>
 
-    <!-- Footer will be loaded dynamically -->
-    <div id="footer"></div>
+<script>
+(function () {
+    const API_BASE = (window.API_BASE || '') + '/api/auth';
+    const form      = document.getElementById('loginForm');
+    const alertBox  = document.getElementById('authAlert');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitLbl = document.getElementById('submitLabel');
+    const forgot    = document.getElementById('forgotLink');
 
-    <script src="js/auth.js"></script>
-    <script>
-        // Load header and footer
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('header').innerHTML = data;
+    function showAlert (type, msg) {
+        alertBox.className = 'auth-alert show ' + type;
+        alertBox.textContent = msg;
+    }
+    function clearAlert () {
+        alertBox.className = 'auth-alert';
+        alertBox.textContent = '';
+    }
+    function setLoading (on) {
+        submitBtn.disabled = on;
+        if (on) {
+            submitBtn.classList.add('btn-loading');
+            submitLbl.innerHTML = '<span class="spinner"></span>Signing in…';
+        } else {
+            submitBtn.classList.remove('btn-loading');
+            submitLbl.textContent = 'Sign In';
+        }
+    }
 
-                // Initialize header behavior (auth modals / links)
-                const s = document.createElement('script');
-                s.src = '/js/header-init.js';
-                s.onload = () => { if (typeof initHeader === 'function') initHeader(); if (typeof updateAuthNavigation === 'function') updateAuthNavigation(); };
-                document.body.appendChild(s);
-            });
+    // Redirect if already logged in
+    if (localStorage.getItem('bb_token')) {
+        const next = new URLSearchParams(location.search).get('next') || '/dashboard';
+        window.location.replace(next);
+        return;
+    }
 
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer').innerHTML = data;
-            });
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlert();
 
-        // Check for URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
+        const email    = form.email.value.trim();
+        const password = form.password.value;
 
-        if (message === 'account_created') {
-            document.getElementById('successMessage').textContent = 'Account created successfully! Please sign in.';
-            document.getElementById('successMessage').style.display = 'block';
-        } else if (message === 'password_reset') {
-            document.getElementById('successMessage').textContent = 'Password reset successfully! Please sign in with your new password.';
-            document.getElementById('successMessage').style.display = 'block';
-        } else if (message === 'logged_out') {
-            document.getElementById('successMessage').textContent = 'You have been logged out successfully.';
-            document.getElementById('successMessage').style.display = 'block';
+        if (!email || !password) {
+            showAlert('error', 'Please enter both email and password.');
+            return;
         }
 
-        // Auto-login if session exists
-        if (AuthSystem.isAuthenticated()) {
-            const session = AuthSystem.getSession();
-            if (session.user) {
-                // Redirect to dashboard or previous page
-                const redirectTo = urlParams.get('redirect') || 'dashboard.html';
-                window.location.href = redirectTo;
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) throw new Error(data.error || 'Login failed. Please try again.');
+
+            // Store tokens under every key used elsewhere in the app
+            if (data.token) {
+                localStorage.setItem('bb_token', data.token);
+                localStorage.setItem('beautybite_jwt_token', data.token);
             }
-        }
-
-        // Form validation and submission
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            handleLogin();
-        });
-
-        // Real-time form validation
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('blur', function () {
-                validateField(this);
-            });
-        });
-
-        function validateField(field) {
-            const errorElement = document.getElementById(field.id + 'Error');
-
-            switch (field.id) {
-                case 'email':
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(field.value)) {
-                        showError(field, errorElement, 'Please enter a valid email address');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-
-                case 'password':
-                    if (!field.value) {
-                        showError(field, errorElement, 'Please enter your password');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
+            if (data.refreshToken) {
+                localStorage.setItem('beautybite_refresh_token', data.refreshToken);
             }
-        }
-
-        function showError(field, errorElement, message) {
-            field.classList.add('error');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-
-        function clearError(field, errorElement) {
-            field.classList.remove('error');
-            errorElement.style.display = 'none';
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-
-            // Validate fields
-            let isValid = true;
-            document.querySelectorAll('.form-input').forEach(field => {
-                validateField(field);
-                if (field.classList.contains('error')) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
-                return;
+            if (data.user) {
+                localStorage.setItem('beautybite_user_data', JSON.stringify(data.user));
             }
+            const exp = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+            localStorage.setItem('beautybite_token_expiry', exp);
 
-            // Show loading state
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('submitBtn').disabled = true;
-
-            // Login user
-            AuthSystem.login(email, password, rememberMe)
-                .then(result => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('submitBtn').disabled = false;
-
-                    if (result && result.success === false) {
-                        let errorMessage = result.error || 'Login failed. Please try again.';
-                        if (errorMessage.includes('locked')) {
-                            errorMessage = 'Account temporarily locked due to multiple failed attempts. Please try again in 30 minutes.';
-                        } else if (errorMessage.includes('Invalid email or password')) {
-                            errorMessage = 'Invalid email or password. Please try again.';
-                        }
-                        alert(errorMessage);
-                        return;
-                    }
-
-                    // Store bb_token for server API calls
-                    const data = result && result.user ? result : {};
-                    if (data && data.token) {
-                        localStorage.setItem('bb_token', data.token);
-                    } else {
-                        // Fallback: copy from AuthSystem storage key if available
-                        const existingToken = localStorage.getItem('beautybite_jwt_token');
-                        if (existingToken) localStorage.setItem('bb_token', existingToken);
-                    }
-                    localStorage.setItem('bb_user', JSON.stringify({
-                        name: (result && result.user && result.user.name) || '',
-                        email: email
-                    }));
-
-                    // Show success message
-                    document.getElementById('successMessage').textContent = 'Login successful! Redirecting...';
-                    document.getElementById('successMessage').style.display = 'block';
-
-                    window.location.href = '/dashboard';
-                })
-                .catch(error => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('submitBtn').disabled = false;
-
-                    let errorMessage = 'Login failed. Please try again.';
-                    if (error.message && error.message.includes('locked')) {
-                        errorMessage = 'Account temporarily locked due to multiple failed attempts. Please try again in 30 minutes.';
-                    } else if (error.message && error.message.includes('Invalid email or password')) {
-                        errorMessage = 'Invalid email or password. Please try again.';
-                    } else if (error.message) {
-                        errorMessage = error.message;
-                    }
-
-                    alert(errorMessage);
-                });
+            showAlert('success', 'Signed in — redirecting…');
+            const next = new URLSearchParams(location.search).get('next') || '/dashboard';
+            setTimeout(() => window.location.replace(next), 400);
+        } catch (err) {
+            showAlert('error', err.message || 'Login failed.');
+            setLoading(false);
         }
+    });
 
-        function socialLogin(provider) {
-            alert(`Social login with ${provider} would be implemented here. For demo purposes, this is a placeholder.`);
+    forgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        const email = form.email.value.trim();
+        if (!email) {
+            showAlert('error', 'Enter your email above, then click Forgot password.');
+            return;
         }
+        showAlert('success', `If an account exists for ${email}, a password reset link will be sent shortly.`);
+    });
+})();
+</script>
 
-        function continueAsGuest() {
-            // Set guest session
-            const guestSession = {
-                isLoggedIn: false,
-                user: null,
-                role: 'guest',
-                token: 'guest_' + Date.now()
-            };
-
-            localStorage.setItem('beautybite_guest_session', JSON.stringify(guestSession));
-
-            // Redirect to shop or continue shopping
-            const redirectTo = urlParams.get('redirect') || 'shop.html';
-            window.location.href = redirectTo + '?guest=true';
-        }
-
-        function updateAuthNavigation() {
-            // This function will be implemented when we update the navigation
-        }
-    </script>
 </body>
-
 </html>

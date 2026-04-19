@@ -1,623 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - BeautyBite</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Create Account — Beauty Bite</title>
+    <meta name="description" content="Create a Beauty Bite account to save designs, track orders, and access the custom design studio.">
+    <link rel="icon" href="logo2.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #F8FAFC;
-        }
-
-        .auth-container {
-            max-width: 420px;
-            margin: 2rem auto;
-            padding: 2.5rem;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(27,45,62,0.10);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-logo {
-            font-family: 'Pacifico', cursive;
-            font-size: 1.6rem;
-            color: #14B8A6;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-subtitle {
-            color: #1B2D3E;
-            font-size: 1.1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
-        }
-
-        .form-input.error {
-            border-color: var(--accent-red);
-        }
-
-        .error-message {
-            color: var(--accent-red);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .password-strength {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 5px;
-            font-size: 0.875rem;
-            display: none;
-        }
-
-        .password-strength.weak {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--accent-red);
-            border: 1px solid var(--accent-red);
-        }
-
-        .password-strength.medium {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent-orange);
-            border: 1px solid var(--accent-orange);
-        }
-
-        .password-strength.strong {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
-        }
-
-        .checkbox-group {
+        .auth-wrap {
+            min-height: calc(100vh - 72px - 48px);
+            background: linear-gradient(155deg, var(--brand-bg) 0%, #ffffff 100%);
+            padding: 4rem 1.5rem;
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .checkbox-input {
-            margin-top: 0.25rem;
-        }
-
-        .checkbox-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        .checkbox-label a {
-            color: var(--accent-teal);
-            text-decoration: none;
-        }
-
-        .checkbox-label a:hover {
-            text-decoration: underline;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 0.85rem 1.5rem;
-            background: #14B8A6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
-        }
-
-        .btn-primary:hover {
-            background: #0ea898;
-            transform: translateY(-1px);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .auth-footer a {
-            color: var(--accent-teal);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
-        }
-
-        .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--border-light);
-            border-top: 3px solid var(--accent-teal);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .success-message {
-            display: none;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .social-login {
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-
-        .social-divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-        }
-
-        .social-divider::before,
-        .social-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-light);
-        }
-
-        .social-divider span {
-            padding: 0 1rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .social-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .social-btn {
-            display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 10px;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
             background: white;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2.75rem 2.5rem 2.25rem;
+        }
+        .auth-logo { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .auth-logo img { height: 48px; width: auto; border-radius: 10px; }
+        .auth-title {
+            font-size: 1.7rem; font-weight: 700;
+            text-align: center; margin-bottom: 0.4rem;
+        }
+        .auth-subtitle {
+            text-align: center; color: var(--text-secondary);
+            font-size: 0.95rem; margin-bottom: 2rem;
+        }
+        .auth-switch {
+            text-align: center; font-size: 0.92rem;
+            color: var(--text-secondary); margin-top: 1.5rem;
+        }
+        .auth-switch a { color: var(--brand-dark); font-weight: 600; }
+        .auth-alert {
+            display: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+        .auth-alert.show { display: block; }
+        .auth-alert.error   { background: #fde8ec; color: #9c1f33; border-color: #f5b9c2; }
+        .auth-alert.success { background: #e5f6ed; color: #0f6b3e; border-color: #a8dcbf; }
+
+        .pw-meter {
+            display: flex; gap: 4px; margin-top: 0.5rem;
+        }
+        .pw-meter span {
+            flex: 1; height: 4px; border-radius: 2px;
+            background: var(--gray-200); transition: background 0.2s;
+        }
+        .pw-meter.s1 span:nth-child(-n+1) { background: #e53935; }
+        .pw-meter.s2 span:nth-child(-n+2) { background: #fb8c00; }
+        .pw-meter.s3 span:nth-child(-n+3) { background: #fdd835; }
+        .pw-meter.s4 span:nth-child(-n+4) { background: var(--teal); }
+        .pw-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+            min-height: 1em;
         }
 
-        .social-btn:hover {
-            border-color: var(--accent-teal);
-            transform: translateY(-1px);
+        .terms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin: 0.5rem 0 1.5rem;
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
         }
-
-        .social-btn.google {
-            color: #DB4437;
+        .terms-row input[type="checkbox"] {
+            width: 16px; height: 16px;
+            margin-top: 0.2rem;
+            accent-color: var(--brand-dark);
+            flex-shrink: 0;
         }
+        .terms-row a { color: var(--brand-dark); font-weight: 500; }
 
-        .social-btn.facebook {
-            color: #4267B2;
+        .btn-loading .spinner {
+            width: 16px; height: 16px;
+            border-width: 2px;
+            border-color: rgba(255,255,255,0.35);
+            border-top-color: white;
+            margin-right: 0.5rem;
         }
-
-        @media (max-width: 768px) {
-            .auth-container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-
-            .social-buttons {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 480px) {
+            .auth-card { padding: 2rem 1.5rem; }
+            .auth-wrap { padding: 2.5rem 1rem; }
         }
     </style>
 </head>
-
 <body>
-    <!-- Header will be loaded dynamically -->
-    <div id="header"></div>
 
-    <main class="main-content">
-        <div class="auth-container">
-            <div class="auth-header">
-                <div class="auth-logo">BeautyBite</div>
-                <h1 class="auth-subtitle">Create Your Account</h1>
+<!-- Patent strip -->
+<div class="patent-strip">
+    <strong>US Patent Pending</strong> &nbsp;·&nbsp; Application No. C1688.70001US00 &nbsp;·&nbsp; Medical-grade proprietary material &nbsp;·&nbsp; FDA-compliant manufacturing
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/logo2.webp" alt="Beauty Bite" style="height:40px;width:auto;border-radius:10px;display:block;">
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/shop" class="nav-link">Shop</a></li>
+        <li><a href="/design-studio" class="nav-link">Design Studio</a></li>
+        <li><a href="/login" class="nav-link">Login</a></li>
+    </ul>
+    <div class="navbar-actions">
+        <a href="/shop" class="btn btn-primary btn-sm">Order Now</a>
+    </div>
+</nav>
+
+<main class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <img src="/logo2.webp" alt="Beauty Bite">
+        </div>
+        <h1 class="auth-title">Create your account</h1>
+        <p class="auth-subtitle">Save custom designs, track orders, and manage your clinic.</p>
+
+        <div id="authAlert" class="auth-alert"></div>
+
+        <form id="registerForm" autocomplete="on" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="name">Full name</label>
+                <input class="form-input" id="name" name="name" type="text"
+                       autocomplete="name" placeholder="Dr. Jordan Lee" minlength="2" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-input" id="email" name="email" type="email"
+                       autocomplete="email" placeholder="you@clinic.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-input" id="password" name="password" type="password"
+                       autocomplete="new-password" placeholder="At least 6 characters"
+                       minlength="6" required>
+                <div class="pw-meter" id="pwMeter"><span></span><span></span><span></span><span></span></div>
+                <div class="pw-label" id="pwLabel"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="confirm">Confirm password</label>
+                <input class="form-input" id="confirm" name="confirm" type="password"
+                       autocomplete="new-password" placeholder="Re-enter password"
+                       minlength="6" required>
             </div>
 
-            <div class="success-message" id="successMessage">
-                Account created successfully! Redirecting to login...
+            <label class="terms-row">
+                <input type="checkbox" id="terms" required>
+                <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+            </label>
+
+            <button type="submit" class="btn btn-brand btn-block btn-lg" id="submitBtn">
+                <span id="submitLabel">Create Account</span>
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            Already have an account? <a href="/login">Sign in</a>
+        </p>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <img src="logo2.webp" alt="Beauty Bite" class="footer-logo" style="height:30px;width:auto;border-radius:4px;margin-bottom:0.75rem;">
+                <p class="footer-tagline">Patented electrical isolation guard.<br>Built for therapy clinics &amp; med spas.</p>
+                <p style="margin-top:1rem;font-size:0.75rem;color:rgba(255,255,255,0.3);">Patent Pending · C1688.70001US00</p>
             </div>
-
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" id="firstName" name="firstName" class="form-input" required>
-                    <div class="error-message" id="firstNameError">Please enter your first name</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" class="form-input" required>
-                    <div class="error-message" id="lastNameError">Please enter your last name</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
-                    <div class="error-message" id="emailError">Please enter a valid email address</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone" class="form-label">Phone Number (Optional)</label>
-                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 123-4567">
-                    <div class="error-message" id="phoneError">Please enter a valid phone number</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required>
-                    <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase,
-                        lowercase, and numbers</div>
-                    <div class="password-strength" id="passwordStrength"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
-                    <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="terms" name="terms" class="checkbox-input" required>
-                    <label for="terms" class="checkbox-label">
-                        I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#"
-                            onclick="showPrivacy()">Privacy Policy</a>
-                    </label>
-                </div>
-                <div class="error-message" id="termsError">You must agree to the terms and conditions</div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="marketing" name="marketing" class="checkbox-input">
-                    <label for="marketing" class="checkbox-label">
-                        Send me promotional emails about new products and special offers
-                    </label>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="rememberMe" name="rememberMe" class="checkbox-input">
-                    <label for="rememberMe" class="checkbox-label">
-                        Keep me logged in
-                    </label>
-                </div>
-
-                <div class="loading" id="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Creating your account...</p>
-                </div>
-
-                <button type="submit" class="btn-primary" id="submitBtn">
-                    Create Account
-                </button>
-            </form>
-
-            <div class="social-login">
-                <div class="social-divider">
-                    <span>Or sign up with</span>
-                </div>
-                <div class="social-buttons">
-                    <button type="button" class="social-btn google" onclick="socialLogin('google')">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="currentColor"
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                            <path fill="currentColor"
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                            <path fill="currentColor"
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                            <path fill="currentColor"
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                        </svg>
-                        Google
-                    </button>
-                    <button type="button" class="social-btn facebook" onclick="socialLogin('facebook')">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="currentColor"
-                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg>
-                        Facebook
-                    </button>
-                </div>
+            <div>
+                <div class="footer-col-title">Products</div>
+                <ul class="footer-links">
+                    <li><a href="/shop?tier=clear-bulk">BeautyBite Standard (Tier 1)</a></li>
+                    <li><a href="/shop?tier=beautybite-branded">BeautyBite Signature (Tier 2)</a></li>
+                    <li><a href="/design-studio">BeautyBite Custom (Tier 3)</a></li>
+                </ul>
             </div>
-
-            <div class="auth-footer">
-                <p>Already have an account? <a href="login.html">Sign in here</a></p>
+            <div>
+                <div class="footer-col-title">Account</div>
+                <ul class="footer-links">
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title">Company</div>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
             </div>
         </div>
-    </main>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Beauty Bite. All rights reserved.</span>
+            <span>US Patent Pending &nbsp;·&nbsp; Medical-Grade Technology</span>
+        </div>
+    </div>
+</footer>
 
-    <!-- Footer will be loaded dynamically -->
-    <div id="footer"></div>
+<script>
+(function () {
+    const API_BASE = (window.API_BASE || '') + '/api/auth';
+    const form      = document.getElementById('registerForm');
+    const alertBox  = document.getElementById('authAlert');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitLbl = document.getElementById('submitLabel');
+    const pwInput   = document.getElementById('password');
+    const pwMeter   = document.getElementById('pwMeter');
+    const pwLabel   = document.getElementById('pwLabel');
 
-    <script src="js/auth.js"></script>
-    <script>
-        // Load header and footer
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('header').innerHTML = data;
+    function showAlert (type, msg) {
+        alertBox.className = 'auth-alert show ' + type;
+        alertBox.textContent = msg;
+    }
+    function clearAlert () {
+        alertBox.className = 'auth-alert';
+        alertBox.textContent = '';
+    }
+    function setLoading (on) {
+        submitBtn.disabled = on;
+        if (on) {
+            submitBtn.classList.add('btn-loading');
+            submitLbl.innerHTML = '<span class="spinner"></span>Creating account…';
+        } else {
+            submitBtn.classList.remove('btn-loading');
+            submitLbl.textContent = 'Create Account';
+        }
+    }
 
-                // Initialize header behavior (auth modals / links)
-                const s = document.createElement('script');
-                s.src = '/js/header-init.js';
-                s.onload = () => { if (typeof initHeader === 'function') initHeader(); if (typeof updateAuthNavigation === 'function') updateAuthNavigation(); };
-                document.body.appendChild(s);
+    function passwordStrength (pw) {
+        if (!pw) return { score: 0, label: '' };
+        let score = 0;
+        if (pw.length >= 6)  score++;
+        if (pw.length >= 10) score++;
+        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+        if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+        score = Math.min(score, 4);
+        const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        return { score, label: labels[score] };
+    }
+
+    pwInput.addEventListener('input', () => {
+        const { score, label } = passwordStrength(pwInput.value);
+        pwMeter.className = 'pw-meter s' + score;
+        pwLabel.textContent = label;
+    });
+
+    // Redirect if already logged in
+    if (localStorage.getItem('bb_token')) {
+        window.location.replace('/dashboard');
+        return;
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlert();
+
+        const name     = form.name.value.trim();
+        const email    = form.email.value.trim();
+        const password = form.password.value;
+        const confirm  = form.confirm.value;
+        const terms    = form.terms.checked;
+
+        if (!name || name.length < 2) {
+            showAlert('error', 'Please enter your full name.');
+            return;
+        }
+        if (!email) {
+            showAlert('error', 'Please enter your email.');
+            return;
+        }
+        if (password.length < 6) {
+            showAlert('error', 'Password must be at least 6 characters.');
+            return;
+        }
+        if (password !== confirm) {
+            showAlert('error', 'Passwords do not match.');
+            return;
+        }
+        if (!terms) {
+            showAlert('error', 'Please agree to the Terms of Service to continue.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
             });
+            const data = await res.json().catch(() => ({}));
 
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer').innerHTML = data;
-            });
-
-        // Form validation and submission
-        document.getElementById('registerForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            handleRegistration();
-        });
-
-        // Real-time password strength checking
-        document.getElementById('password').addEventListener('input', function () {
-            checkPasswordStrength(this.value);
-        });
-
-        // Real-time form validation
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('blur', function () {
-                validateField(this);
-            });
-        });
-
-        function validateField(field) {
-            const errorElement = document.getElementById(field.id + 'Error');
-
-            switch (field.id) {
-                case 'firstName':
-                case 'lastName':
-                    if (!field.value.trim()) {
-                        showError(field, errorElement, 'This field is required');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-
-                case 'email':
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(field.value)) {
-                        showError(field, errorElement, 'Please enter a valid email address');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-
-                case 'phone':
-                    if (field.value && !isValidPhone(field.value)) {
-                        showError(field, errorElement, 'Please enter a valid phone number');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-
-                case 'password':
-                    const passwordCheck = AuthSystem.utils.checkPasswordStrength(field.value);
-                    if (field.value && !passwordCheck.isValid) {
-                        showError(field, errorElement, 'Password does not meet requirements');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-
-                case 'confirmPassword':
-                    const password = document.getElementById('password').value;
-                    if (field.value !== password) {
-                        showError(field, errorElement, 'Passwords do not match');
-                    } else {
-                        clearError(field, errorElement);
-                    }
-                    break;
-            }
-        }
-
-        function checkPasswordStrength(password) {
-            const strengthElement = document.getElementById('passwordStrength');
-
-            if (!password) {
-                strengthElement.style.display = 'none';
-                return;
-            }
-
-            const result = AuthSystem.utils.checkPasswordStrength(password);
-            strengthElement.textContent = `Password strength: ${result.strength}`;
-            strengthElement.className = `password-strength ${result.strength}`;
-            strengthElement.style.display = 'block';
-        }
-
-        function showError(field, errorElement, message) {
-            field.classList.add('error');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-
-        function clearError(field, errorElement) {
-            field.classList.remove('error');
-            errorElement.style.display = 'none';
-        }
-
-        function isValidPhone(phone) {
-            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-            return phoneRegex.test(phone.replace(/[^\d+]/g, ''));
-        }
-
-        function handleRegistration() {
-            const formData = {
-                firstName: document.getElementById('firstName').value.trim(),
-                lastName: document.getElementById('lastName').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                password: document.getElementById('password').value,
-                rememberMe: document.getElementById('rememberMe').checked,
-                marketingEmails: document.getElementById('marketing').checked
-            };
-
-            // Validate all fields
-            let isValid = true;
-            document.querySelectorAll('.form-input').forEach(field => {
-                validateField(field);
-                if (field.classList.contains('error')) {
-                    isValid = false;
-                }
-            });
-
-            // Validate terms
-            const termsCheckbox = document.getElementById('terms');
-            const termsError = document.getElementById('termsError');
-            if (!termsCheckbox.checked) {
-                termsError.style.display = 'block';
-                isValid = false;
-            } else {
-                termsError.style.display = 'none';
+            if (!res.ok) {
+                if (res.status === 409) throw new Error('An account with that email already exists.');
+                throw new Error(data.error || 'Registration failed. Please try again.');
             }
 
-            if (!isValid) {
-                return;
+            if (data.token) {
+                localStorage.setItem('bb_token', data.token);
+                localStorage.setItem('beautybite_jwt_token', data.token);
             }
+            if (data.refreshToken) {
+                localStorage.setItem('beautybite_refresh_token', data.refreshToken);
+            }
+            if (data.user) {
+                localStorage.setItem('beautybite_user_data', JSON.stringify(data.user));
+            }
+            const exp = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+            localStorage.setItem('beautybite_token_expiry', exp);
 
-            // Show loading state
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('submitBtn').disabled = true;
-
-            // Register user
-            AuthSystem.register(formData)
-                .then(result => {
-                    document.getElementById('loading').style.display = 'none';
-
-                    if (result && result.success === false) {
-                        document.getElementById('submitBtn').disabled = false;
-                        alert('Registration failed: ' + (result.error || 'Unknown error'));
-                        return;
-                    }
-
-                    // Store bb_token for server API calls
-                    if (result && result.token) {
-                        localStorage.setItem('bb_token', result.token);
-                    } else {
-                        const existingToken = localStorage.getItem('beautybite_jwt_token');
-                        if (existingToken) localStorage.setItem('bb_token', existingToken);
-                    }
-                    localStorage.setItem('bb_user', JSON.stringify({
-                        name: formData.firstName + ' ' + formData.lastName,
-                        email: formData.email
-                    }));
-
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('registerForm').style.display = 'none';
-
-                    // Redirect to dashboard
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1500);
-                })
-                .catch(error => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('submitBtn').disabled = false;
-                    alert('Registration failed: ' + (error.message || 'Please try again.'));
-                });
+            showAlert('success', 'Account created — redirecting…');
+            setTimeout(() => window.location.replace('/dashboard'), 500);
+        } catch (err) {
+            showAlert('error', err.message || 'Registration failed.');
+            setLoading(false);
         }
+    });
+})();
+</script>
 
-        function socialLogin(provider) {
-            alert(`Social login with ${provider} would be implemented here. For demo purposes, this is a placeholder.`);
-        }
-
-        function showTerms() {
-            alert('Terms of Service would be displayed here.');
-        }
-
-        function showPrivacy() {
-            alert('Privacy Policy would be displayed here.');
-        }
-
-        function updateAuthNavigation() {
-            // This function will be implemented when we update the navigation
-        }
-    </script>
 </body>
-
 </html>
