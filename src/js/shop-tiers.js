@@ -19,7 +19,8 @@
             finish:   'silicone',
             rotSpeed: 0.0030,
             label:    'Beauty Bite',
-            labelColor: '#5C8EA6'
+            labelColor:    '#5C8EA6',
+            labelColorway: 'badge'
         },
         'custom-branded': {
             color:    '#5C8EA6',
@@ -64,15 +65,16 @@
 
         BB3D.registerViewer({
             canvas,
-            color:      view.color,
-            bg:         view.bg,
-            finish:     view.finish,
-            rotSpeed:   view.rotSpeed,
-            label:      view.label,
-            labelColor: view.labelColor,
-            scale:      1.85,
-            camZ:       4.0,
-            camY:       0.6,
+            color:         view.color,
+            bg:            view.bg,
+            finish:        view.finish,
+            rotSpeed:      view.rotSpeed,
+            label:         view.label,
+            labelColor:    view.labelColor,
+            labelColorway: view.labelColorway,
+            scale:         1.85,
+            camZ:          4.0,
+            camY:          0.6,
             onReady:    function () { hideLoader(productId); },
             onFallback: function () { hideLoader(productId); }
         });

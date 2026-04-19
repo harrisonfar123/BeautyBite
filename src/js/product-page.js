@@ -57,7 +57,8 @@
             color: '#F4F6F8', bg: '#13243A', finish: 'silicone',
             finishLabel: 'Signature White',
             label: 'Beauty Bite',
-            labelColor: '#5C8EA6'
+            labelColor:    '#5C8EA6',
+            labelColorway: 'badge'
         },
         'custom-branded': {
             color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
@@ -330,16 +331,17 @@
 
         viewer = window.BB3D.registerViewer({
             canvas,
-            color:      view.color,
-            bg:         view.bg,
-            finish:     view.finish,
-            label:      view.label || null,
-            labelColor: view.labelColor || '#5C8EA6',
-            rotSpeed:   0.0035,
-            scale:      2.0,
-            camZ:       3.6,
-            camY:       0.5,
-            interactive: true,
+            color:         view.color,
+            bg:            view.bg,
+            finish:        view.finish,
+            label:         view.label || null,
+            labelColor:    view.labelColor    || '#5C8EA6',
+            labelColorway: view.labelColorway || null,
+            rotSpeed:      0.0035,
+            scale:         2.0,
+            camZ:          3.6,
+            camY:          0.5,
+            interactive:   true,
             onReady:    hideLoader,
             onFallback: hideLoader
         });

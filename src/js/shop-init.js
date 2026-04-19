@@ -9,7 +9,7 @@
     // ── Product tiers & their BB3D viewer configs ────────────────────────
     const TIER_VIEWS = {
         'clear-bulk':         { color: '#C4CDD4', bg: '#0A1929', finish: 'clear',    rotSpeed: 0.0035, label: null,           labelColor: '#5C8EA6' },
-        'beautybite-branded': { color: '#F4F6F8', bg: '#13243A', finish: 'silicone', rotSpeed: 0.0030, label: 'Beauty Bite',  labelColor: '#5C8EA6' },
+        'beautybite-branded': { color: '#F4F6F8', bg: '#13243A', finish: 'silicone', rotSpeed: 0.0030, label: 'Beauty Bite',  labelColor: '#5C8EA6', labelColorway: 'badge' },
         'custom-branded':     { color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',   rotSpeed: 0.0050, label: null,           labelColor: '#5C8EA6' }
     };
 
@@ -144,15 +144,16 @@
 
             BB3D.registerViewer({
                 canvas,
-                color:      view.color,
-                bg:         view.bg,
-                finish:     view.finish,
-                rotSpeed:   view.rotSpeed,
-                label:      view.label,
-                labelColor: view.labelColor,
-                scale:      1.8,
-                camZ:       4.2,
-                camY:       0.8,
+                color:         view.color,
+                bg:            view.bg,
+                finish:        view.finish,
+                rotSpeed:      view.rotSpeed,
+                label:         view.label,
+                labelColor:    view.labelColor,
+                labelColorway: view.labelColorway,
+                scale:         1.8,
+                camZ:          4.2,
+                camY:          0.8,
                 onReady:    hideLoader,
                 onFallback: hideLoader
             });
@@ -166,16 +167,17 @@
         const view = TIER_VIEWS[productId] || TIER_VIEWS['beautybite-branded'];
         BB3D.registerViewer({
             canvas,
-            color:      view.color,
-            bg:         view.bg,
-            finish:     view.finish,
-            rotSpeed:   view.rotSpeed + 0.0015,
-            label:      view.label,
-            labelColor: view.labelColor,
-            scale:      1.9,
-            camZ:       3.5,
-            camY:       0.5,
-            interactive: true
+            color:         view.color,
+            bg:            view.bg,
+            finish:        view.finish,
+            rotSpeed:      view.rotSpeed + 0.0015,
+            label:         view.label,
+            labelColor:    view.labelColor,
+            labelColorway: view.labelColorway,
+            scale:         1.9,
+            camZ:          3.5,
+            camY:          0.5,
+            interactive:   true
         });
     }
 
