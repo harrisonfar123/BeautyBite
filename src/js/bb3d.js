@@ -374,6 +374,8 @@
         const maxDim = Math.max(sz.x, sz.y, sz.z);
         clone.scale.setScalar((opts.scale || 1.6) / maxDim);
         clone.position.y += (opts.yOffset != null ? opts.yOffset : -0.05);
+        // Optional initial tilt — used to show the guard's flat exterior surface
+        if (opts.initRotX != null) clone.rotation.x = opts.initRotX;
         clone.traverse(c => {
             if (c.isMesh) {
                 // The shipped GLB has no vertex normals — without normals, any lit
@@ -630,7 +632,8 @@
             controls:    null,
             _paused:     false,
             interactive: !!cfg.interactive,
-            labelLocked: !!cfg.labelLocked
+            labelLocked: !!cfg.labelLocked,
+            initRotX:    cfg.initRotX != null ? cfg.initRotX : null
         };
 
         load().then(() => {
@@ -943,8 +946,10 @@
                 v.model.traverse(function (ch) {
                     if (!ch.userData || !ch.userData.isLabelDecal) return;
                     if (v.controls) {
-                        // Orbit controls: camera moves, model stays. Show if camera is in front (+Z side).
-                        ch.visible = v.camera.position.z > 0;
+                        // Orbit controls: camera moves. Compute guard's world-space forward (+Z → world).
+                        const fwd = new THREE.Vector3(0, 0, 1).applyEuler(v.model.rotation);
+                        const toCam = v.camera.position.clone().normalize();
+                        ch.visible = fwd.dot(toCam) > -0.1;
                     } else {
                         // Auto-spin: hide when guard shows its back (rotation.y between 90° and 270°)
                         const r = ((v.model.rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);

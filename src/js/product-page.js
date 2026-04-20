@@ -54,11 +54,11 @@
             label: null
         },
         'beautybite-branded': {
-            color: '#C8D4DC', bg: '#13243A', finish: 'silicone',
-            finishLabel: 'Signature',
+            color: '#5C8EA6', bg: '#13243A', finish: 'silicone',
+            finishLabel: 'Signature Blue',
             label: 'Beauty Bite',
-            labelColor:    '#5C8EA6',
-            labelColorway: null   // default: blue text, no badge
+            labelColor:    '#FFFFFF',  // solid white on blue guard
+            labelColorway: null        // no badge — plain solid text
         },
         'custom-branded': {
             color: '#5C8EA6', bg: '#080F1E', finish: 'glossy',
@@ -329,6 +329,7 @@
             return;
         }
 
+        const isBranded = product.id === 'beautybite-branded';
         viewer = window.BB3D.registerViewer({
             canvas,
             color:         view.color,
@@ -337,49 +338,64 @@
             label:         view.label || null,
             labelColor:    view.labelColor    || '#5C8EA6',
             labelColorway: view.labelColorway || null,
-            rotSpeed:      0.0035,
+            rotSpeed:      0.003,
             scale:         2.0,
-            camZ:          3.6,
-            camY:          0.5,
+            camZ:          isBranded ? 3.2 : 3.6,
+            camY:          isBranded ? 1.4 : 0.5,
+            initRotX:      isBranded ? -Math.PI * 0.42 : null,
             interactive:   true,
-            labelLocked:   product.id === 'beautybite-branded',
-            onReady:    function () { hideLoader(); if (product.id === 'beautybite-branded') renderColorwayOptions(); },
+            labelLocked:   isBranded,
+            onReady:    function () { hideLoader(); if (isBranded) renderColorwayOptions(); },
             onFallback: hideLoader
         });
     }
 
     // ── Colorway toggle for BeautyBite Signature ──────────────────────────
     function renderColorwayOptions () {
-        // Only for branded product — inject once below the viewer footer
         const foot = document.querySelector('.viewer-foot');
         if (!foot || document.getElementById('colorway-row')) return;
 
         const row = document.createElement('div');
         row.id = 'colorway-row';
-        row.style.cssText = 'display:flex;gap:0.6rem;align-items:center;justify-content:center;margin-top:0.75rem;';
+        row.style.cssText = 'display:flex;gap:0.6rem;align-items:center;justify-content:center;margin-top:0.75rem;flex-wrap:wrap;';
+
+        // label above
+        const lbl = document.createElement('div');
+        lbl.style.cssText = 'width:100%;text-align:center;font-size:0.72rem;font-weight:600;color:#556678;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.1rem;';
+        lbl.textContent = 'Colorway';
+        row.appendChild(lbl);
 
         const options = [
-            { key: null,    label: 'Classic',  desc: 'Blue text on guard',    chip: 'color:#5C8EA6;background:#EEF6FA;border:2px solid #5C8EA6;' },
-            { key: 'badge', label: 'Badge',    desc: 'White text, blue badge', chip: 'color:#fff;background:#5C8EA6;border:2px solid #5C8EA6;'   }
+            {
+                label: 'Classic Blue',
+                desc:  'BeautyBite blue guard · white text',
+                guardColor: '#5C8EA6',
+                textColor:  '#FFFFFF',
+                chipStyle:  'color:#fff;background:#5C8EA6;border:2px solid #5C8EA6;'
+            },
+            {
+                label: 'Inverse',
+                desc:  'Light guard · blue text',
+                guardColor: '#C8D4DC',
+                textColor:  '#5C8EA6',
+                chipStyle:  'color:#5C8EA6;background:#EEF6FA;border:2px solid #5C8EA6;'
+            }
         ];
 
         options.forEach(function (opt, idx) {
             const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.dataset.colorway = opt.key || '';
+            btn.type  = 'button';
             btn.title = opt.desc;
-            btn.style.cssText = 'padding:0.3rem 0.85rem;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:Inter,sans-serif;' + opt.chip;
+            btn.style.cssText = 'padding:0.35rem 1rem;border-radius:20px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:Inter,sans-serif;' + opt.chipStyle;
             btn.textContent = opt.label;
-            if (idx === 0) btn.style.boxShadow = '0 0 0 2px rgba(92,142,166,0.4)';
+            if (idx === 0) btn.style.outline = '3px solid rgba(92,142,166,0.5)';
             btn.addEventListener('click', function () {
-                row.querySelectorAll('button').forEach(function (b) { b.style.boxShadow = ''; });
-                btn.style.boxShadow = '0 0 0 2px rgba(92,142,166,0.4)';
-                const cw = opt.key;
-                const view = VIEW_CONFIGS['beautybite-branded'];
+                row.querySelectorAll('button').forEach(function (b) { b.style.outline = ''; });
+                btn.style.outline = '3px solid rgba(92,142,166,0.5)';
                 if (viewer && window.BB3D) {
-                    window.BB3D.setViewerLabel(viewer, view.label, {
-                        color:     cw ? '#FFFFFF' : view.labelColor,
-                        colorway:  cw || null,
+                    window.BB3D.setViewerColor(viewer, opt.guardColor);
+                    window.BB3D.setViewerLabel(viewer, 'Beauty Bite', {
+                        color:      opt.textColor,
                         fontFamily: 'Pacifico'
                     });
                 }
