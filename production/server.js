@@ -68,7 +68,7 @@ async function issueTokens(user) {
         name:  user.name,
         role:  user.role || 'customer'
     };
-    const accessToken  = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const accessToken  = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
     const refreshToken = crypto.randomBytes(48).toString('hex');
     const refreshHash  = hashRefreshToken(refreshToken);
     const expiresAt    = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days

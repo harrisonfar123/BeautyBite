@@ -335,7 +335,7 @@ p  { color: var(--text-secondary); line-height: 1.75; }
 .footer { background: var(--navy); color: rgba(255,255,255,0.65); padding: 5rem 1.5rem 2.5rem; }
 .footer a { color: rgba(255,255,255,0.65); transition: var(--transition); }
 .footer a:hover { color: white; }
-.footer-logo { height: 32px; width: auto; filter: brightness(0) invert(1); opacity: 0.7; margin-bottom: 0.75rem; }
+.footer-logo { height: 32px; width: auto; margin-bottom: 0.75rem; filter: drop-shadow(0 0 6px rgba(255,255,255,0.15)); }
 .footer-tagline { font-size: 0.88rem; color: rgba(255,255,255,0.45); }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; }
 .footer-col-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: white; margin-bottom: 1.25rem; }

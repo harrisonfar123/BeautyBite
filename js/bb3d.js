@@ -374,6 +374,8 @@
         const maxDim = Math.max(sz.x, sz.y, sz.z);
         clone.scale.setScalar((opts.scale || 1.6) / maxDim);
         clone.position.y += (opts.yOffset != null ? opts.yOffset : -0.05);
+        // Optional initial tilt — used to show the guard's flat exterior surface
+        if (opts.initRotX != null) clone.rotation.x = opts.initRotX;
         clone.traverse(c => {
             if (c.isMesh) {
                 // The shipped GLB has no vertex normals — without normals, any lit
@@ -394,7 +396,7 @@
                 background: isBadge ? (opts.labelColor || '#5C8EA6') : null
             });
             if (decal) {
-                decal.scale.setScalar(labelScale * 0.68);
+                decal.scale.setScalar(labelScale * 1.1);
 
                 // Raycast from camera position toward the guard's front surface.
                 // This snaps the decal to the actual mesh face instead of a fixed offset.
@@ -422,27 +424,20 @@
                 const hits2 = rc2.intersectObjects(guardMeshes, false);
                 if (hits2.length > 0) {
                     const hit = hits2[0];
-                    // Get world-space face normal; ensure it faces the camera
-                    const wNorm = hit.face.normal.clone()
-                        .transformDirection(hit.object.matrixWorld).normalize();
+                    // Push the hit point toward the camera to sit proud of the surface.
+                    // We use camera direction instead of mesh normals to avoid winding issues.
                     const toCam = camPos.clone().sub(hit.point).normalize();
-                    if (wNorm.dot(toCam) < 0) wNorm.negate();
-
-                    const invM = new THREE.Matrix4().copy(clone.matrixWorld).invert();
-                    const lNorm = wNorm.clone().transformDirection(invM).normalize();
-                    const lPos  = clone.worldToLocal(hit.point.clone());
-                    // Push the decal 1.5% of model size off the surface so it doesn't z-fight
-                    lPos.addScaledVector(lNorm, 0.015 / (clone.scale.x || 1));
+                    const worldPos = hit.point.clone().addScaledVector(toCam, 0.08);
+                    const lPos = clone.worldToLocal(worldPos);
                     decal.position.copy(lPos);
-                    // Align decal plane's +Z with the outward surface normal
-                    decal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
-                    decal.userData.surfaceSnapped = true;
+                    // Leave quaternion at identity — PlaneGeometry's +Z faces clone's local +Z,
+                    // which is world +Z (toward camera) when guard is unrotated.
+                    // Visibility is controlled per-frame in the render loop based on rotation.y.
                     placed = true;
                 }
 
                 if (!placed) {
-                    // Fallback: centre of the anterior face
-                    decal.position.set(0, sz.y * 0.05, sz.z * 0.52);
+                    decal.position.set(0, sz.y * 0.1, sz.z * 0.55);
                 }
 
                 clone.add(decal);
@@ -472,6 +467,82 @@
                 n.material.dispose();
             }
             if (n.geometry) n.geometry.dispose();
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // ID-based decal API — supports multiple text labels and logos.
+    // Each decal is tagged with userData.decalId so it can be updated
+    // or removed without disturbing other decals.
+    // ────────────────────────────────────────────────────────────
+    function addDecalById (v, id, type, data, opts) {
+        if (!v || !v.model || !data) { removeDecalById(v, id); return null; }
+
+        // Capture existing transform before removing
+        let prevPos = null, prevQuat = null, prevSnapped = false, prevUserScale = 1;
+        v.model.traverse(c => {
+            if (c.userData && c.userData.decalId === id && !prevPos) {
+                prevPos       = c.position.clone();
+                prevQuat      = c.quaternion.clone();
+                prevSnapped   = !!c.userData.surfaceSnapped;
+                prevUserScale = c.userData.userScale || 1;
+            }
+        });
+        removeDecalById(v, id);
+
+        const s = v.model.scale.x || 1;
+        const o = opts || {};
+        let decal;
+
+        if (type === 'label') {
+            const isBadge = (o.colorway === 'badge' || o.colorway === 'reverse');
+            decal = buildLabelDecal(data, {
+                color:      isBadge ? '#FFFFFF' : (o.color || '#1B2D3E'),
+                background: isBadge ? (o.color || '#5C8EA6') : null,
+                fontFamily: o.fontFamily || 'Pacifico',
+                textScale:  o.textScale  || 1.0,
+                fontSize:   o.fontSize
+            });
+        } else if (type === 'logo') {
+            const ls = o.scale != null ? o.scale : prevUserScale;
+            decal = buildLogoDecal(data, { scale: ls });
+            if (decal) decal.userData.userScale = ls;
+        }
+        if (!decal) return null;
+
+        decal.userData.decalId   = id;
+        decal.userData.decalType = type;
+        if (!decal.userData.userScale) decal.userData.userScale = prevUserScale;
+        decal.scale.setScalar((1 / s) * (decal.userData.userScale || 1));
+
+        let placed = false;
+        if (prevPos) {
+            decal.position.copy(prevPos);
+            if (prevQuat) decal.quaternion.copy(prevQuat);
+            if (prevSnapped) decal.userData.surfaceSnapped = true;
+            placed = true;
+        } else if (v.interactive && v.camera) {
+            placed = _snapDecalToSurface(v, decal);
+        }
+        if (!placed) {
+            const box = new THREE.Box3().setFromObject(v.model);
+            const sz  = box.getSize(new THREE.Vector3());
+            const localZ = sz.z * 0.55 / s;
+            decal.position.set(0, type === 'label' ? sz.y * 0.05 / s : sz.y * 0.25 / s, localZ);
+        }
+
+        v.model.add(decal);
+        return decal;
+    }
+
+    function removeDecalById (v, id) {
+        if (!v || !v.model) return;
+        const toRemove = [];
+        v.model.traverse(c => { if (c.userData && c.userData.decalId === id) toRemove.push(c); });
+        toRemove.forEach(n => {
+            if (n.parent) n.parent.remove(n);
+            if (n.material) { if (n.material.map) n.material.map.dispose(); n.material.dispose(); }
+            if (n.geometry)  n.geometry.dispose();
         });
     }
 
@@ -633,10 +704,12 @@
             labelColor: cfg.labelColor || '#1B2D3E',
             labelColorway: cfg.labelColorway || null,
             logo:     cfg.logo || null,
-            onReady:  cfg.onReady,
-            controls: null,
-            _paused:  false,
-            interactive: !!cfg.interactive
+            onReady:     cfg.onReady,
+            controls:    null,
+            _paused:     false,
+            interactive: !!cfg.interactive,
+            labelLocked: !!cfg.labelLocked,
+            initRotX:    cfg.initRotX != null ? cfg.initRotX : null
         };
 
         load().then(() => {
@@ -703,6 +776,7 @@
                     }
 
                     if (!hits.length) return;
+                    if (v.labelLocked && hits[0].object.userData && hits[0].object.userData.isLabelDecal) return;
                     e.stopPropagation();
                     if (v.controls) v.controls.enabled = false;
                     const hit = hits[0];
@@ -755,9 +829,8 @@
                             const lNorm = wNorm.clone().transformDirection(invM).normalize();
                             const lPos  = v.model.worldToLocal(hit.point.clone());
                             lPos.addScaledVector(lNorm, 0.012 / s);
-                            const baseQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
-                            if (drag.userRotQ) baseQ.multiply(drag.userRotQ);
-                            drag.decal.quaternion.copy(baseQ);
+                            // Only update position — preserve quaternion so the decal
+                            // doesn't spin as it crosses curved surface faces.
                             drag.decal.position.copy(lPos);
                         } else {
                             // Fallback: slide along the camera-perpendicular plane so
@@ -943,6 +1016,22 @@
                 } else {
                     v.model.rotation.y = state.sharedRotY;
                 }
+
+                // Hide label decals when guard's back faces the camera (prevents bleed-through)
+                v.model.traverse(function (ch) {
+                    if (!ch.userData || !ch.userData.isLabelDecal) return;
+                    if (v.controls) {
+                        // Orbit controls: camera moves. Compute guard's world-space forward (+Z → world).
+                        const fwd = new THREE.Vector3(0, 0, 1).applyEuler(v.model.rotation);
+                        const toCam = v.camera.position.clone().normalize();
+                        ch.visible = fwd.dot(toCam) > -0.1;
+                    } else {
+                        // Auto-spin: hide when guard shows its back (rotation.y between 90° and 270°)
+                        const r = ((v.model.rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                        ch.visible = r < Math.PI * 0.55 || r > Math.PI * 1.45;
+                    }
+                });
+
                 renderer.setSize(w, h, false);
                 v.camera.aspect = w / h;
                 v.camera.updateProjectionMatrix();
@@ -1089,6 +1178,7 @@
         load,
         registerViewer, unregisterViewer,
         setViewerColor, setViewerFinish, setViewerLabel, setViewerLogo,
+        addDecalById, removeDecalById,
         getDecalScreenBounds, scaleDecalBy, rotateDecalBy, getViewerDecals,
         startLoop,
         makeMaterial,

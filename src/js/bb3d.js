@@ -470,6 +470,82 @@
         });
     }
 
+    // ────────────────────────────────────────────────────────────
+    // ID-based decal API — supports multiple text labels and logos.
+    // Each decal is tagged with userData.decalId so it can be updated
+    // or removed without disturbing other decals.
+    // ────────────────────────────────────────────────────────────
+    function addDecalById (v, id, type, data, opts) {
+        if (!v || !v.model || !data) { removeDecalById(v, id); return null; }
+
+        // Capture existing transform before removing
+        let prevPos = null, prevQuat = null, prevSnapped = false, prevUserScale = 1;
+        v.model.traverse(c => {
+            if (c.userData && c.userData.decalId === id && !prevPos) {
+                prevPos       = c.position.clone();
+                prevQuat      = c.quaternion.clone();
+                prevSnapped   = !!c.userData.surfaceSnapped;
+                prevUserScale = c.userData.userScale || 1;
+            }
+        });
+        removeDecalById(v, id);
+
+        const s = v.model.scale.x || 1;
+        const o = opts || {};
+        let decal;
+
+        if (type === 'label') {
+            const isBadge = (o.colorway === 'badge' || o.colorway === 'reverse');
+            decal = buildLabelDecal(data, {
+                color:      isBadge ? '#FFFFFF' : (o.color || '#1B2D3E'),
+                background: isBadge ? (o.color || '#5C8EA6') : null,
+                fontFamily: o.fontFamily || 'Pacifico',
+                textScale:  o.textScale  || 1.0,
+                fontSize:   o.fontSize
+            });
+        } else if (type === 'logo') {
+            const ls = o.scale != null ? o.scale : prevUserScale;
+            decal = buildLogoDecal(data, { scale: ls });
+            if (decal) decal.userData.userScale = ls;
+        }
+        if (!decal) return null;
+
+        decal.userData.decalId   = id;
+        decal.userData.decalType = type;
+        if (!decal.userData.userScale) decal.userData.userScale = prevUserScale;
+        decal.scale.setScalar((1 / s) * (decal.userData.userScale || 1));
+
+        let placed = false;
+        if (prevPos) {
+            decal.position.copy(prevPos);
+            if (prevQuat) decal.quaternion.copy(prevQuat);
+            if (prevSnapped) decal.userData.surfaceSnapped = true;
+            placed = true;
+        } else if (v.interactive && v.camera) {
+            placed = _snapDecalToSurface(v, decal);
+        }
+        if (!placed) {
+            const box = new THREE.Box3().setFromObject(v.model);
+            const sz  = box.getSize(new THREE.Vector3());
+            const localZ = sz.z * 0.55 / s;
+            decal.position.set(0, type === 'label' ? sz.y * 0.05 / s : sz.y * 0.25 / s, localZ);
+        }
+
+        v.model.add(decal);
+        return decal;
+    }
+
+    function removeDecalById (v, id) {
+        if (!v || !v.model) return;
+        const toRemove = [];
+        v.model.traverse(c => { if (c.userData && c.userData.decalId === id) toRemove.push(c); });
+        toRemove.forEach(n => {
+            if (n.parent) n.parent.remove(n);
+            if (n.material) { if (n.material.map) n.material.map.dispose(); n.material.dispose(); }
+            if (n.geometry)  n.geometry.dispose();
+        });
+    }
+
     function setViewerLabel (v, label, opts) {
         if (!v || !v.model) return;
 
@@ -753,9 +829,8 @@
                             const lNorm = wNorm.clone().transformDirection(invM).normalize();
                             const lPos  = v.model.worldToLocal(hit.point.clone());
                             lPos.addScaledVector(lNorm, 0.012 / s);
-                            const baseQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lNorm);
-                            if (drag.userRotQ) baseQ.multiply(drag.userRotQ);
-                            drag.decal.quaternion.copy(baseQ);
+                            // Only update position — preserve quaternion so the decal
+                            // doesn't spin as it crosses curved surface faces.
                             drag.decal.position.copy(lPos);
                         } else {
                             // Fallback: slide along the camera-perpendicular plane so
@@ -1103,6 +1178,7 @@
         load,
         registerViewer, unregisterViewer,
         setViewerColor, setViewerFinish, setViewerLabel, setViewerLogo,
+        addDecalById, removeDecalById,
         getDecalScreenBounds, scaleDecalBy, rotateDecalBy, getViewerDecals,
         startLoop,
         makeMaterial,

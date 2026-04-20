@@ -442,6 +442,35 @@
         .gizmo-handle.rotate:hover { background: #1B2D3E; }
         .gizmo-handle.ne, .gizmo-handle.sw { cursor: nesw-resize; }
 
+        /* ── Decal chips ─────────────────────────────────────── */
+        .decal-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.65rem; }
+        .decal-chip {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.3rem 0.65rem 0.3rem 0.75rem;
+            background: var(--brand-bg); border: 1.5px solid var(--brand);
+            border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+            color: var(--brand-dark); max-width: 170px;
+        }
+        .decal-chip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
+        .decal-chip-remove {
+            width: 16px; height: 16px; border-radius: 50%;
+            background: none; border: none; cursor: pointer; padding: 0;
+            font-size: 0.9rem; line-height: 1; color: var(--brand-dark);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            transition: background 0.1s;
+        }
+        .decal-chip-remove:hover { background: rgba(92,142,166,0.25); }
+        .text-add-row { display: flex; gap: 0.4rem; align-items: stretch; }
+        .text-add-row .studio-input { flex: 1; }
+        .add-decal-btn {
+            width: 36px; flex-shrink: 0;
+            background: var(--brand-dark); border: none; border-radius: 8px;
+            color: white; font-size: 1.4rem; line-height: 1; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .add-decal-btn:hover { background: var(--navy); }
+
         @media (max-width: 920px) {
             body { overflow: auto; height: auto; }
             .studio-shell {
@@ -500,34 +529,33 @@
         <!-- Finish -->
         <div class="studio-section">
             <h3>Finish</h3>
-            <div class="finish-grid">
+            <div class="finish-grid" style="grid-template-columns:repeat(2,1fr);">
                 <button class="finish-btn active" data-finish="silicone" type="button">
                     Silicone
                     <small>Medical grade</small>
                 </button>
-                <button class="finish-btn" data-finish="glossy" type="button">
-                    Glossy
-                    <small>High shine</small>
-                </button>
-                <button class="finish-btn" data-finish="matte" type="button">
-                    Matte
-                    <small>Soft feel</small>
+                <button class="finish-btn" data-finish="clear" type="button">
+                    Clear
+                    <small>Transparent</small>
                 </button>
             </div>
         </div>
 
-        <!-- Engraving -->
+        <!-- Text labels -->
         <div class="studio-section">
-            <h3>Clinic Engraving <span class="optional">Optional</span></h3>
-            <input type="text" class="studio-input" id="brand-text" placeholder="e.g. Glow Med Spa" maxlength="32" autocomplete="off">
-
-            <!-- Font picker -->
+            <h3>Text Labels <span class="optional">Optional</span></h3>
+            <!-- Existing chips -->
+            <div class="decal-chips" id="text-chips"></div>
+            <!-- New text input -->
+            <div class="text-add-row">
+                <input type="text" class="studio-input" id="brand-text" placeholder="e.g. Glow Med Spa" maxlength="32" autocomplete="off">
+                <button class="add-decal-btn" id="add-text-btn" type="button" title="Add to guard">+</button>
+            </div>
+            <!-- Controls for the text being typed -->
             <div style="margin-top:0.75rem;">
                 <span class="text-opt-label">Font</span>
                 <div class="font-grid" id="font-grid"></div>
             </div>
-
-            <!-- Text color + size -->
             <div class="text-opts-row">
                 <div>
                     <span class="text-opt-label">Text Colour</span>
@@ -546,32 +574,24 @@
             </div>
         </div>
 
-        <!-- Logo -->
+        <!-- Images / Logos -->
         <div class="studio-section">
-            <h3>Logo <span class="optional">Optional · PNG / SVG</span></h3>
+            <h3>Images / Logos <span class="optional">Optional · PNG / SVG / JPG</span></h3>
+            <!-- Uploaded image chips -->
+            <div class="decal-chips" id="logo-chips"></div>
+            <!-- Upload zone -->
             <input type="file" id="logo-file" accept="image/png,image/svg+xml,image/jpeg" hidden>
             <div class="upload-zone" id="upload-zone">
-                <div id="upload-default">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5C8EA6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <div class="upload-hint"><strong>Upload logo</strong> · 2 MB max</div>
-                </div>
-                <div id="upload-preview" style="display:none;">
-                    <img id="logo-preview" alt="Logo preview">
-                    <div class="upload-hint"><strong>Logo added</strong> — click to change</div>
-                </div>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5C8EA6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="upload-hint"><strong>Upload image</strong> · 2 MB max</div>
             </div>
-            <!-- Logo size + drag hint (appear after upload) -->
+            <!-- Size slider for selected image (shown when images exist) -->
             <div class="logo-controls" id="logo-controls">
-                <div style="margin-top:0.1rem;">
-                    <span class="text-opt-label">Logo Size</span>
-                    <div class="range-row">
-                        <input type="range" id="logo-size-slider" min="30" max="250" value="100" step="5">
-                        <span class="range-val" id="logo-size-val">100%</span>
-                    </div>
+                <span class="text-opt-label" style="display:block;margin-top:0.6rem;">Selected Image Size</span>
+                <div class="range-row">
+                    <input type="range" id="logo-size-slider" min="30" max="250" value="100" step="5">
+                    <span class="range-val" id="logo-size-val">100%</span>
                 </div>
-                <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.5rem;line-height:1.45;">
-                    Drag the logo on the canvas to reposition it.
-                </p>
             </div>
         </div>
 
@@ -619,26 +639,9 @@
 
         <canvas id="viewer-canvas"></canvas>
 
-        <!-- Transform gizmo overlay — handles are positioned by JS each frame -->
+        <!-- Transform gizmo overlay — handles injected dynamically by JS -->
         <div id="gizmo-overlay">
             <canvas id="gizmo-lines"></canvas>
-            <!-- label decal handles -->
-            <div class="gizmo-handle nw" id="gh-label-tl" data-decal="label" data-corner="tl"></div>
-            <div class="gizmo-handle ne" id="gh-label-tr" data-decal="label" data-corner="tr"></div>
-            <div class="gizmo-handle sw" id="gh-label-bl" data-decal="label" data-corner="bl"></div>
-            <div class="gizmo-handle se" id="gh-label-br" data-decal="label" data-corner="br"></div>
-            <div class="gizmo-handle rotate" id="gh-label-rot" data-decal="label" data-corner="rot"></div>
-            <!-- logo decal handles -->
-            <div class="gizmo-handle nw" id="gh-logo-tl" data-decal="logo" data-corner="tl"></div>
-            <div class="gizmo-handle ne" id="gh-logo-tr" data-decal="logo" data-corner="tr"></div>
-            <div class="gizmo-handle sw" id="gh-logo-bl" data-decal="logo" data-corner="bl"></div>
-            <div class="gizmo-handle se" id="gh-logo-br" data-decal="logo" data-corner="br"></div>
-            <div class="gizmo-handle rotate" id="gh-logo-rot" data-decal="logo" data-corner="rot"></div>
-        </div>
-
-        <div class="viewport-label-overlay">
-            <img class="logo-overlay" id="logo-overlay" alt="">
-            <div class="engraving-preview" id="engraving-preview"></div>
         </div>
 
         <div class="viewport-hint">Drag guard to orbit · Drag text/logo to reposition · Scroll to zoom</div>
@@ -673,37 +676,38 @@
 <script src="/js/bb3d.js"></script>
 <script>
 /* ========================================================================
-   Design Studio — state + wiring
+   Design Studio — state + wiring  (multi-decal)
    ====================================================================== */
 
-const UNIT_PRICE = 300;
-const MIN_QTY    = 50;
-const STORAGE_KEY = 'bb_studio_design_v1';
+const UNIT_PRICE  = 300;
+const MIN_QTY     = 50;
+const STORAGE_KEY = 'bb_studio_design_v2';
 
 const state = {
-    color:       '#8BB8CC',
-    finish:      'silicone',
-    brandText:   '',
-    textColor:   '#1B2D3E',
-    textFont:    'Pacifico',
-    textSize:    100,          // percent, 40–200
-    logoDataUrl: null,
-    logoFilename: null,
-    logoScale:   100,          // percent, 30–250
-    quantity:    50
+    color:      '#8BB8CC',
+    finish:     'silicone',
+    texts:      [],   // [{id, text}]  — all share global textColor/textFont/textSize
+    logos:      [],   // [{id, dataUrl, filename}]  — all share global logoScale
+    nextTextId: 1,
+    nextLogoId: 1,
+    textColor:  '#1B2D3E',
+    textFont:   'Pacifico',
+    textSize:   100,
+    logoScale:  100,
+    quantity:   50
 };
 
 const $  = (id) => document.getElementById(id);
 const el = {
-    swatchGrid:   $('swatch-grid'),
-    colorPicker:  $('color-picker'),
-    finishButtons: document.querySelectorAll('.finish-btn'),
-    brandText:    $('brand-text'),
-    logoFile:     $('logo-file'),
-    uploadZone:   $('upload-zone'),
-    uploadDefault:$('upload-default'),
-    uploadPreview:$('upload-preview'),
-    logoPreview:  $('logo-preview'),
+    swatchGrid:     $('swatch-grid'),
+    colorPicker:    $('color-picker'),
+    finishButtons:  document.querySelectorAll('.finish-btn'),
+    brandText:      $('brand-text'),
+    addTextBtn:     $('add-text-btn'),
+    textChips:      $('text-chips'),
+    logoChips:      $('logo-chips'),
+    logoFile:       $('logo-file'),
+    uploadZone:     $('upload-zone'),
     quantity:       $('quantity'),
     priceQty:       $('price-qty'),
     priceTotal:     $('price-total'),
@@ -713,9 +717,6 @@ const el = {
     studioStatus:   $('studio-status'),
     viewerCanvas:   $('viewer-canvas'),
     viewportLoad:   $('viewport-loading'),
-    viewport:       $('viewport'),
-    engraving:      $('engraving-preview'),
-    logoOverlay:    $('logo-overlay'),
     modeChip:       $('render-mode-chip'),
     saveModal:      $('save-modal'),
     saveCancel:     $('save-cancel'),
@@ -733,18 +734,14 @@ const el = {
     logoSizeVal:    $('logo-size-val'),
 };
 
-/* ── 0. Font picker bootstrap ──────────────────────────────────────── */
-function buildFontPicker () {
-    const fonts = Object.keys(BB3D.LABEL_FONTS);
+/* ── 0. Font picker ─────────────────────────────────────────────────── */
+function buildFontPicker() {
     const LABELS = {
-        'Pacifico':         'Pacifico',
-        'Dancing Script':   'Dancing',
-        'Playfair Display': 'Playfair',
-        'Montserrat':       'Montserrat',
-        'Inter':            'Inter',
-        'Bebas Neue':       'Bebas',
+        'Pacifico': 'Pacifico', 'Dancing Script': 'Dancing',
+        'Playfair Display': 'Playfair', 'Montserrat': 'Montserrat',
+        'Inter': 'Inter', 'Bebas Neue': 'Bebas',
     };
-    fonts.forEach(f => {
+    Object.keys(BB3D.LABEL_FONTS).forEach(f => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'font-btn' + (f === state.textFont ? ' active' : '');
@@ -754,82 +751,166 @@ function buildFontPicker () {
         btn.addEventListener('click', () => {
             state.textFont = f;
             document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', b.dataset.font === f));
-            refreshLabel();
+            refreshAllTexts();
             persistLocal();
         });
         el.fontGrid.appendChild(btn);
     });
 }
 
-/* ── Range slider track-fill helper ────────────────────────────────── */
-function updateSliderFill (input) {
+/* ── Range slider fill ──────────────────────────────────────────────── */
+function updateSliderFill(input) {
     const min = +input.min, max = +input.max, val = +input.value;
-    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
-    input.style.setProperty('--pct', pct);
+    input.style.setProperty('--pct', ((val - min) / (max - min) * 100).toFixed(1) + '%');
 }
 
-/* ── 1. Session detection ───────────────────────────────────────────── */
-function getAuthToken () {
-    return localStorage.getItem('bb_token') ||
-           localStorage.getItem('authToken') ||
-           localStorage.getItem('token') || null;
+/* ── Auth helpers ───────────────────────────────────────────────────── */
+function getAuthToken() {
+    return localStorage.getItem('bb_token') || localStorage.getItem('authToken') || localStorage.getItem('token') || null;
 }
-function getAuthUser () {
-    const raw = localStorage.getItem('bb_user') ||
-                localStorage.getItem('user')    ||
-                localStorage.getItem('authUser');
+function getAuthUser() {
+    const raw = localStorage.getItem('bb_user') || localStorage.getItem('user') || localStorage.getItem('authUser');
     try { return raw ? JSON.parse(raw) : null; } catch (_) { return null; }
 }
-/* auth chip removed — site header handles auth state */
 
-/* ── 2. Local persistence (compact text — ~220 bytes without logo) ──── */
-function serializeDesign () {
+/* ── Serialization ──────────────────────────────────────────────────── */
+function serializeDesign() {
     return {
-        v: 1,
-        color:     state.color,
-        finish:    state.finish,
-        brandText: state.brandText.slice(0, 32),
-        logoFilename: state.logoFilename,
-        logoDataUrl:  state.logoDataUrl,  // stays in-session; the POST payload strips this if >64 KB
-        quantity:  state.quantity
+        v: 2,
+        color: state.color, finish: state.finish,
+        texts: state.texts.slice(),
+        logos: state.logos.map(l => ({ id: l.id, filename: l.filename, dataUrl: l.dataUrl })),
+        nextTextId: state.nextTextId, nextLogoId: state.nextLogoId,
+        textColor: state.textColor, textFont: state.textFont, textSize: state.textSize,
+        logoScale: state.logoScale, quantity: state.quantity
     };
 }
-function persistLocal () {
-    try {
-        const d = serializeDesign();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-    } catch (_) { /* storage quota — ignore */ }
+function persistLocal() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeDesign())); } catch (_) {}
 }
-function restoreLocal () {
+function restoreLocal() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const d = JSON.parse(raw);
-        if (d.color)     state.color     = d.color;
-        if (d.finish)    state.finish    = d.finish;
-        if (d.brandText) state.brandText = d.brandText;
-        if (d.logoDataUrl) {
-            state.logoDataUrl  = d.logoDataUrl;
-            state.logoFilename = d.logoFilename;
+        if (d.color)  state.color  = d.color;
+        if (d.finish) state.finish = d.finish;
+        if (d.v === 2) {
+            if (Array.isArray(d.texts)) { state.texts = d.texts; state.nextTextId = d.nextTextId || state.texts.length + 1; }
+            if (Array.isArray(d.logos)) { state.logos = d.logos; state.nextLogoId = d.nextLogoId || state.logos.length + 1; }
+        } else if (d.v === 1) {
+            // Migrate v1 single-text/logo format
+            if (d.brandText) state.texts = [{ id: 1, text: d.brandText }];
+            if (d.logoDataUrl) state.logos = [{ id: 1, dataUrl: d.logoDataUrl, filename: d.logoFilename || 'logo' }];
         }
+        if (d.textColor) state.textColor = d.textColor;
+        if (d.textFont)  state.textFont  = d.textFont;
+        if (d.textSize)  state.textSize  = d.textSize;
+        if (d.logoScale) state.logoScale = d.logoScale;
         if (d.quantity)  state.quantity  = Math.max(MIN_QTY, parseInt(d.quantity) || MIN_QTY);
-    } catch (_) { /* ignore malformed */ }
+    } catch (_) {}
 }
 
-/* ── 3. Apply state → UI (swatches, inputs, viewer) ─────────────────── */
-let viewer = null;
-function syncSwatches () {
-    document.querySelectorAll('.swatch').forEach(s => {
-        s.classList.toggle('active', s.dataset.color && s.dataset.color.toLowerCase() === state.color.toLowerCase());
+/* ── Chip rendering ─────────────────────────────────────────────────── */
+function renderTextChips() {
+    el.textChips.innerHTML = '';
+    state.texts.forEach(t => {
+        const chip = document.createElement('div');
+        chip.className = 'decal-chip';
+        const label = document.createElement('span');
+        label.className = 'decal-chip-label';
+        label.textContent = t.text;
+        const rm = document.createElement('button');
+        rm.className = 'decal-chip-remove';
+        rm.title = 'Remove';
+        rm.textContent = '×';
+        rm.addEventListener('click', () => removeText(t.id));
+        chip.appendChild(label);
+        chip.appendChild(rm);
+        el.textChips.appendChild(chip);
     });
+}
+function renderLogoChips() {
+    el.logoChips.innerHTML = '';
+    state.logos.forEach(l => {
+        const chip = document.createElement('div');
+        chip.className = 'decal-chip';
+        const label = document.createElement('span');
+        label.className = 'decal-chip-label';
+        label.textContent = l.filename || 'Image';
+        const rm = document.createElement('button');
+        rm.className = 'decal-chip-remove';
+        rm.title = 'Remove';
+        rm.textContent = '×';
+        rm.addEventListener('click', () => removeLogo(l.id));
+        chip.appendChild(label);
+        chip.appendChild(rm);
+        el.logoChips.appendChild(chip);
+    });
+    if (state.logos.length > 0) el.logoControls.classList.add('visible');
+    else                         el.logoControls.classList.remove('visible');
+}
+
+/* ── Add / remove text ──────────────────────────────────────────────── */
+function addText() {
+    const text = el.brandText.value.trim().slice(0, 32);
+    if (!text) return;
+    const id = state.nextTextId++;
+    state.texts.push({ id, text });
+    el.brandText.value = '';
+    renderTextChips();
+    if (viewer) BB3D.addDecalById(viewer, 'text-' + id, 'label', text, {
+        color: state.textColor, fontFamily: state.textFont, textScale: state.textSize / 100
+    });
+    persistLocal();
+}
+function removeText(id) {
+    state.texts = state.texts.filter(t => t.id !== id);
+    if (viewer) BB3D.removeDecalById(viewer, 'text-' + id);
+    renderTextChips();
+    persistLocal();
+}
+
+/* ── Add / remove logo ──────────────────────────────────────────────── */
+function addLogo(dataUrl, filename) {
+    const id = state.nextLogoId++;
+    state.logos.push({ id, dataUrl, filename });
+    renderLogoChips();
+    if (viewer) BB3D.addDecalById(viewer, 'logo-' + id, 'logo', dataUrl, { scale: state.logoScale / 100 });
+    persistLocal();
+}
+function removeLogo(id) {
+    state.logos = state.logos.filter(l => l.id !== id);
+    if (viewer) BB3D.removeDecalById(viewer, 'logo-' + id);
+    renderLogoChips();
+    persistLocal();
+}
+
+/* ── Refresh all decals when style controls change ──────────────────── */
+function refreshAllTexts() {
+    if (!viewer) return;
+    state.texts.forEach(t => BB3D.addDecalById(viewer, 'text-' + t.id, 'label', t.text, {
+        color: state.textColor, fontFamily: state.textFont, textScale: state.textSize / 100
+    }));
+}
+function refreshAllLogos() {
+    if (!viewer) return;
+    state.logos.forEach(l => BB3D.addDecalById(viewer, 'logo-' + l.id, 'logo', l.dataUrl, { scale: state.logoScale / 100 }));
+}
+
+/* ── Sync UI state → DOM ─────────────────────────────────────────────── */
+let viewer = null;
+
+function syncSwatches() {
+    document.querySelectorAll('.swatch').forEach(s =>
+        s.classList.toggle('active', s.dataset.color && s.dataset.color.toLowerCase() === state.color.toLowerCase())
+    );
     el.colorPicker.value = state.color;
 }
-function syncFinishButtons () {
-    el.finishButtons.forEach(b => {
-        b.classList.toggle('active', b.dataset.finish === state.finish);
-    });
+function syncFinishButtons() {
+    el.finishButtons.forEach(b => b.classList.toggle('active', b.dataset.finish === state.finish));
 }
-function syncPricing () {
+function syncPricing() {
     const q = Math.max(MIN_QTY, parseInt(state.quantity) || 0);
     const total = q * UNIT_PRICE;
     el.priceQty.textContent   = q.toLocaleString();
@@ -837,183 +918,93 @@ function syncPricing () {
     el.btnTotal.textContent   = '$' + total.toLocaleString('en-US');
     el.purchaseBtn.disabled   = q < MIN_QTY;
 }
-function syncOverlays () {
-    // If the 3D viewer is live we render text + logo AS a decal on the mesh
-    // (they rotate with the guard). Keep the HTML overlay only as a fallback
-    // when 3D is unavailable — otherwise hide it so it never floats in front
-    // of the canvas.
-    const has3D = !!viewer;
-    if (state.brandText && !has3D) {
-        el.engraving.textContent = state.brandText;
-        el.engraving.classList.add('visible');
-    } else {
-        el.engraving.classList.remove('visible');
-    }
-    if (state.logoDataUrl && !has3D) {
-        el.logoOverlay.src = state.logoDataUrl;
-        el.logoOverlay.classList.add('visible');
-    } else {
-        el.logoOverlay.classList.remove('visible');
-        el.logoOverlay.removeAttribute('src');
-    }
-    // Show logo preview in panel
-    if (state.logoDataUrl) {
-        el.logoPreview.src = state.logoDataUrl;
-        el.uploadDefault.style.display = 'none';
-        el.uploadPreview.style.display = 'block';
-        el.uploadZone.classList.add('has-logo');
-    } else {
-        el.uploadDefault.style.display = 'block';
-        el.uploadPreview.style.display = 'none';
-        el.uploadZone.classList.remove('has-logo');
-    }
-}
-function syncBrandText () {
-    el.brandText.value = state.brandText;
-}
-function syncQuantity () {
-    el.quantity.value = state.quantity;
-}
-function syncTextControls () {
-    el.textColorPicker.value = state.textColor;
+function syncQuantity() { el.quantity.value = state.quantity; }
+function syncTextControls() {
+    el.textColorPicker.value    = state.textColor;
     el.textColorVal.textContent = state.textColor.toUpperCase();
-    el.textSizeSlider.value = state.textSize;
-    el.textSizeVal.textContent = state.textSize + '%';
+    el.textSizeSlider.value     = state.textSize;
+    el.textSizeVal.textContent  = state.textSize + '%';
     updateSliderFill(el.textSizeSlider);
 }
-function syncLogoControls () {
-    if (state.logoDataUrl) el.logoControls.classList.add('visible');
-    else                   el.logoControls.classList.remove('visible');
-    el.logoSizeSlider.value = state.logoScale;
+function syncLogoControls() {
+    el.logoSizeSlider.value    = state.logoScale;
     el.logoSizeVal.textContent = state.logoScale + '%';
     updateSliderFill(el.logoSizeSlider);
 }
-function syncAll () {
-    syncSwatches();
-    syncFinishButtons();
-    syncBrandText();
-    syncQuantity();
-    syncPricing();
-    syncOverlays();
-    syncTextControls();
-    syncLogoControls();
+function syncAll() {
+    syncSwatches(); syncFinishButtons(); syncQuantity();
+    syncPricing(); syncTextControls(); syncLogoControls();
+    renderTextChips(); renderLogoChips();
 }
 
-/* ── 4. 3D viewer — uses BB3D universal loader ──────────────────────── */
-function initViewer () {
-    const webgl = BB3D.probeWebGL();
-    if (!webgl || typeof THREE === 'undefined') {
-        // Immediate 2D fallback — still pretty, still branded
-        BB3D.draw2DGuard(el.viewerCanvas, {
-            bg: '#1B2D3E',
-            color: state.color,
-            label: state.brandText || null
-        });
+/* ── Viewer ─────────────────────────────────────────────────────────── */
+function initViewer() {
+    if (!BB3D.probeWebGL() || typeof THREE === 'undefined') {
+        BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color });
         el.viewportLoad.classList.add('hidden');
         el.modeChip.textContent = '2D Preview';
         return;
     }
-
     viewer = BB3D.registerViewer({
         canvas: el.viewerCanvas,
-        bg: '#1B2D3E',
-        color: state.color,
-        finish: state.finish,
-        label: state.brandText || null,
-        labelColor: '#1B2D3E',
-        logo:  state.logoDataUrl || null,
-        camY: 0.4, camZ: 3.9,
-        scale: 2.2, yOffset: 0.05,
-        rotSpeed: 0.004,
-        interactive: true,
+        bg: '#1B2D3E', color: state.color, finish: state.finish,
+        camY: 0.4, camZ: 3.9, scale: 2.2, yOffset: 0.05,
+        rotSpeed: 0.004, interactive: true,
         onReady: (v) => {
             el.viewportLoad.classList.add('hidden');
             el.modeChip.textContent = '3D Preview';
             window.__bb_viewer = v;
-            if (state.brandText)   BB3D.setViewerLabel(v, state.brandText, { color: state.textColor, fontFamily: state.textFont, textScale: state.textSize / 100 });
-            if (state.logoDataUrl) BB3D.setViewerLogo(v,  state.logoDataUrl, { scale: state.logoScale / 100 });
+            state.texts.forEach(t => BB3D.addDecalById(v, 'text-' + t.id, 'label', t.text, {
+                color: state.textColor, fontFamily: state.textFont, textScale: state.textSize / 100
+            }));
+            state.logos.forEach(l => BB3D.addDecalById(v, 'logo-' + l.id, 'logo', l.dataUrl, { scale: state.logoScale / 100 }));
         },
         onFallback: () => {
-            BB3D.draw2DGuard(el.viewerCanvas, {
-                bg: '#1B2D3E',
-                color: state.color,
-                label: state.brandText || null
-            });
+            BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color });
             el.viewportLoad.classList.add('hidden');
             el.modeChip.textContent = '2D Preview';
         }
     });
 }
 
-function refreshViewerColor () {
-    if (viewer) {
-        BB3D.setViewerColor(viewer, state.color);
-    } else {
-        // 2D mode: redraw
-        BB3D.draw2DGuard(el.viewerCanvas, {
-            bg: '#1B2D3E',
-            color: state.color,
-            label: state.brandText || null
-        });
-    }
+function refreshViewerColor() {
+    if (viewer) BB3D.setViewerColor(viewer, state.color);
+    else BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color });
 }
-function refreshViewerFinish () {
+function refreshViewerFinish() {
     if (viewer) BB3D.setViewerFinish(viewer, state.finish);
 }
-function refreshLabel () {
-    if (!state.brandText) return;
-    const opts = {
-        color:      state.textColor,
-        fontFamily: state.textFont,
-        textScale:  state.textSize / 100
-    };
-    if (viewer) BB3D.setViewerLabel(viewer, state.brandText, opts);
-    else BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color, label: state.brandText || null });
-}
-function refreshLogoSize () {
-    if (viewer && state.logoDataUrl) BB3D.setViewerLogo(viewer, state.logoDataUrl, { scale: state.logoScale / 100 });
-}
 
-/* ── 5. Panel events ────────────────────────────────────────────────── */
+/* ── Panel events ───────────────────────────────────────────────────── */
 el.swatchGrid.addEventListener('click', (e) => {
     const s = e.target.closest('.swatch');
     if (!s) return;
     state.color = s.dataset.color;
-    syncSwatches();
-    refreshViewerColor();
-    persistLocal();
+    syncSwatches(); refreshViewerColor(); persistLocal();
 });
 el.colorPicker.addEventListener('input', (e) => {
     state.color = e.target.value;
-    syncSwatches();
-    refreshViewerColor();
-    persistLocal();
+    syncSwatches(); refreshViewerColor(); persistLocal();
 });
 el.finishButtons.forEach(b => b.addEventListener('click', () => {
     state.finish = b.dataset.finish;
-    syncFinishButtons();
-    refreshViewerFinish();
-    persistLocal();
+    syncFinishButtons(); refreshViewerFinish(); persistLocal();
 }));
-el.brandText.addEventListener('input', (e) => {
-    state.brandText = e.target.value.slice(0, 32);
-    refreshLabel();
-    syncOverlays();
-    persistLocal();
-});
+el.addTextBtn.addEventListener('click', addText);
+el.brandText.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addText(); } });
+
 el.textColorPicker.addEventListener('input', (e) => {
     state.textColor = e.target.value;
     el.textColorVal.textContent = e.target.value.toUpperCase();
-    refreshLabel();
-    persistLocal();
+    refreshAllTexts(); persistLocal();
 });
 el.textSizeSlider.addEventListener('input', (e) => {
     state.textSize = +e.target.value;
     el.textSizeVal.textContent = e.target.value + '%';
     updateSliderFill(e.target);
-    refreshLabel();
-    persistLocal();
+    refreshAllTexts(); persistLocal();
 });
+
 el.uploadZone.addEventListener('click', () => el.logoFile.click());
 el.logoFile.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -1021,58 +1012,46 @@ el.logoFile.addEventListener('change', (e) => {
     if (!file.type.startsWith('image/')) return alert('Please upload a PNG, JPG or SVG image.');
     if (file.size > 2 * 1024 * 1024)     return alert('Logo must be under 2 MB.');
     const reader = new FileReader();
-    reader.onload = (ev) => {
-        state.logoDataUrl  = ev.target.result;
-        state.logoFilename = file.name;
-        if (viewer) BB3D.setViewerLogo(viewer, state.logoDataUrl, { scale: state.logoScale / 100 });
-        el.logoControls.classList.add('visible');
-        syncOverlays();
-        persistLocal();
-    };
+    reader.onload = (ev) => { addLogo(ev.target.result, file.name); e.target.value = ''; };
     reader.readAsDataURL(file);
 });
-el.quantity.addEventListener('input', (e) => {
-    let q = parseInt(e.target.value, 10);
-    if (isNaN(q) || q < 0) q = 0;
-    state.quantity = q;
-    syncPricing();
-    persistLocal();
-});
-el.quantity.addEventListener('blur', () => {
-    if (state.quantity < MIN_QTY) {
-        state.quantity = MIN_QTY;
-        syncQuantity();
-        syncPricing();
-        persistLocal();
-    }
-});
+
 el.logoSizeSlider.addEventListener('input', (e) => {
     state.logoScale = +e.target.value;
     el.logoSizeVal.textContent = e.target.value + '%';
     updateSliderFill(e.target);
-    refreshLogoSize();
-    persistLocal();
+    refreshAllLogos(); persistLocal();
 });
 
-/* ── 6. Save / save-modal flow ──────────────────────────────────────── */
-function openSaveModal () {
+el.quantity.addEventListener('input', (e) => {
+    let q = parseInt(e.target.value, 10);
+    if (isNaN(q) || q < 0) q = 0;
+    state.quantity = q;
+    syncPricing(); persistLocal();
+});
+el.quantity.addEventListener('blur', () => {
+    if (state.quantity < MIN_QTY) { state.quantity = MIN_QTY; syncQuantity(); syncPricing(); persistLocal(); }
+});
+
+/* ── Save modal ─────────────────────────────────────────────────────── */
+function openSaveModal() {
     const t = getAuthToken();
     if (!t) {
-        el.saveMsg.textContent = 'You need a free Beauty Bite account to sync designs to the cloud. Your design is safe on this device while you sign in.';
+        el.saveMsg.textContent     = 'You need a free Beauty Bite account to sync designs to the cloud. Your design is safe on this device while you sign in.';
         el.saveConfirm.textContent = 'Log in to save';
         el.saveStatus.textContent  = '';
         el.saveModal.classList.add('visible');
         return;
     }
-    el.saveMsg.textContent = 'Give this design a name so you can find it later from your dashboard.';
+    const nameHint = (state.texts[0] && state.texts[0].text) || (state.logos[0] && state.logos[0].filename) || 'My design';
+    el.saveMsg.textContent     = 'Give this design a name so you can find it later.';
     el.saveConfirm.textContent = 'Save to my dashboard';
-    el.designName.value = (state.brandText || 'My design') + ' · ' + state.color.toUpperCase();
-    el.saveStatus.textContent = '';
+    el.designName.value        = nameHint + ' · ' + state.color.toUpperCase();
+    el.saveStatus.textContent  = '';
     el.saveModal.classList.add('visible');
     setTimeout(() => el.designName.focus(), 50);
 }
-function closeSaveModal () { el.saveModal.classList.remove('visible'); }
-
+function closeSaveModal() { el.saveModal.classList.remove('visible'); }
 el.saveBtn.addEventListener('click', openSaveModal);
 el.saveCancel.addEventListener('click', closeSaveModal);
 el.saveModal.addEventListener('click', (e) => { if (e.target === el.saveModal) closeSaveModal(); });
@@ -1080,95 +1059,75 @@ el.saveModal.addEventListener('click', (e) => { if (e.target === el.saveModal) c
 el.saveConfirm.addEventListener('click', async () => {
     const t = getAuthToken();
     if (!t) {
-        // Stash design so login / register can pick it up
         sessionStorage.setItem('bb_pending_design', JSON.stringify(serializeDesign()));
         window.location.href = '/login?next=' + encodeURIComponent('/design-studio?restore=pending');
         return;
     }
     const name = (el.designName.value || 'My design').slice(0, 60);
     const payload = serializeDesign();
-
-    // Storage safety: if logoDataUrl is huge, strip it to just the filename
-    // so backend storage stays text-only and compact. The device copy keeps the image.
-    let compactLogo = null;
-    if (payload.logoDataUrl && payload.logoDataUrl.length < 48 * 1024) {
-        compactLogo = payload.logoDataUrl; // small enough to store as text
-    }
     const config = {
-        v:         1,
-        color:     payload.color,
-        finish:    payload.finish,
-        brandText: payload.brandText,
-        logoFilename: payload.logoFilename || null,
-        logoDataUrl:  compactLogo,   // null if too large — the filename survives
-        quantity:  payload.quantity
+        v: 2,
+        color: payload.color, finish: payload.finish,
+        texts: payload.texts,
+        logos: payload.logos.map(l => ({
+            id: l.id, filename: l.filename,
+            dataUrl: (l.dataUrl && l.dataUrl.length < 48 * 1024) ? l.dataUrl : null
+        })),
+        quantity: payload.quantity
     };
-
     el.saveStatus.textContent = 'Saving…';
     el.saveConfirm.disabled   = true;
-
     try {
         const res = await fetch('/api/designs', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + t
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t },
             body: JSON.stringify({ name, config })
         });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || ('HTTP ' + res.status));
-        }
-        el.saveStatus.textContent = 'Saved to your dashboard.';
-        el.studioStatus.textContent = 'Saved to your dashboard — view it at /dashboard.';
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'HTTP ' + res.status);
+        el.saveStatus.textContent   = 'Saved to your dashboard.';
+        el.studioStatus.textContent = 'Saved — view it at /dashboard.';
         el.studioStatus.classList.add('ok');
         setTimeout(closeSaveModal, 700);
     } catch (err) {
         el.saveStatus.textContent = 'Save failed — ' + err.message;
-        el.saveConfirm.disabled = false;
+        el.saveConfirm.disabled   = false;
     }
 });
 
-/* ── 7. Restore pending design after login ──────────────────────────── */
-function restorePending () {
+/* ── Restore pending design after login ─────────────────────────────── */
+function restorePending() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('restore') !== 'pending') return;
     const raw = sessionStorage.getItem('bb_pending_design');
     if (!raw) return;
     try {
         const d = JSON.parse(raw);
-        if (d.color)     state.color     = d.color;
-        if (d.finish)    state.finish    = d.finish;
-        if (d.brandText) state.brandText = d.brandText;
-        if (d.logoDataUrl) {
-            state.logoDataUrl  = d.logoDataUrl;
-            state.logoFilename = d.logoFilename;
-        }
+        if (d.color)  state.color  = d.color;
+        if (d.finish) state.finish = d.finish;
+        if (Array.isArray(d.texts)) { state.texts = d.texts; state.nextTextId = d.nextTextId || state.texts.length + 1; }
+        if (Array.isArray(d.logos)) { state.logos = d.logos; state.nextLogoId = d.nextLogoId || state.logos.length + 1; }
         if (d.quantity) state.quantity = Math.max(MIN_QTY, parseInt(d.quantity) || MIN_QTY);
         sessionStorage.removeItem('bb_pending_design');
-        if (getAuthToken()) {
-            setTimeout(openSaveModal, 300);
-        }
+        if (getAuthToken()) setTimeout(openSaveModal, 300);
     } catch (_) {}
 }
 
-/* ── 8. Purchase flow ───────────────────────────────────────────────── */
+/* ── Purchase flow ──────────────────────────────────────────────────── */
 el.purchaseBtn.addEventListener('click', () => {
     if (state.quantity < MIN_QTY) return;
     const cfg = {
         color: state.color, material: state.finish,
-        brandText: state.brandText,
-        logoFile:  state.logoFilename,
+        brandText: state.texts.map(t => t.text).join(', '),
+        logoFile:  state.logos.map(l => l.filename).join(', '),
         quantity:  state.quantity,
         unitPrice: UNIT_PRICE,
         totalPrice: state.quantity * UNIT_PRICE
     };
-    try { if (state.logoDataUrl) sessionStorage.setItem('bb_logo_dataurl', state.logoDataUrl); } catch(_){}
+    try { if (state.logos.length) sessionStorage.setItem('bb_logo_dataurl', state.logos[0].dataUrl); } catch (_) {}
     window.location.href = '/checkout?config=' + encodeURIComponent(JSON.stringify(cfg));
 });
 
-/* ── 9. Boot ────────────────────────────────────────────────────────── */
+/* ── Boot ───────────────────────────────────────────────────────────── */
 restoreLocal();
 restorePending();
 buildFontPicker();
@@ -1176,70 +1135,72 @@ syncAll();
 initViewer();
 
 window.addEventListener('resize', () => {
-    if (!viewer) {
-        BB3D.draw2DGuard(el.viewerCanvas, {
-            bg: '#1B2D3E',
-            color: state.color,
-            label: state.brandText || null
-        });
-    }
+    if (!viewer) BB3D.draw2DGuard(el.viewerCanvas, { bg: '#1B2D3E', color: state.color });
 });
 
-/* ── 10. Transform gizmo ─────────────────────────────────────────────── */
-(function () {
+/* ── Transform gizmo (dynamic — handles created per decal) ──────────── */
+(function() {
     const gizmoLines = $('gizmo-lines');
     const overlay    = $('gizmo-overlay');
 
-    const HANDLES = {
-        label: {
-            tl: $('gh-label-tl'), tr: $('gh-label-tr'),
-            bl: $('gh-label-bl'), br: $('gh-label-br'),
-            rot: $('gh-label-rot')
-        },
-        logo: {
-            tl: $('gh-logo-tl'), tr: $('gh-logo-tr'),
-            bl: $('gh-logo-bl'), br: $('gh-logo-br'),
-            rot: $('gh-logo-rot')
-        }
-    };
+    const gizmoHandles = {};   // decalId → {tl, tr, bl, br, rot}
 
-    function getViewerDecalByType(type) {
-        if (!viewer) return null;
-        const decals = BB3D.getViewerDecals(viewer);
-        return decals.find(d => type === 'label' ? d.userData.isLabelDecal : d.userData.isLogoDecal) || null;
+    function ensureHandles(decalId) {
+        if (gizmoHandles[decalId]) return gizmoHandles[decalId];
+        const handles = {};
+        ['tl', 'tr', 'bl', 'br'].forEach(c => {
+            const h = document.createElement('div');
+            h.className      = 'gizmo-handle ' + c;
+            h.dataset.decalId = decalId;
+            h.dataset.corner  = c;
+            overlay.appendChild(h);
+            handles[c] = h;
+        });
+        const rot = document.createElement('div');
+        rot.className      = 'gizmo-handle rotate';
+        rot.dataset.decalId = decalId;
+        rot.dataset.corner  = 'rot';
+        overlay.appendChild(rot);
+        handles.rot = rot;
+        gizmoHandles[decalId] = handles;
+        ['tl', 'tr', 'bl', 'br', 'rot'].forEach(c => setupHandlePointer(handles[c], decalId, c));
+        return handles;
     }
 
-    function positionHandle(el, x, y) {
-        el.style.left = x + 'px';
-        el.style.top  = y + 'px';
-        el.style.display = 'block';
+    function hideHandlesFor(decalId) {
+        const h = gizmoHandles[decalId];
+        if (h) Object.values(h).forEach(e => { e.style.display = 'none'; });
     }
 
-    function hideHandles(type) {
-        Object.values(HANDLES[type]).forEach(h => { h.style.display = 'none'; });
+    function positionHandle(handleEl, x, y) {
+        handleEl.style.left    = x + 'px';
+        handleEl.style.top     = y + 'px';
+        handleEl.style.display = 'block';
     }
 
     function drawGizmo() {
         const cW = overlay.offsetWidth, cH = overlay.offsetHeight;
         if (gizmoLines.width  !== cW) gizmoLines.width  = cW;
         if (gizmoLines.height !== cH) gizmoLines.height = cH;
-
         const ctx = gizmoLines.getContext('2d');
         ctx.clearRect(0, 0, cW, cH);
+        if (!viewer) return;
 
-        ['label', 'logo'].forEach(type => {
-            const decal = getViewerDecalByType(type);
-            if (!decal) { hideHandles(type); return; }
+        const decals    = BB3D.getViewerDecals(viewer);
+        const activeIds = new Set();
 
+        decals.forEach(decal => {
+            const id = decal.userData && decal.userData.decalId;
+            if (!id) return;
+            activeIds.add(id);
             const b = BB3D.getDecalScreenBounds(viewer, decal);
-            if (!b || (b.maxX - b.minX) < 4 || (b.maxY - b.minY) < 4) { hideHandles(type); return; }
+            if (!b || (b.maxX - b.minX) < 4 || (b.maxY - b.minY) < 4) { hideHandlesFor(id); return; }
 
+            const handles = ensureHandles(id);
             const pad = 7;
             const x1 = b.minX - pad, y1 = b.minY - pad;
             const x2 = b.maxX + pad, y2 = b.maxY + pad;
-            const mx = (x1 + x2) / 2;
 
-            // Dashed border
             ctx.save();
             ctx.strokeStyle = 'rgba(255,255,255,0.80)';
             ctx.lineWidth   = 1.5;
@@ -1247,95 +1208,76 @@ window.addEventListener('resize', () => {
             ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
             ctx.restore();
 
-            // Line to rotation handle
             ctx.save();
             ctx.strokeStyle = 'rgba(255,255,255,0.60)';
             ctx.lineWidth   = 1.5;
             ctx.setLineDash([3, 3]);
             ctx.beginPath();
-            ctx.moveTo(mx, y1);
+            ctx.moveTo((x1 + x2) / 2, y1);
             ctx.lineTo(b.rotX, b.rotY);
             ctx.stroke();
             ctx.restore();
 
-            // Position corner handles
-            positionHandle(HANDLES[type].tl, x1, y1);
-            positionHandle(HANDLES[type].tr, x2, y1);
-            positionHandle(HANDLES[type].bl, x1, y2);
-            positionHandle(HANDLES[type].br, x2, y2);
-            positionHandle(HANDLES[type].rot, b.rotX, b.rotY);
+            positionHandle(handles.tl,  x1, y1);
+            positionHandle(handles.tr,  x2, y1);
+            positionHandle(handles.bl,  x1, y2);
+            positionHandle(handles.br,  x2, y2);
+            positionHandle(handles.rot, b.rotX, b.rotY);
         });
+
+        Object.keys(gizmoHandles).forEach(id => { if (!activeIds.has(id)) hideHandlesFor(id); });
     }
 
-    // Run the gizmo draw in sync with the 3D loop
     (function gizmoLoop() { drawGizmo(); requestAnimationFrame(gizmoLoop); })();
 
-    // ── Handle interactions ──────────────────────────────────────────
-    // corner drag  → scale
-    // rotate drag  → rotate around surface normal
-    let gizmoOp = null; // { type, corner, decal, startDist/startAngle, startPos }
+    let gizmoOp = null;
 
-    function handleCenter(type) {
-        const b = BB3D.getDecalScreenBounds(viewer, getViewerDecalByType(type));
-        if (!b) return { x: 0, y: 0 };
-        return { x: (b.minX + b.maxX) / 2 + overlay.getBoundingClientRect().left,
-                 y: (b.minY + b.maxY) / 2 + overlay.getBoundingClientRect().top };
+    function getDecalById(decalId) {
+        if (!viewer) return null;
+        return BB3D.getViewerDecals(viewer).find(d => d.userData && d.userData.decalId === decalId) || null;
     }
 
-    function setupHandlePointer(handleEl, type, corner) {
+    function setupHandlePointer(handleEl, decalId, corner) {
         handleEl.addEventListener('pointerdown', (e) => {
             if (!viewer) return;
             e.stopPropagation();
-            const decal = getViewerDecalByType(type);
+            const decal = getDecalById(decalId);
             if (!decal) return;
             handleEl.setPointerCapture(e.pointerId);
-
             const rect = overlay.getBoundingClientRect();
-            const cx   = (BB3D.getDecalScreenBounds(viewer, decal).minX + BB3D.getDecalScreenBounds(viewer, decal).maxX) / 2;
-            const cy   = (BB3D.getDecalScreenBounds(viewer, decal).minY + BB3D.getDecalScreenBounds(viewer, decal).maxY) / 2;
-            const px   = e.clientX - rect.left;
-            const py   = e.clientY - rect.top;
-
+            const b    = BB3D.getDecalScreenBounds(viewer, decal);
+            if (!b) return;
+            const cx = (b.minX + b.maxX) / 2;
+            const cy = (b.minY + b.maxY) / 2;
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
             if (corner === 'rot') {
-                gizmoOp = {
-                    type, corner, decal,
-                    startAngle: Math.atan2(py - cy, px - cx),
-                    cx, cy
-                };
+                gizmoOp = { decalId, corner, decal, startAngle: Math.atan2(py - cy, px - cx), cx, cy };
             } else {
-                const startDist = Math.hypot(px - cx, py - cy);
-                gizmoOp = { type, corner, decal, startDist, cx, cy };
+                gizmoOp = { decalId, corner, decal, startDist: Math.hypot(px - cx, py - cy), cx, cy };
             }
         });
     }
-
-    ['label', 'logo'].forEach(type => {
-        ['tl', 'tr', 'bl', 'br', 'rot'].forEach(corner => {
-            setupHandlePointer(HANDLES[type][corner], type, corner);
-        });
-    });
 
     document.addEventListener('pointermove', (e) => {
         if (!gizmoOp) return;
         const rect  = overlay.getBoundingClientRect();
         const px    = e.clientX - rect.left;
         const py    = e.clientY - rect.top;
-        const decal = gizmoOp.decal;
-
+        const decal = getDecalById(gizmoOp.decalId) || gizmoOp.decal;
+        if (!decal) return;
         if (gizmoOp.corner === 'rot') {
-            const currAngle = Math.atan2(py - gizmoOp.cy, px - gizmoOp.cx);
-            const delta     = currAngle - gizmoOp.startAngle;
-            BB3D.rotateDecalBy(viewer, decal, delta);
-            gizmoOp.startAngle = currAngle;
+            const curr = Math.atan2(py - gizmoOp.cy, px - gizmoOp.cx);
+            BB3D.rotateDecalBy(viewer, decal, curr - gizmoOp.startAngle);
+            gizmoOp.startAngle = curr;
         } else {
             const dist   = Math.hypot(px - gizmoOp.cx, py - gizmoOp.cy);
-            const factor = dist / Math.max(gizmoOp.startDist, 1);
-            BB3D.scaleDecalBy(viewer, decal, factor);
+            BB3D.scaleDecalBy(viewer, decal, dist / Math.max(gizmoOp.startDist, 1));
             gizmoOp.startDist = dist;
         }
     });
 
-    document.addEventListener('pointerup', () => { gizmoOp = null; });
+    document.addEventListener('pointerup',     () => { gizmoOp = null; });
     document.addEventListener('pointercancel', () => { gizmoOp = null; });
 })();
 </script>
